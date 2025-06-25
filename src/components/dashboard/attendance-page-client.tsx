@@ -40,8 +40,17 @@ export function AttendancePageClient() {
   const [date, setDate] = React.useState<Date | undefined>(undefined);
 
   React.useEffect(() => {
-    const recordsFromStorage = getAttendanceRecords();
-    setAllRecords(recordsFromStorage);
+    const loadRecords = () => {
+      setAllRecords(getAttendanceRecords());
+    };
+    
+    loadRecords();
+
+    window.addEventListener('local-storage', loadRecords);
+
+    return () => {
+        window.removeEventListener('local-storage', loadRecords);
+    }
   }, []);
 
   React.useEffect(() => {

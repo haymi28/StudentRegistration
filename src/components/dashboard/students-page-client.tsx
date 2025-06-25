@@ -54,9 +54,17 @@ export function StudentsPageClient() {
   const [searchTerm, setSearchTerm] = React.useState("");
 
   React.useEffect(() => {
-    const studentsFromStorage = getStudents();
-    setAllStudents(studentsFromStorage);
-    setStudents(studentsFromStorage);
+    const loadStudents = () => {
+      setAllStudents(getStudents());
+    };
+
+    loadStudents(); // Initial load
+
+    window.addEventListener("local-storage", loadStudents);
+
+    return () => {
+      window.removeEventListener("local-storage", loadStudents);
+    };
   }, []);
 
   React.useEffect(() => {

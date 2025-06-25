@@ -120,6 +120,7 @@ export const addStudent = (student: Student) => {
     students.push(student);
     try {
         window.localStorage.setItem('students', JSON.stringify(students));
+        window.dispatchEvent(new Event("local-storage"));
     } catch (error) {
         console.error("Error writing students to localStorage", error);
     }
@@ -148,6 +149,7 @@ export const addAttendanceRecord = (record: AttendanceRecord) => {
     records.unshift(record);
     try {
         window.localStorage.setItem('attendanceRecords', JSON.stringify(records));
+        window.dispatchEvent(new Event("local-storage"));
     } catch (error) {
         console.error("Error writing attendance records to localStorage", error);
     }
