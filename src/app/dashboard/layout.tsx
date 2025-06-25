@@ -93,11 +93,13 @@ export default function DashboardLayout({
 }
 
 function ButtonLink({ href, children }: { href: string; children: React.ReactNode }) {
+    const tooltipText = (React.Children.toArray(children) as React.ReactElement[]).find(
+        (child) => child.type === 'span'
+    )?.props.children;
+
     return (
-        <Link href={href} passHref legacyBehavior>
-            <SidebarMenuButton asChild tooltip={children.toString()}>
-                {children}
-            </SidebarMenuButton>
-        </Link>
+        <SidebarMenuButton asChild tooltip={tooltipText}>
+            <Link href={href}>{children}</Link>
+        </SidebarMenuButton>
     )
 }
