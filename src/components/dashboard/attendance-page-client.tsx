@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search } from "lucide-react";
+import { Calendar as CalendarIcon, Search, FileSpreadsheet } from "lucide-react";
+import * as XLSX from 'xlsx';
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import type { AttendanceRecord, Student } from "@/lib/types";
 import { getAttendanceRecords, getStudents } from "@/lib/data";
@@ -46,6 +54,7 @@ export function AttendancePageClient() {
   const [records, setRecords] = React.useState<DailyAttendanceRecord[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [date, setDate] = React.useState<Date>(new Date());
+  const [statusFilter, setStatusFilter] = React.useState<'All' | 'Present' | 'Absent'>('All');
 
   React.useEffect(() => {
     const loadData = () => {
@@ -88,6 +97,10 @@ export function AttendancePageClient() {
       }
     });
 
+    if (statusFilter !== 'All') {
+        dailyRecords = dailyRecords.filter(record => record.status === statusFilter);
+    }
+
     if (searchTerm) {
       dailyRecords = dailyRecords.filter(
         (record) =>
@@ -97,7 +110,34 @@ export function AttendancePageClient() {
     }
 
     setRecords(dailyRecords);
-  }, [searchTerm, date, allStudents, allRecords]);
+  }, [searchTerm, date, allStudents, allRecords, statusFilter]);
+
+  const handleExport = () => {
+    const dataToExport = records.map(record => ({
+      'Student ID': record.studentId,
+      'Full Name': record.studentName,
+      'Status': record.status,
+      'Check-in Time': record.checkInTime ? format(record.checkInTime, 'p') : 'N/A',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+
+    // Manually set headers because json_to_sheet doesn't guarantee order and styling
+    XLSX.utils.sheet_add_aoa(worksheet, [['Student ID', 'Full Name', 'Status', 'Check-in Time']], { origin: 'A1' });
+
+    // Adjust column widths
+    worksheet['!cols'] = [
+        { wch: 15 }, // Student ID
+        { wch: 25 }, // Full Name
+        { wch: 10 }, // Status
+        { wch: 20 }, // Check-in Time
+    ];
+
+    const today = format(date, 'yyyy-MM-dd');
+    XLSX.writeFile(workbook, `Attendance-${today}.xlsx`);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -110,40 +150,56 @@ export function AttendancePageClient() {
           <CardDescription>
             View attendance status for all students on a selected date. Defaults to today.
           </CardDescription>
-          <div className="flex flex-col md:flex-row gap-4 pt-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search by name or ID..."
-                className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-             <Popover>
-                <PopoverTrigger asChild>
-                <Button
-                    variant={"outline"}
-                    className={cn(
-                    "w-full md:w-[280px] justify-start text-left font-normal"
-                    )}
-                >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(date, "PPP")}
-                </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={(d) => d && setDate(d)}
-                    initialFocus
+          <div className="flex flex-col sm:flex-row items-center gap-2 pt-4">
+            <div className="relative flex-1 w-full">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                    type="search"
+                    placeholder="Search by name or ID..."
+                    className="w-full appearance-none bg-background pl-8 shadow-none"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                </PopoverContent>
-            </Popover>
-            { searchTerm && <Button variant="outline" onClick={() => setSearchTerm("")}>Clear Search</Button> }
+            </div>
+            <div className="flex gap-2 w-full sm:w-auto">
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <Button
+                        variant={"outline"}
+                        className={cn(
+                        "w-full sm:w-[240px] justify-start text-left font-normal"
+                        )}
+                    >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {format(date, "PPP")}
+                    </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(d) => d && setDate(d)}
+                        initialFocus
+                    />
+                    </PopoverContent>
+                </Popover>
+                 <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
+                    <SelectTrigger className="w-full sm:w-[150px]">
+                        <SelectValue placeholder="Filter status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="All">All Statuses</SelectItem>
+                        <SelectItem value="Present">Present</SelectItem>
+                        <SelectItem value="Absent">Absent</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Button onClick={handleExport} variant="outline" size="icon" className="w-full sm:w-auto">
+                    <FileSpreadsheet className="h-4 w-4" />
+                    <span className="sr-only">Export</span>
+                </Button>
+            </div>
           </div>
+          { searchTerm && <Button variant="outline" onClick={() => setSearchTerm("")} className="mt-2 w-full sm:max-w-xs">Clear Search</Button> }
         </CardHeader>
         <CardContent>
           <Table>
@@ -163,7 +219,9 @@ export function AttendancePageClient() {
                   </TableCell>
                   <TableCell className="font-medium">{record.studentName}</TableCell>
                    <TableCell>
-                    <Badge variant={record.status === 'Present' ? 'default' : 'secondary'}>
+                    <Badge variant={record.status === 'Absent' ? 'destructive' : 'default'} className={cn(
+                        record.status === 'Present' && 'bg-green-600 hover:bg-green-600/90'
+                    )}>
                       {record.status}
                     </Badge>
                   </TableCell>
