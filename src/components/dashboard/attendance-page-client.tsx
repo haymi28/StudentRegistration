@@ -30,48 +30,74 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-import type { AttendanceRecord } from "@/lib/types";
-import { getAttendanceRecords } from "@/lib/data";
+import type { AttendanceRecord, Student } from "@/lib/types";
+import { getAttendanceRecords, getStudents } from "@/lib/data";
+
+interface DailyAttendanceRecord {
+  studentId: string;
+  studentName: string;
+  status: 'Present' | 'Absent';
+  checkInTime: Date | null;
+}
 
 export function AttendancePageClient() {
+  const [allStudents, setAllStudents] = React.useState<Student[]>([]);
   const [allRecords, setAllRecords] = React.useState<AttendanceRecord[]>([]);
-  const [records, setRecords] = React.useState<AttendanceRecord[]>([]);
+  const [records, setRecords] = React.useState<DailyAttendanceRecord[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [date, setDate] = React.useState<Date>(new Date());
 
   React.useEffect(() => {
-    const loadRecords = () => {
+    const loadData = () => {
+      setAllStudents(getStudents());
       setAllRecords(getAttendanceRecords());
     };
     
-    loadRecords();
+    loadData();
 
-    window.addEventListener('local-storage', loadRecords);
+    window.addEventListener('local-storage', loadData);
 
     return () => {
-        window.removeEventListener('local-storage', loadRecords);
+        window.removeEventListener('local-storage', loadData);
     }
   }, []);
 
   React.useEffect(() => {
-    let filteredRecords = [...allRecords];
+    const checkInsForDate = allRecords.filter(
+      (record) => format(record.checkInTime, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+    );
+    const checkedInStudentIds = new Set(checkInsForDate.map(r => r.studentId));
+
+    let dailyRecords: DailyAttendanceRecord[] = allStudents.map(student => {
+      const isPresent = checkedInStudentIds.has(student.id);
+      if (isPresent) {
+        const record = checkInsForDate.find(r => r.studentId === student.id)!;
+        return {
+          studentId: student.id,
+          studentName: student.fullName,
+          status: 'Present',
+          checkInTime: record.checkInTime,
+        };
+      } else {
+        return {
+          studentId: student.id,
+          studentName: student.fullName,
+          status: 'Absent',
+          checkInTime: null,
+        };
+      }
+    });
 
     if (searchTerm) {
-      filteredRecords = filteredRecords.filter(
+      dailyRecords = dailyRecords.filter(
         (record) =>
           record.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           record.studentId.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    if (date) {
-        filteredRecords = filteredRecords.filter(
-            (record) => format(record.checkInTime, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
-        );
-    }
-
-    setRecords(filteredRecords);
-  }, [searchTerm, date, allRecords]);
+    setRecords(dailyRecords);
+  }, [searchTerm, date, allStudents, allRecords]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -80,9 +106,9 @@ export function AttendancePageClient() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Attendance Log</CardTitle>
+          <CardTitle>Daily Attendance Status</CardTitle>
           <CardDescription>
-            View and filter attendance records by student or date.
+            View attendance status for all students on a selected date. Defaults to today.
           </CardDescription>
           <div className="flex flex-col md:flex-row gap-4 pt-4">
             <div className="relative flex-1">
@@ -100,24 +126,23 @@ export function AttendancePageClient() {
                 <Button
                     variant={"outline"}
                     className={cn(
-                    "w-full md:w-[280px] justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
+                    "w-full md:w-[280px] justify-start text-left font-normal"
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>Filter by date</span>}
+                    {format(date, "PPP")}
                 </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
                 <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
+                    onSelect={(d) => d && setDate(d)}
                     initialFocus
                 />
                 </PopoverContent>
             </Popover>
-            { (date || searchTerm) && <Button onClick={() => { setDate(undefined); setSearchTerm(""); }}>Clear Filters</Button> }
+            { searchTerm && <Button variant="outline" onClick={() => setSearchTerm("")}>Clear Search</Button> }
           </div>
         </CardHeader>
         <CardContent>
@@ -126,19 +151,25 @@ export function AttendancePageClient() {
               <TableRow>
                 <TableHead>Student ID</TableHead>
                 <TableHead>Full Name</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Check-in Time</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {records.map((record) => (
-                <TableRow key={record.id}>
+                <TableRow key={record.studentId}>
                   <TableCell>
                     <Badge variant="outline">{record.studentId}</Badge>
                   </TableCell>
                   <TableCell className="font-medium">{record.studentName}</TableCell>
-                  <TableCell>{format(record.checkInTime, 'PPP')}</TableCell>
-                  <TableCell>{format(record.checkInTime, 'p')}</TableCell>
+                   <TableCell>
+                    <Badge variant={record.status === 'Present' ? 'default' : 'secondary'}>
+                      {record.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {record.checkInTime ? format(record.checkInTime, 'p') : 'N/A'}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
