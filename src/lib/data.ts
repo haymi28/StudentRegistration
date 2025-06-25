@@ -109,22 +109,55 @@ export const getStudents = (): Student[] => {
     }
 }
 
-export const addStudent = (student: Student) => {
-    if (isServer) return;
+export const addStudent = (student: Student): boolean => {
+    if (isServer) return false;
     const students = getStudents();
-    const studentExists = students.some(s => s.id === student.id);
+    const studentExists = students.some(s => s.id.toLowerCase() === student.id.toLowerCase());
     if (studentExists) {
         console.warn(`Student with ID ${student.id} already exists.`);
-        return;
+        return false;
     }
     students.push(student);
     try {
         window.localStorage.setItem('students', JSON.stringify(students));
         window.dispatchEvent(new Event("local-storage"));
+        return true;
     } catch (error) {
         console.error("Error writing students to localStorage", error);
+        return false;
     }
 }
+
+export const getStudentById = (id: string): Student | undefined => {
+    if (isServer) return undefined;
+    const students = getStudents();
+    return students.find(s => s.id === id);
+}
+
+export const updateStudent = (updatedStudent: Student) => {
+    if (isServer) return;
+    let students = getStudents();
+    students = students.map(s => s.id === updatedStudent.id ? updatedStudent : s);
+    try {
+        window.localStorage.setItem('students', JSON.stringify(students));
+        window.dispatchEvent(new Event("local-storage"));
+    } catch (error) {
+        console.error("Error updating students in localStorage", error);
+    }
+}
+
+export const deleteStudent = (studentId: string) => {
+    if (isServer) return;
+    let students = getStudents();
+    students = students.filter(s => s.id !== studentId);
+    try {
+        window.localStorage.setItem('students', JSON.stringify(students));
+        window.dispatchEvent(new Event("local-storage"));
+    } catch (error) {
+        console.error("Error deleting student from localStorage", error);
+    }
+}
+
 
 export const getAttendanceRecords = (): AttendanceRecord[] => {
     if (isServer) return [...defaultAttendanceRecords];

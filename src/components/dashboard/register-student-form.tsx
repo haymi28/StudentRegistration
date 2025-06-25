@@ -59,8 +59,8 @@ export function RegisterStudentForm() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        addStudent({
-            id: values.studentId,
+        const success = addStudent({
+            id: values.studentId.toUpperCase(),
             fullName: values.fullName,
             christianName: values.christianName,
             dob: values.dob,
@@ -69,11 +69,24 @@ export function RegisterStudentForm() {
             motherPhone: values.motherPhone,
             joiningDate: values.joiningDate,
         })
-        toast({
-            title: "Student Registered!",
-            description: `${values.fullName} has been added to the system.`,
-        })
-        router.push("/dashboard/students")
+        
+        if (success) {
+            toast({
+                title: "Student Registered!",
+                description: `${values.fullName} has been added to the system.`,
+            })
+            router.push("/dashboard/students")
+        } else {
+             form.setError("studentId", {
+                type: "manual",
+                message: "This Student ID already exists. Please use a unique ID.",
+            });
+            toast({
+                variant: "destructive",
+                title: "Registration Failed",
+                description: `A student with ID ${values.studentId.toUpperCase()} already exists.`,
+            })
+        }
     }
 
     return (
@@ -159,7 +172,7 @@ export function RegisterStudentForm() {
                                 <FormItem>
                                 <FormLabel>Student ID</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="STU005" {...field} />
+                                    <Input placeholder="STU005" {...field} onInput={(e) => (e.currentTarget.value = e.currentTarget.value.toUpperCase())} />
                                 </FormControl>
                                 <FormDescription>Must be a unique ID.</FormDescription>
                                 <FormMessage />
