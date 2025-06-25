@@ -31,15 +31,21 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 import type { AttendanceRecord } from "@/lib/types";
-import { attendanceRecords as allRecords } from "@/lib/data";
+import { getAttendanceRecords } from "@/lib/data";
 
 export function AttendancePageClient() {
-  const [records, setRecords] = React.useState<AttendanceRecord[]>(allRecords);
+  const [allRecords, setAllRecords] = React.useState<AttendanceRecord[]>([]);
+  const [records, setRecords] = React.useState<AttendanceRecord[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [date, setDate] = React.useState<Date | undefined>(undefined);
 
   React.useEffect(() => {
-    let filteredRecords = allRecords;
+    const recordsFromStorage = getAttendanceRecords();
+    setAllRecords(recordsFromStorage);
+  }, []);
+
+  React.useEffect(() => {
+    let filteredRecords = [...allRecords];
 
     if (searchTerm) {
       filteredRecords = filteredRecords.filter(
@@ -56,7 +62,7 @@ export function AttendancePageClient() {
     }
 
     setRecords(filteredRecords);
-  }, [searchTerm, date]);
+  }, [searchTerm, date, allRecords]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -69,7 +75,7 @@ export function AttendancePageClient() {
           <CardDescription>
             View and filter attendance records by student or date.
           </CardDescription>
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-4 pt-4">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -85,7 +91,7 @@ export function AttendancePageClient() {
                 <Button
                     variant={"outline"}
                     className={cn(
-                    "w-[280px] justify-start text-left font-normal",
+                    "w-full md:w-[280px] justify-start text-left font-normal",
                     !date && "text-muted-foreground"
                     )}
                 >

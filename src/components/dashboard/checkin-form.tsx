@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, AlertTriangle, UserCheck } from 'lucide-react';
-import { students } from '@/lib/data';
+import { getStudents, addAttendanceRecord } from '@/lib/data';
 
 export function CheckInForm() {
   const [studentId, setStudentId] = useState('');
@@ -15,10 +15,17 @@ export function CheckInForm() {
 
   const handleCheckIn = (e: React.FormEvent) => {
     e.preventDefault();
+    const students = getStudents();
     const student = students.find(s => s.id.toLowerCase() === studentId.toLowerCase());
     
     if (student) {
       const now = new Date();
+      addAttendanceRecord({
+        id: `ATT-${Date.now()}`,
+        studentId: student.id,
+        studentName: student.fullName,
+        checkInTime: now,
+      });
       setFeedback({ 
         type: 'success', 
         message: `Successfully checked in.`,

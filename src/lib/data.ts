@@ -1,6 +1,6 @@
 import type { Student, AttendanceRecord } from './types';
 
-export const students: Student[] = [
+const defaultStudents: Student[] = [
   {
     id: 'STU001',
     fullName: 'John Doe',
@@ -43,7 +43,7 @@ export const students: Student[] = [
   },
 ];
 
-export const attendanceRecords: AttendanceRecord[] = [
+const defaultAttendanceRecords: AttendanceRecord[] = [
   {
     id: 'ATT001',
     studentId: 'STU001',
@@ -75,3 +75,80 @@ export const attendanceRecords: AttendanceRecord[] = [
     checkInTime: new Date('2024-07-20T09:01:30'),
   },
 ];
+
+const isServer = typeof window === 'undefined';
+
+const studentReviver = (key: string, value: any) => {
+    if (key === 'dob' || key === 'joiningDate') {
+        return new Date(value);
+    }
+    return value;
+};
+
+const attendanceReviver = (key: string, value: any) => {
+    if (key === 'checkInTime') {
+        return new Date(value);
+    }
+    return value;
+};
+
+export const getStudents = (): Student[] => {
+    if (isServer) return [...defaultStudents];
+    try {
+        const item = window.localStorage.getItem('students');
+        if (item) {
+            return JSON.parse(item, studentReviver);
+        } else {
+            const students = [...defaultStudents];
+            window.localStorage.setItem('students', JSON.stringify(students));
+            return students;
+        }
+    } catch (error) {
+        console.error("Error with localStorage 'students'", error);
+        return [...defaultStudents];
+    }
+}
+
+export const addStudent = (student: Student) => {
+    if (isServer) return;
+    const students = getStudents();
+    const studentExists = students.some(s => s.id === student.id);
+    if (studentExists) {
+        console.warn(`Student with ID ${student.id} already exists.`);
+        return;
+    }
+    students.push(student);
+    try {
+        window.localStorage.setItem('students', JSON.stringify(students));
+    } catch (error) {
+        console.error("Error writing students to localStorage", error);
+    }
+}
+
+export const getAttendanceRecords = (): AttendanceRecord[] => {
+    if (isServer) return [...defaultAttendanceRecords];
+    try {
+        const item = window.localStorage.getItem('attendanceRecords');
+        if (item) {
+            return JSON.parse(item, attendanceReviver);
+        } else {
+            const records = [...defaultAttendanceRecords];
+            window.localStorage.setItem('attendanceRecords', JSON.stringify(records));
+            return records;
+        }
+    } catch (error) {
+        console.error("Error with localStorage 'attendanceRecords'", error);
+        return [...defaultAttendanceRecords];
+    }
+}
+
+export const addAttendanceRecord = (record: AttendanceRecord) => {
+    if (isServer) return;
+    const records = getAttendanceRecords();
+    records.unshift(record);
+    try {
+        window.localStorage.setItem('attendanceRecords', JSON.stringify(records));
+    } catch (error) {
+        console.error("Error writing attendance records to localStorage", error);
+    }
+}

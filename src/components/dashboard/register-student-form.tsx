@@ -23,6 +23,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { addStudent } from "@/lib/data"
 
 const formSchema = z.object({
   studentId: z.string().min(2, {
@@ -58,7 +59,16 @@ export function RegisterStudentForm() {
     })
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
+        addStudent({
+            id: values.studentId,
+            fullName: values.fullName,
+            christianName: values.christianName,
+            dob: values.dob,
+            address: values.address,
+            fatherPhone: values.fatherPhone,
+            motherPhone: values.motherPhone,
+            joiningDate: values.joiningDate,
+        })
         toast({
             title: "Student Registered!",
             description: `${values.fullName} has been added to the system.`,

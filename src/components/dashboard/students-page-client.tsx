@@ -46,11 +46,18 @@ import {
 import { Label } from "@/components/ui/label";
 
 import type { Student } from "@/lib/types";
-import { students as allStudents } from "@/lib/data";
+import { getStudents } from "@/lib/data";
 
 export function StudentsPageClient() {
-  const [students, setStudents] = React.useState<Student[]>(allStudents);
+  const [allStudents, setAllStudents] = React.useState<Student[]>([]);
+  const [students, setStudents] = React.useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
+
+  React.useEffect(() => {
+    const studentsFromStorage = getStudents();
+    setAllStudents(studentsFromStorage);
+    setStudents(studentsFromStorage);
+  }, []);
 
   React.useEffect(() => {
     const filteredStudents = allStudents.filter(
@@ -59,7 +66,7 @@ export function StudentsPageClient() {
         student.id.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setStudents(filteredStudents);
-  }, [searchTerm]);
+  }, [searchTerm, allStudents]);
 
   return (
     <div className="flex flex-col gap-6">
