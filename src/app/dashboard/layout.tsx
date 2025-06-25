@@ -1,4 +1,7 @@
+"use client";
+
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Sidebar,
   SidebarContent,
@@ -17,7 +20,6 @@ import {
   ClipboardList,
   BookMarked,
 } from 'lucide-react';
-import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/logout-button';
 
@@ -26,36 +28,38 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+
   return (
     <SidebarProvider>
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
-            <ButtonLink href="/dashboard">
-              <BookMarked className="text-sidebar-primary" />
-              <span className="font-headline font-semibold text-lg text-sidebar-primary">Academia</span>
-            </ButtonLink>
+            <SidebarMenuButton tooltip="Academia" onClick={() => router.push('/dashboard')}>
+                <BookMarked className="text-sidebar-primary" />
+                <span className="font-headline font-semibold text-lg text-sidebar-primary">Academia</span>
+            </SidebarMenuButton>
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <ButtonLink href="/dashboard">
+              <SidebarMenuButton tooltip="Check-In" onClick={() => router.push('/dashboard')}>
                 <LayoutDashboard />
                 <span>Check-In</span>
-              </ButtonLink>
+              </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <ButtonLink href="/dashboard/students">
-                <Users />
-                <span>Students</span>
-              </ButtonLink>
+                <SidebarMenuButton tooltip="Students" onClick={() => router.push('/dashboard/students')}>
+                    <Users />
+                    <span>Students</span>
+                </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <ButtonLink href="/dashboard/attendance">
-                <ClipboardList />
-                <span>Attendance</span>
-              </ButtonLink>
+                <SidebarMenuButton tooltip="Attendance" onClick={() => router.push('/dashboard/attendance')}>
+                    <ClipboardList />
+                    <span>Attendance</span>
+                </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
@@ -90,16 +94,4 @@ export default function DashboardLayout({
       </SidebarInset>
     </SidebarProvider>
   );
-}
-
-function ButtonLink({ href, children }: { href: string; children: React.ReactNode }) {
-    const tooltipText = (React.Children.toArray(children) as React.ReactElement[]).find(
-        (child) => child.type === 'span'
-    )?.props.children;
-
-    return (
-        <SidebarMenuButton asChild tooltip={tooltipText}>
-            <Link href={href}>{children}</Link>
-        </SidebarMenuButton>
-    )
 }
