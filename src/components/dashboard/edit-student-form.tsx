@@ -25,14 +25,14 @@ import { getStudentById, updateStudent } from "@/lib/data"
 import type { Student, Role } from "@/lib/types"
 
 const formSchema = z.object({
-  fullName: z.string().min(2, "Full name is required."),
-  christianName: z.string().min(2, "Christian name is required."),
-  educationLevel: z.string().min(1, "Education level is required."),
-  dob: z.date({ required_error: "A date of birth is required." }),
-  address: z.string().min(5, "Address is required."),
-  fatherPhone: z.string().min(10, "A valid phone number is required."),
-  motherPhone: z.string().min(10, "A valid phone number is required."),
-  joiningDate: z.date({ required_error: "A joining date is required." }),
+  fullName: z.string().min(2, "ሙሉ ስም ያስፈልጋል።"),
+  christianName: z.string().min(2, "የክርስትና ስም ያስፈልጋል።"),
+  educationLevel: z.string().min(1, "የትምህርት ደረጃ ያስፈልጋል።"),
+  dob: z.date({ required_error: "የትውልድ ቀን ያስፈልጋል።" }),
+  address: z.string().min(5, "አድራሻ ያስፈልጋል።"),
+  fatherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
+  motherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
+  joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
   role: z.enum(["children", "juniors", "seniors"]),
   photo: z.any().optional(),
 })
@@ -40,7 +40,7 @@ const formSchema = z.object({
 export function EditStudentForm({ studentId }: { studentId: string }) {
     const router = useRouter()
     const { toast } = useToast()
-    const { role: adminRole, isLoading } = useAuth()
+    const { isLoading } = useAuth()
     const [student, setStudent] = React.useState<Student | null | undefined>(undefined)
     const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
 
@@ -93,8 +93,8 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                 console.error("Error reading file:", error);
                 toast({
                     variant: "destructive",
-                    title: "Image Upload Failed",
-                    description: "There was an error processing the image file.",
+                    title: "ምስል መስቀል አልተሳካም።",
+                    description: "የምስል ፋይሉን በማዘጋጀት ላይ ስህተት ነበር።",
                 });
                 return;
             }
@@ -106,8 +106,8 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
             photoUrl: photoUrl,
         });
         toast({
-            title: "Student Updated!",
-            description: `${values.fullName}'s information has been updated.`,
+            title: "የተማሪ መረጃ ተዘምኗል!",
+            description: `የ${values.fullName} መረጃ ተዘምኗል።`,
         })
         router.push("/dashboard/students")
     }
@@ -120,11 +120,11 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         return (
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
-                    <CardTitle className="font-headline text-2xl">Student Not Found</CardTitle>
-                    <CardDescription>The student you are trying to edit does not exist or you do not have permission.</CardDescription>
+                    <CardTitle className="font-headline text-2xl">ተማሪ አልተገኘም</CardTitle>
+                    <CardDescription>ለማርትዕ የሞከሩት ተማሪ የለም።</CardDescription>
                 </CardHeader>
                 <CardFooter>
-                    <Button variant="outline" onClick={() => router.back()}>Go Back</Button>
+                    <Button variant="outline" onClick={() => router.back()}>ተመለስ</Button>
                 </CardFooter>
             </Card>
         )
@@ -133,35 +133,35 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     return (
         <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">Edit Student Information</CardTitle>
-                <CardDescription>Update the details for {student.fullName}.</CardDescription>
+                <CardTitle className="font-headline text-2xl">የተማሪ መረጃ ያርትዑ</CardTitle>
+                <CardDescription>የ{student.fullName} ዝርዝሮችን ያዘምኑ።</CardDescription>
             </CardHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <CardContent className="space-y-6">
                         <div>
-                            <Label>Student ID</Label>
+                            <Label>የተማሪ መለያ</Label>
                             <Input value={student.id} readOnly disabled className="mt-2" />
-                            <FormDescription className="mt-2">The student ID cannot be changed.</FormDescription>
+                            <FormDescription className="mt-2">የተማሪው መለያ ሊቀየር አይችልም።</FormDescription>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField control={form.control} name="fullName" render={({ field }) => ( <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="christianName" render={({ field }) => ( <FormItem><FormLabel>Christian Name</FormLabel><FormControl><Input placeholder="John" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="educationLevel" render={({ field }) => ( <FormItem><FormLabel>Education Level</FormLabel><FormControl><Input placeholder="e.g. Grade 5" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Date of birth</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Date of Joining</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="fullName" render={({ field }) => ( <FormItem><FormLabel>ሙሉ ስም</FormLabel><FormControl><Input placeholder="እከሌ እከሌ" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="christianName" render={({ field }) => ( <FormItem><FormLabel>የክርስትና ስም</FormLabel><FormControl><Input placeholder="ዮሐንስ" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="educationLevel" render={({ field }) => ( <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የተቀላቀለበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="role" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Role</FormLabel>
+                                    <FormLabel>ሚና</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="Select a role" /></SelectTrigger></FormControl>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="ሚና ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            <SelectItem value="children">Children</SelectItem>
-                                            <SelectItem value="juniors">Juniors</SelectItem>
-                                            <SelectItem value="seniors">Seniors</SelectItem>
+                                            <SelectItem value="children">ህፃናት</SelectItem>
+                                            <SelectItem value="juniors">ወጣቶች</SelectItem>
+                                            <SelectItem value="seniors">አዋቂዎች</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <FormDescription>Transfer the student to a different group.</FormDescription>
+                                    <FormDescription>ተማሪውን ወደ ሌላ ቡድን ያስተላልፉ።</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )} />
@@ -170,7 +170,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                 name="photo"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Student Photo</FormLabel>
+                                        <FormLabel>የተማሪ ፎቶ</FormLabel>
                                         <FormControl>
                                         <Input
                                             type="file"
@@ -191,7 +191,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                         />
                                         </FormControl>
                                         <FormDescription>
-                                        Optional. Upload a new photo to replace the current one.
+                                        አማራጭ። የአሁኑን ለመተካት አዲስ ፎቶ ይስቀሉ።
                                         </FormDescription>
                                         {photoPreview && (
                                         <div className="mt-4">
@@ -209,14 +209,14 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                     </FormItem>
                                 )}
                             />
-                            <FormField control={form.control} name="address" render={({ field }) => ( <FormItem className="md:col-span-2"><FormLabel>Address</FormLabel><FormControl><Input placeholder="123 Main St, Anytown" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>Father's Phone</FormLabel><FormControl><Input type="tel" placeholder="123-456-7890" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>Mother's Phone</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="address" render={({ field }) => ( <FormItem className="md:col-span-2"><FormLabel>አድራሻ</FormLabel><FormControl><Input placeholder="123 ዋና መንገድ, ከተማ" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ</FormLabel><FormControl><Input type="tel" placeholder="123-456-7890" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormItem> )} />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
-                        <Button type="submit">Save Changes</Button>
+                        <Button type="button" variant="outline" onClick={() => router.back()}>ሰርዝ</Button>
+                        <Button type="submit">ለውጦችን ያስቀምጡ</Button>
                     </CardFooter>
                 </form>
             </Form>

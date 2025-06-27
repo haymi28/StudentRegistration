@@ -45,7 +45,7 @@ export default function LoginPage() {
       login(selectedRole);
       router.push('/dashboard');
     } else {
-      setError('Invalid password for the selected role.');
+      setError('ለምርጥ ሚና የተሳሳተ የይለፍ ቃል።');
     }
   };
 
@@ -54,37 +54,37 @@ export default function LoginPage() {
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center gap-4 mb-8">
             <BookMarked className="h-12 w-12 text-primary" />
-            <h1 className="text-4xl font-headline font-bold text-primary">Academia</h1>
+            <h1 className="text-4xl font-headline font-bold text-primary">አካዳሚ</h1>
         </div>
         <Card className="w-full max-w-sm shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl font-headline flex items-center gap-2 justify-center"><Users /> Admin Login</CardTitle>
-            <CardDescription>Select your role and enter the password.</CardDescription>
+            <CardTitle className="text-2xl font-headline flex items-center gap-2 justify-center"><Users /> የአስተዳዳሪ መግቢያ</CardTitle>
+            <CardDescription>ሚናዎን ይምረጡ እና የይለፍ ቃልዎን ያስገቡ።</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="grid gap-4">
               <div className="grid gap-2 text-left">
-                <Label htmlFor="role">Role</Label>
+                <Label htmlFor="role">ሚና</Label>
                 <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)}>
                     <SelectTrigger id="role">
-                        <SelectValue placeholder="Select a role" />
+                        <SelectValue placeholder="ሚና ይምረጡ" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="children">Children's Admin</SelectItem>
-                        <SelectItem value="juniors">Juniors Admin</SelectItem>
-                        <SelectItem value="seniors">Seniors Admin</SelectItem>
-                        <SelectItem value="superadmin">Super Admin</SelectItem>
+                        <SelectItem value="children">የህፃናት አስተዳዳሪ</SelectItem>
+                        <SelectItem value="juniors">የወጣቶች አስተዳዳሪ</SelectItem>
+                        <SelectItem value="seniors">የአዋቂዎች አስተዳዳሪ</SelectItem>
+                        <SelectItem value="superadmin">ዋና አስተዳዳሪ</SelectItem>
                     </SelectContent>
                 </Select>
               </div>
               <div className="grid gap-2 text-left">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">የይለፍ ቃል</Label>
                 <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">Sign in</Button>
+              <Button type="submit" className="w-full">ይግቡ</Button>
             </CardFooter>
           </form>
         </Card>

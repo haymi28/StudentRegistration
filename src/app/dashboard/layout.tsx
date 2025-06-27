@@ -27,10 +27,10 @@ import { LogoutButton } from '@/components/logout-button';
 import { useAuth } from '@/lib/auth';
 
 const ROLE_NAMES: Record<string, string> = {
-    superadmin: "Super Admin",
-    children: "Children's Admin",
-    juniors: "Juniors Admin",
-    seniors: "Seniors Admin"
+    superadmin: "ዋና አስተዳዳሪ",
+    children: "የህፃናት አስተዳዳሪ",
+    juniors: "የወጣቶች አስተዳዳሪ",
+    seniors: "የአዋቂዎች አስተዳዳሪ"
 };
 
 export default function DashboardLayout({
@@ -64,24 +64,24 @@ export default function DashboardLayout({
       <Sidebar variant="inset" collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
-            <SidebarMenuButton tooltip="Academia" onClick={() => router.push('/dashboard')}>
+            <SidebarMenuButton tooltip="አካዳሚ" onClick={() => router.push('/dashboard')}>
                 <BookMarked className="text-sidebar-primary" />
-                <span className="font-headline font-semibold text-lg text-sidebar-primary">Academia</span>
+                <span className="font-headline font-semibold text-lg text-sidebar-primary">አካዳሚ</span>
             </SidebarMenuButton>
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Dashboard" onClick={() => router.push('/dashboard')} isActive={getIsActive('/dashboard')}>
+              <SidebarMenuButton tooltip="ዳሽቦርድ" onClick={() => router.push('/dashboard')} isActive={getIsActive('/dashboard')}>
                 <LayoutDashboard />
-                <span>Dashboard</span>
+                <span>ዳሽቦርድ</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Students" onClick={() => router.push('/dashboard/students')} isActive={getIsActive('/dashboard/students')}>
+                <SidebarMenuButton tooltip="ተማሪዎች" onClick={() => router.push('/dashboard/students')} isActive={getIsActive('/dashboard/students')}>
                     <Users />
-                    <span>Students</span>
+                    <span>ተማሪዎች</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

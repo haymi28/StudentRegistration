@@ -1,13 +1,13 @@
-import type { Student, Role, UserRole } from './types';
+import type { Student, Role } from './types';
 
 const defaultStudents: Student[] = [
   {
     id: 'STU001',
-    fullName: 'John Doe',
-    christianName: 'John',
-    educationLevel: 'Kindergarten',
+    fullName: 'አበበ ከበደ',
+    christianName: 'ዮሐንስ',
+    educationLevel: 'መዋለ ህፃናት',
     dob: new Date('2015-04-12'),
-    address: '123 Main St, Anytown, USA',
+    address: '123 ዋና መንገድ, አዲስ አበባ',
     fatherPhone: '123-456-7890',
     motherPhone: '098-765-4321',
     joiningDate: new Date('2022-09-01'),
@@ -16,11 +16,11 @@ const defaultStudents: Student[] = [
   },
   {
     id: 'STU002',
-    fullName: 'Jane Smith',
-    christianName: 'Jane',
-    educationLevel: 'Pre-K',
+    fullName: 'አለሚቱ ጫላ',
+    christianName: 'አለሚቱ',
+    educationLevel: 'ቅድመ-መዋለ ህፃናት',
     dob: new Date('2016-08-22'),
-    address: '456 Oak Ave, Anytown, USA',
+    address: '456 ኦክ ጎዳና, አዲስ አበባ',
     fatherPhone: '111-222-3333',
     motherPhone: '444-555-6666',
     joiningDate: new Date('2022-09-01'),
@@ -29,11 +29,11 @@ const defaultStudents: Student[] = [
   },
   {
     id: 'STU003',
-    fullName: 'Peter Jones',
-    christianName: 'Peter',
-    educationLevel: 'Grade 3',
+    fullName: 'ጴጥሮስ ዮሐንስ',
+    christianName: 'ጴጥሮስ',
+    educationLevel: '3ኛ ክፍል',
     dob: new Date('2012-01-30'),
-    address: '789 Pine Ln, Anytown, USA',
+    address: '789 ፓይን መንገድ, አዲስ አበባ',
     fatherPhone: '777-888-9999',
     motherPhone: '000-111-2222',
     joiningDate: new Date('2023-01-15'),
@@ -41,11 +41,11 @@ const defaultStudents: Student[] = [
   },
   {
     id: 'STU004',
-    fullName: 'Mary Johnson',
-    christianName: 'Mary',
-    educationLevel: 'Grade 6',
+    fullName: 'ማርያም ጌታቸው',
+    christianName: 'ማርያም',
+    educationLevel: '6ኛ ክፍል',
     dob: new Date('2009-03-15'),
-    address: '321 Elm St, Anytown, USA',
+    address: '321 ኤልም መንገድ, አዲስ አበባ',
     fatherPhone: '321-654-9870',
     motherPhone: '654-321-0987',
     joiningDate: new Date('2023-02-20'),
@@ -89,12 +89,8 @@ const saveStudents = (students: Student[]) => {
     }
 }
 
-export const getStudents = (role: UserRole | null): Student[] => {
-    const students = getRawStudents();
-    if (!role || role === 'superadmin') {
-        return students;
-    }
-    return students.filter(s => s.role === role);
+export const getStudents = (): Student[] => {
+    return getRawStudents();
 }
 
 export const addStudent = (student: Student): boolean => {

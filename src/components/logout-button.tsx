@@ -18,10 +18,10 @@ export function LogoutButton() {
   return (
     <SidebarMenuButton
       onClick={handleLogout}
-      tooltip="Logout"
+      tooltip="ውጣ"
     >
       <LogOut />
-      <span>Logout</span>
+      <span>ውጣ</span>
     </SidebarMenuButton>
   );
 }
