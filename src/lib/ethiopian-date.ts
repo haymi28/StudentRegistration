@@ -1,19 +1,21 @@
+import { ETC } from './abushakir';
+
 export function toEthiopianDateString(gregorianDate: Date | null | undefined): string {
-  if (!gregorianDate || !(gregorianDate instanceof Date)) return "";
+  if (!gregorianDate || !(gregorianDate instanceof Date) || isNaN(gregorianDate.getTime())) {
+    return "";
+  }
   
-  // The Ethiopian calendar packages were causing installation issues.
-  // Reverting to browser-native Gregorian dates with Amharic locale formatting
-  // as a temporary measure to fix the build.
   try {
-    return gregorianDate.toLocaleDateString('am-ET', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        calendar: 'gregory' // Explicitly use Gregorian calendar
-    });
+    const ethiopianDate = new ETC(gregorianDate.getFullYear(), gregorianDate.getMonth() + 1, gregorianDate.getDate());
+    
+    const ethMonthName = ethiopianDate.monthName;
+    const day = ethiopianDate.day;
+    const year = ethiopianDate.year;
+    
+    return `${ethMonthName} ${day}, ${year}`;
   } catch (error) {
-    console.error("Error formatting date:", error);
-    // Fallback for environments that might not support am-ET locale
+    console.error("Error converting date to Ethiopian format:", error);
+    // Fallback to Gregorian date display on error
     return gregorianDate.toLocaleDateString();
   }
 }
