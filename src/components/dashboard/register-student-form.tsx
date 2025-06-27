@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
-import { format } from "date-fns"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -22,6 +21,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
 import type { Role, Student } from "@/lib/types"
+import { toEthiopianDateString } from "@/lib/ethiopian-date"
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
@@ -144,7 +144,7 @@ export function RegisterStudentForm() {
                             <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="dob" render={({ field }) => (
-                            <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
+                            <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="studentId" render={({ field }) => (
                             <FormItem><FormLabel>የተማሪ መለያ</FormLabel><FormControl><Input placeholder="ተማሪ005" {...field} onInput={(e) => (e.currentTarget.value = e.currentTarget.value.toUpperCase())} /></FormControl><FormDescription>ልዩ መለያ መሆን አለበት።</FormDescription><FormMessage /></FormItem>
@@ -168,7 +168,7 @@ export function RegisterStudentForm() {
                         )}
 
                         <FormField control={form.control} name="joiningDate" render={({ field }) => (
-                            <FormItem className="flex flex-col"><FormLabel>የተቀላቀለበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
+                            <FormItem className="flex flex-col"><FormLabel>የተቀላቀለበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
                         )} />
                         
                         <FormField

@@ -3,7 +3,6 @@
 
 import * as React from "react";
 import Link from 'next/link';
-import { format } from "date-fns";
 import {
   MoreHorizontal,
   PlusCircle,
@@ -31,6 +30,7 @@ import { useAuth } from "@/lib/auth";
 import type { Student, Role } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
 import * as XLSX from 'xlsx';
+import { toEthiopianDateString } from "@/lib/ethiopian-date";
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
@@ -418,8 +418,8 @@ export function StudentsPageClient() {
                     <TableCell>{student.fullName}</TableCell>
                     <TableCell>{student.educationLevel}</TableCell>
                     <TableCell><Badge variant="secondary">{ROLE_NAMES[student.role]}</Badge></TableCell>
-                    <TableCell className="hidden md:table-cell">{format(student.dob, 'PPP')}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{format(student.joiningDate, 'PPP')}</TableCell>
+                    <TableCell className="hidden md:table-cell">{toEthiopianDateString(student.dob)}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{toEthiopianDateString(student.joiningDate)}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button aria-haspopup="true" size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /><span className="sr-only">ምናሌ ቀይር</span></Button></DropdownMenuTrigger>
@@ -464,11 +464,11 @@ export function StudentsPageClient() {
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የክርስትና ስም</Label><span className="col-span-2">{studentToView.christianName}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የትምህርት ደረጃ</Label><span className="col-span-2">{studentToView.educationLevel}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ሚና</Label><span className="col-span-2"><Badge variant="secondary">{ROLE_NAMES[studentToView.role]}</Badge></span></div>
-                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የትውልድ ቀን</Label><span className="col-span-2">{format(studentToView.dob, "PPP")}</span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የትውልድ ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.dob)}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">አድራሻ</Label><span className="col-span-2">{studentToView.address}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የአባት ስልክ</Label><span className="col-span-2">{studentToView.fatherPhone}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የእናት ስልክ</Label><span className="col-span-2">{studentToView.motherPhone}</span></div>
-                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተቀላቀለበት ቀን</Label><span className="col-span-2">{format(studentToView.joiningDate, "PPP")}</span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተቀላቀለበት ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.joiningDate)}</span></div>
               </div>
             </div>
           )}
@@ -492,7 +492,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob" (በቀን ቅርጸት), "address", "fatherPhone", "motherPhone", "joiningDate" (በቀን ቅርጸት), እና "role" አምዶችን መያዝ አለበት። ለ'role' አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob", "address", "fatherPhone", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
