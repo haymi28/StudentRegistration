@@ -28,13 +28,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import type { Student, Role } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById } from "@/lib/data";
-import type { jsPDF } from "jspdf";
-
-declare module "jspdf" {
-    interface jsPDF {
-      autoTable: (options: any) => jsPDF;
-    }
-}
 
 const ROLE_NAMES: Record<string, string> = {
     children: "Children",
@@ -91,40 +84,6 @@ export function StudentsPageClient() {
     });
     setStudentToDelete(null);
   };
-  
-  const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
-    const { jsPDF } = await import('jspdf');
-    await import('jspdf-autotable');
-    const doc = new jsPDF();
-    const transferredStudents = transferredStudentIds.map(id => getStudentById(id)).filter(Boolean) as Student[];
-
-    doc.setFontSize(18);
-    doc.text(`Student Transfer Report`, 14, 22);
-    doc.setFontSize(11);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
-    doc.text(`Transferred from ${ROLE_NAMES[fromRole]} to ${ROLE_NAMES[toRole]}`, 14, 36);
-
-    const tableColumn = ["Student ID", "Full Name", "Christian Name", "Date of Birth"];
-    const tableRows: (string | Date)[][] = [];
-
-    transferredStudents.forEach(student => {
-        const studentData = [
-            student.id,
-            student.fullName,
-            student.christianName,
-            format(student.dob, 'PPP')
-        ];
-        tableRows.push(studentData);
-    });
-
-    doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        startY: 50,
-    });
-    
-    doc.save(`transfer-report-${fromRole}-to-${toRole}-${new Date().toISOString().split('T')[0]}.pdf`);
-  }
 
   const isTransferDisabled = React.useMemo(() => {
     if (role !== 'superadmin' || selectedStudents.length === 0) {
@@ -177,8 +136,6 @@ export function StudentsPageClient() {
 
       transferStudents(selectedStudents, transferToRole);
       toast({ title: 'Transfer Successful!', description: `${selectedStudents.length} student(s) have been moved to ${ROLE_NAMES[transferToRole]}.` });
-      
-      await generateTransferReport(selectedStudents, fromRole, transferToRole);
       
       setSelectedStudents([]);
       setIsTransferring(false);
@@ -239,7 +196,7 @@ export function StudentsPageClient() {
                         <DialogHeader>
                             <DialogTitle>Confirm Student Transfer</DialogTitle>
                             <DialogDescription>
-                                Select the group to transfer the {selectedStudents.length} selected student(s) to. A PDF report will be generated after the transfer.
+                                Select the group to transfer the {selectedStudents.length} selected student(s) to.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
