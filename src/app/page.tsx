@@ -71,10 +71,10 @@ export default function LoginPage() {
                         <SelectValue placeholder="ሚና ይምረጡ" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="children">የህፃናት አስተዳዳሪ</SelectItem>
-                        <SelectItem value="children2">የህፃናት 2 አስተዳዳሪ</SelectItem>
-                        <SelectItem value="juniors">የወጣቶች አስተዳዳሪ</SelectItem>
-                        <SelectItem value="seniors">የአዋቂዎች አስተዳዳሪ</SelectItem>
+                        <SelectItem value="children">የቀዳማይ -1 ክፍል አስተዳዳሪ</SelectItem>
+                        <SelectItem value="children2">የቀዳማይ -2 ክፍል አስተዳዳሪ</SelectItem>
+                        <SelectItem value="juniors">የካእላይ ክፍል አስተዳዳሪ</SelectItem>
+                        <SelectItem value="seniors">የማእከላይ ክፍል አስተዳዳሪ</SelectItem>
                         <SelectItem value="superadmin">ዋና አስተዳዳሪ</SelectItem>
                     </SelectContent>
                 </Select>

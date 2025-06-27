@@ -51,14 +51,6 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     const fetchAndSetStudent = React.useCallback(() => {
         const studentData = getStudentById(studentId);
         if (studentData) {
-            if (adminRole !== 'superadmin' && studentData.role !== adminRole) {
-                // This admin is not allowed to edit this student anymore
-                // But the user requested all admins can edit all students
-                // So this check is commented out for now.
-                // toast({ variant: "destructive", title: "Unauthorized", description: "You do not have permission to edit this student." });
-                // router.push("/dashboard/students");
-                // return;
-            }
             setStudent(studentData);
             form.reset({
                 ...studentData,
@@ -69,7 +61,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         } else {
              setStudent(null);
         }
-    }, [studentId, form, adminRole, router, toast]);
+    }, [studentId, form]);
 
     React.useEffect(() => {
         fetchAndSetStudent();
@@ -164,10 +156,10 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl><SelectTrigger><SelectValue placeholder="ሚና ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            <SelectItem value="children">ህፃናት</SelectItem>
-                                            <SelectItem value="children2">ህፃናት 2</SelectItem>
-                                            <SelectItem value="juniors">ወጣቶች</SelectItem>
-                                            <SelectItem value="seniors">አዋቂዎች</SelectItem>
+                                            <SelectItem value="children">ቀዳማይ -1 ክፍል</SelectItem>
+                                            <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
+                                            <SelectItem value="juniors">ካእላይ ክፍል</SelectItem>
+                                            <SelectItem value="seniors">ማእከላይ ክፍል</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormDescription>ተማሪውን ወደ ሌላ ቡድን ያስተላልፉ።</FormDescription>

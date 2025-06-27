@@ -28,10 +28,10 @@ import { useAuth } from '@/lib/auth';
 
 const ROLE_NAMES: Record<string, string> = {
     superadmin: "ዋና አስተዳዳሪ",
-    children: "የህፃናት አስተዳዳሪ",
-    children2: "የህፃናት 2 አስተዳዳሪ",
-    juniors: "የወጣቶች አስተዳዳሪ",
-    seniors: "የአዋቂዎች አስተዳዳሪ"
+    children: "የቀዳማይ -1 ክፍል አስተዳዳሪ",
+    children2: "የቀዳማይ -2 ክፍል አስተዳዳሪ",
+    juniors: "የካእላይ ክፍል አስተዳዳሪ",
+    seniors: "የማእከላይ ክፍል አስተዳዳሪ"
 };
 
 export default function DashboardLayout({

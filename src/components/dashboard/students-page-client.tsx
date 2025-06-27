@@ -33,17 +33,17 @@ import { getStudents, deleteStudent, transferStudents, getStudentById, addStuden
 import * as XLSX from 'xlsx';
 
 const ROLE_NAMES: Record<string, string> = {
-    children: "ህፃናት",
-    children2: "ህፃናት 2",
-    juniors: "ወጣቶች",
-    seniors: "አዋቂዎች"
+    children: "ቀዳማይ -1 ክፍል",
+    children2: "ቀዳማይ -2 ክፍል",
+    juniors: "ካእላይ ክፍል",
+    seniors: "ማእከላይ ክፍል"
 };
 
 const AMHARIC_TO_ROLE: Record<string, Role> = {
-    "ህፃናት": "children",
-    "ህፃናት 2": "children2",
-    "ወጣቶች": "juniors",
-    "አዋቂዎች": "seniors"
+    "ቀዳማይ -1 ክፍል": "children",
+    "ቀዳማይ -2 ክፍል": "children2",
+    "ካእላይ ክፍል": "juniors",
+    "ማእከላይ ክፍል": "seniors"
 };
 
 
@@ -492,7 +492,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob" (በቀን ቅርጸት), "address", "fatherPhone", "motherPhone", "joiningDate" (በቀን ቅርጸት), እና "role" አምዶችን መያዝ አለበት። ለ'role' አምድ፣ እሴቶቹ “ህፃናት”፣ “ህፃናት 2”፣ “ወጣቶች” ወይም “አዋቂዎች” መሆን አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob" (በቀን ቅርጸት), "address", "fatherPhone", "motherPhone", "joiningDate" (በቀን ቅርጸት), እና "role" አምዶችን መያዝ አለበት። ለ'role' አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

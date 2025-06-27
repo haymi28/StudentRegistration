@@ -24,10 +24,10 @@ import { addStudent } from "@/lib/data"
 import type { Role, Student } from "@/lib/types"
 
 const ROLE_NAMES: Record<string, string> = {
-    children: "ህፃናት",
-    children2: "ህፃናት 2",
-    juniors: "ወጣቶች",
-    seniors: "አዋቂዎች"
+    children: "ቀዳማይ -1 ክፍል",
+    children2: "ቀዳማይ -2 ክፍል",
+    juniors: "ካእላይ ክፍል",
+    seniors: "ማእከላይ ክፍል"
 };
 
 const formSchema = z.object({
@@ -155,10 +155,10 @@ export function RegisterStudentForm() {
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl><SelectTrigger><SelectValue placeholder="ለተማሪው ሚና ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            <SelectItem value="children">ህፃናት</SelectItem>
-                                            <SelectItem value="children2">ህፃናት 2</SelectItem>
-                                            <SelectItem value="juniors">ወጣቶች</SelectItem>
-                                            <SelectItem value="seniors">አዋቂዎች</SelectItem>
+                                            <SelectItem value="children">ቀዳማይ -1 ክፍል</SelectItem>
+                                            <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
+                                            <SelectItem value="juniors">ካእላይ ክፍል</SelectItem>
+                                            <SelectItem value="seniors">ማእከላይ ክፍል</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 <FormMessage /></FormItem>
