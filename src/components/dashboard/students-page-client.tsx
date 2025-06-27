@@ -114,7 +114,8 @@ export function StudentsPageClient() {
     }
 
     if (fromRole === 'children') return ['juniors'];
-    if (fromRole === 'juniors') return ['seniors'];
+    if (fromRole === 'juniors') return ['children', 'seniors'];
+    if (fromRole === 'seniors') return ['juniors'];
     
     return [];
   }
@@ -232,7 +233,7 @@ export function StudentsPageClient() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input type="search" placeholder="Search by name or ID..." className="w-full appearance-none bg-background pl-8 shadow-none md:w-80" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               </div>
-              {selectedStudents.length > 0 && role !== 'seniors' && (
+              {selectedStudents.length > 0 && (
                 <Dialog open={isTransferring} onOpenChange={(open) => {
                     setIsTransferring(open);
                     if (!open) {
@@ -254,7 +255,7 @@ export function StudentsPageClient() {
                         <DialogHeader>
                             <DialogTitle>Confirm Student Transfer</DialogTitle>
                             <DialogDescription>
-                                Select the group to transfer the {selectedStudents.length} selected student(s) to.
+                                Select the group to transfer the {selectedStudents.length} selected student(s) to. This will generate and download a PDF report.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
@@ -272,7 +273,7 @@ export function StudentsPageClient() {
                         </div>
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setIsTransferring(false)}>Cancel</Button>
-                            <Button onClick={handleTransfer} disabled={!transferToRole}>Confirm & Download Report</Button>
+                            <Button onClick={handleTransfer} disabled={!transferToRole}>Confirm & Transfer</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
