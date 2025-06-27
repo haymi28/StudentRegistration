@@ -1,3 +1,6 @@
+export type Role = 'children' | 'juniors' | 'seniors';
+export type UserRole = Role | 'superadmin';
+
 export interface Student {
   id: string;
   fullName: string;
@@ -7,11 +10,5 @@ export interface Student {
   fatherPhone: string;
   motherPhone: string;
   joiningDate: Date;
-}
-
-export interface AttendanceRecord {
-  id: string;
-  studentId: string;
-  studentName: string;
-  checkInTime: Date;
+  role: Role;
 }

@@ -1,7 +1,8 @@
+
 "use client";
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   Sidebar,
   SidebarContent,
@@ -17,11 +18,20 @@ import {
 import {
   LayoutDashboard,
   Users,
-  ClipboardList,
   BookMarked,
+  Shield,
+  Loader2
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/logout-button';
+import { useAuth } from '@/lib/auth';
+
+const ROLE_NAMES: Record<string, string> = {
+    superadmin: "Super Admin",
+    children: "Children's Admin",
+    juniors: "Juniors Admin",
+    seniors: "Seniors Admin"
+};
 
 export default function DashboardLayout({
   children,
@@ -29,6 +39,25 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { role, isLoading, logout } = useAuth();
+
+  React.useEffect(() => {
+    if (!isLoading && !role) {
+      router.replace('/');
+    }
+  }, [isLoading, role, router]);
+
+
+  if (isLoading || !role) {
+      return (
+        <div className="flex h-screen w-full items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      );
+  }
+
+  const getIsActive = (path: string) => pathname === path;
 
   return (
     <SidebarProvider>
@@ -44,21 +73,15 @@ export default function DashboardLayout({
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Check-In" onClick={() => router.push('/dashboard')}>
+              <SidebarMenuButton tooltip="Dashboard" onClick={() => router.push('/dashboard')} isActive={getIsActive('/dashboard')}>
                 <LayoutDashboard />
-                <span>Check-In</span>
+                <span>Dashboard</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Students" onClick={() => router.push('/dashboard/students')}>
+                <SidebarMenuButton tooltip="Students" onClick={() => router.push('/dashboard/students')} isActive={getIsActive('/dashboard/students')}>
                     <Users />
                     <span>Students</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Attendance" onClick={() => router.push('/dashboard/attendance')}>
-                    <ClipboardList />
-                    <span>Attendance</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -68,12 +91,11 @@ export default function DashboardLayout({
             <SidebarMenuItem>
                 <div className="flex items-center gap-2 w-full p-2">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src="https://placehold.co/100x100.png" alt="@admin" />
-                        <AvatarFallback>A</AvatarFallback>
+                       <AvatarFallback><Shield /></AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col text-sm truncate">
-                        <span className="font-semibold text-sidebar-foreground">Admin User</span>
-                        <span className="text-sidebar-foreground/70">admin@academia.com</span>
+                        <span className="font-semibold text-sidebar-foreground">{ROLE_NAMES[role]}</span>
+                        <span className="text-sidebar-foreground/70">{role}@academia.com</span>
                     </div>
                 </div>
             </SidebarMenuItem>

@@ -1,98 +1,62 @@
-import type { Student, AttendanceRecord } from './types';
+import type { Student, Role, UserRole } from './types';
 
 const defaultStudents: Student[] = [
   {
     id: 'STU001',
     fullName: 'John Doe',
     christianName: 'John',
-    dob: new Date('2005-04-12'),
+    dob: new Date('2015-04-12'),
     address: '123 Main St, Anytown, USA',
     fatherPhone: '123-456-7890',
     motherPhone: '098-765-4321',
     joiningDate: new Date('2022-09-01'),
+    role: 'children'
   },
   {
     id: 'STU002',
     fullName: 'Jane Smith',
     christianName: 'Jane',
-    dob: new Date('2006-08-22'),
+    dob: new Date('2016-08-22'),
     address: '456 Oak Ave, Anytown, USA',
     fatherPhone: '111-222-3333',
     motherPhone: '444-555-6666',
     joiningDate: new Date('2022-09-01'),
+    role: 'children'
   },
   {
     id: 'STU003',
     fullName: 'Peter Jones',
     christianName: 'Peter',
-    dob: new Date('2005-01-30'),
+    dob: new Date('2012-01-30'),
     address: '789 Pine Ln, Anytown, USA',
     fatherPhone: '777-888-9999',
     motherPhone: '000-111-2222',
     joiningDate: new Date('2023-01-15'),
+    role: 'juniors'
   },
   {
     id: 'STU004',
     fullName: 'Mary Johnson',
     christianName: 'Mary',
-    dob: new Date('2007-03-15'),
+    dob: new Date('2009-03-15'),
     address: '321 Elm St, Anytown, USA',
     fatherPhone: '321-654-9870',
     motherPhone: '654-321-0987',
     joiningDate: new Date('2023-02-20'),
-  },
-];
-
-const defaultAttendanceRecords: AttendanceRecord[] = [
-  {
-    id: 'ATT001',
-    studentId: 'STU001',
-    studentName: 'John Doe',
-    checkInTime: new Date('2024-07-21T09:02:15'),
-  },
-  {
-    id: 'ATT002',
-    studentId: 'STU002',
-    studentName: 'Jane Smith',
-    checkInTime: new Date('2024-07-21T09:03:42'),
-  },
-  {
-    id: 'ATT003',
-    studentId: 'STU001',
-    studentName: 'John Doe',
-    checkInTime: new Date('2024-07-20T08:59:55'),
-  },
-  {
-    id: 'ATT004',
-    studentId: 'STU003',
-    studentName: 'Peter Jones',
-    checkInTime: new Date('2024-07-21T09:05:11'),
-  },
-    {
-    id: 'ATT005',
-    studentId: 'STU004',
-    studentName: 'Mary Johnson',
-    checkInTime: new Date('2024-07-20T09:01:30'),
+    role: 'seniors'
   },
 ];
 
 const isServer = typeof window === 'undefined';
 
 const studentReviver = (key: string, value: any) => {
-    if (key === 'dob' || key === 'joiningDate') {
+    if ((key === 'dob' || key === 'joiningDate') && value) {
         return new Date(value);
     }
     return value;
 };
 
-const attendanceReviver = (key: string, value: any) => {
-    if (key === 'checkInTime') {
-        return new Date(value);
-    }
-    return value;
-};
-
-export const getStudents = (): Student[] => {
+const getRawStudents = (): Student[] => {
     if (isServer) return [...defaultStudents];
     try {
         const item = window.localStorage.getItem('students');
@@ -109,81 +73,60 @@ export const getStudents = (): Student[] => {
     }
 }
 
+const saveStudents = (students: Student[]) => {
+    if (isServer) return;
+    try {
+        window.localStorage.setItem('students', JSON.stringify(students));
+        window.dispatchEvent(new Event("local-storage-update"));
+    } catch (error) {
+        console.error("Error writing students to localStorage", error);
+    }
+}
+
+export const getStudents = (role: UserRole | null): Student[] => {
+    const students = getRawStudents();
+    if (!role || role === 'superadmin') {
+        return students;
+    }
+    return students.filter(s => s.role === role);
+}
+
 export const addStudent = (student: Student): boolean => {
-    if (isServer) return false;
-    const students = getStudents();
+    const students = getRawStudents();
     const studentExists = students.some(s => s.id.toLowerCase() === student.id.toLowerCase());
     if (studentExists) {
         console.warn(`Student with ID ${student.id} already exists.`);
         return false;
     }
     students.push(student);
-    try {
-        window.localStorage.setItem('students', JSON.stringify(students));
-        window.dispatchEvent(new Event("local-storage"));
-        return true;
-    } catch (error) {
-        console.error("Error writing students to localStorage", error);
-        return false;
-    }
+    saveStudents(students);
+    return true;
 }
 
 export const getStudentById = (id: string): Student | undefined => {
-    if (isServer) return undefined;
-    const students = getStudents();
+    const students = getRawStudents();
     return students.find(s => s.id === id);
 }
 
 export const updateStudent = (updatedStudent: Student) => {
-    if (isServer) return;
-    let students = getStudents();
+    let students = getRawStudents();
     students = students.map(s => s.id === updatedStudent.id ? updatedStudent : s);
-    try {
-        window.localStorage.setItem('students', JSON.stringify(students));
-        window.dispatchEvent(new Event("local-storage"));
-    } catch (error) {
-        console.error("Error updating students in localStorage", error);
-    }
+    saveStudents(students);
 }
 
 export const deleteStudent = (studentId: string) => {
-    if (isServer) return;
-    let students = getStudents();
+    let students = getRawStudents();
     students = students.filter(s => s.id !== studentId);
-    try {
-        window.localStorage.setItem('students', JSON.stringify(students));
-        window.dispatchEvent(new Event("local-storage"));
-    } catch (error) {
-        console.error("Error deleting student from localStorage", error);
-    }
+    saveStudents(students);
 }
 
-
-export const getAttendanceRecords = (): AttendanceRecord[] => {
-    if (isServer) return [...defaultAttendanceRecords];
-    try {
-        const item = window.localStorage.getItem('attendanceRecords');
-        if (item) {
-            return JSON.parse(item, attendanceReviver);
-        } else {
-            const records = [...defaultAttendanceRecords];
-            window.localStorage.setItem('attendanceRecords', JSON.stringify(records));
-            return records;
+export const transferStudents = (studentIds: string[], newRole: Role) => {
+    let students = getRawStudents();
+    students = students.map(student => {
+        if (studentIds.includes(student.id)) {
+            return { ...student, role: newRole };
         }
-    } catch (error) {
-        console.error("Error with localStorage 'attendanceRecords'", error);
-        return [...defaultAttendanceRecords];
-    }
-}
-
-export const addAttendanceRecord = (record: AttendanceRecord) => {
-    if (isServer) return;
-    const records = getAttendanceRecords();
-    records.unshift(record);
-    try {
-        window.localStorage.setItem('attendanceRecords', JSON.stringify(records));
-        window.dispatchEvent(new Event("local-storage"));
-    } catch (error) {
-        console.error("Error writing attendance records to localStorage", error);
-    }
+        return student;
+    });
+    saveStudents(students);
 }
