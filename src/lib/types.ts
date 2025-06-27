@@ -5,6 +5,7 @@ export interface Student {
   id: string;
   fullName: string;
   christianName: string;
+  educationLevel: string;
   dob: Date;
   address: string;
   fatherPhone: string;

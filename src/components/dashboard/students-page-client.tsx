@@ -103,18 +103,23 @@ export function StudentsPageClient() {
   const getTransferOptions = (): Role[] => {
     const allRoles: Role[] = ['children', 'juniors', 'seniors'];
     let fromRole: Role | undefined;
+    if (selectedStudents.length === 0) return [];
 
     if (role === 'superadmin') {
-        if (selectedStudents.length > 0 && !isTransferDisabled) {
-            fromRole = allStudents.find(s => s.id === selectedStudents[0])?.role;
-        }
+      fromRole = allStudents.find(s => s.id === selectedStudents[0])?.role;
     } else {
-        fromRole = role as Role;
+      fromRole = role as Role;
     }
-    
+
     if (!fromRole) return allRoles;
     
-    return allRoles.filter(r => r !== fromRole);
+    // Allow transfer to adjacent roles (promotion and demotion)
+    const currentIndex = allRoles.indexOf(fromRole);
+    const options: Role[] = [];
+    if (currentIndex > 0) options.push(allRoles[currentIndex - 1]);
+    if (currentIndex < allRoles.length - 1) options.push(allRoles[currentIndex + 1]);
+    
+    return options;
   }
 
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
@@ -291,6 +296,7 @@ export function StudentsPageClient() {
                   <TableHead className="w-16">Photo</TableHead>
                   <TableHead>Student ID</TableHead>
                   <TableHead>Full Name</TableHead>
+                  <TableHead>Education Level</TableHead>
                   {role === 'superadmin' && <TableHead>Role</TableHead>}
                   <TableHead className="hidden md:table-cell">Date of Birth</TableHead>
                   <TableHead className="hidden lg:table-cell">Joining Date</TableHead>
@@ -311,6 +317,7 @@ export function StudentsPageClient() {
                     </TableCell>
                     <TableCell className="font-medium"><Badge variant="outline">{student.id}</Badge></TableCell>
                     <TableCell>{student.fullName}</TableCell>
+                    <TableCell>{student.educationLevel}</TableCell>
                     {role === 'superadmin' && <TableCell><Badge variant="secondary">{ROLE_NAMES[student.role]}</Badge></TableCell>}
                     <TableCell className="hidden md:table-cell">{format(student.dob, 'PPP')}</TableCell>
                     <TableCell className="hidden lg:table-cell">{format(student.joiningDate, 'PPP')}</TableCell>
@@ -329,7 +336,7 @@ export function StudentsPageClient() {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={role === 'superadmin' ? 8 : 7} className="h-24 text-center">
+                    <TableCell colSpan={role === 'superadmin' ? 9 : 8} className="h-24 text-center">
                         No students found.
                     </TableCell>
                   </TableRow>
@@ -356,6 +363,7 @@ export function StudentsPageClient() {
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">Student ID</Label><span className="col-span-2 font-mono"><Badge variant="outline">{studentToView.id}</Badge></span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">Full Name</Label><span className="col-span-2 font-semibold">{studentToView.fullName}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">Christian Name</Label><span className="col-span-2">{studentToView.christianName}</span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">Education</Label><span className="col-span-2">{studentToView.educationLevel}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">Role</Label><span className="col-span-2"><Badge variant="secondary">{ROLE_NAMES[studentToView.role]}</Badge></span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">Date of Birth</Label><span className="col-span-2">{format(studentToView.dob, "PPP")}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">Address</Label><span className="col-span-2">{studentToView.address}</span></div>
