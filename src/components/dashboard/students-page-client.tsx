@@ -38,6 +38,13 @@ const ROLE_NAMES: Record<string, string> = {
     seniors: "አዋቂዎች"
 };
 
+const AMHARIC_TO_ROLE: Record<string, Role> = {
+    "ህፃናት": "children",
+    "ወጣቶች": "juniors",
+    "አዋቂዎች": "seniors"
+};
+
+
 export function StudentsPageClient() {
   const { role, isLoading } = useAuth();
   const [allStudents, setAllStudents] = React.useState<Student[]>([]);
@@ -221,9 +228,10 @@ export function StudentsPageClient() {
         let failedStudents: string[] = [];
 
         for (const row of json) {
-            const studentRole = String(row.role || '').toLowerCase() as Role;
+            const amharicRole = String(row.role || '').trim();
+            const studentRole = AMHARIC_TO_ROLE[amharicRole];
             
-            if (!row.id || !row.fullName || !row.dob || !row.role || !row.joiningDate || !row.christianName || !row.educationLevel || !row.address || !row.fatherPhone || !row.motherPhone) {
+            if (!row.id || !row.fullName || !row.dob || !studentRole || !row.joiningDate || !row.christianName || !row.educationLevel || !row.address || !row.fatherPhone || !row.motherPhone) {
                 failureCount++;
                 failedStudents.push(`${row.id || 'ID የለም'} (የጎደለ መረጃ)`);
                 continue;
@@ -482,7 +490,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob" (በቀን ቅርጸት), "address", "fatherPhone", "motherPhone", "joiningDate" (በቀን ቅርጸት), እና "role" (children, juniors, or seniors) አምዶችን መያዝ አለበት።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob" (በቀን ቅርጸት), "address", "fatherPhone", "motherPhone", "joiningDate" (በቀን ቅርጸት), እና "role" አምዶችን መያዝ አለበት። ለ'role' አምድ፣ እሴቶቹ “ህፃናት”፣ “ወጣቶች” ወይም “አዋቂዎች” መሆን አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
