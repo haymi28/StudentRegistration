@@ -152,9 +152,9 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                             <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የተቀላቀለበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="role" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>ሚና</FormLabel>
+                                    <FormLabel>ክፍል</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="ሚና ይምረጡ" /></SelectTrigger></FormControl>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="ክፍል ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="children">ቀዳማይ -1 ክፍል</SelectItem>
                                             <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>

@@ -40,7 +40,7 @@ const formSchema = z.object({
   fatherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   motherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
-  role: z.enum(["children", "children2", "juniors", "seniors"], { required_error: "ሚና ያስፈልጋል።" }),
+  role: z.enum(["children", "children2", "juniors", "seniors"], { required_error: "ክፍል ያስፈልጋል።" }),
   photo: z.any().optional(),
 })
 
@@ -151,9 +151,9 @@ export function RegisterStudentForm() {
                         )} />
                         {adminRole === 'superadmin' ? (
                             <FormField control={form.control} name="role" render={({ field }) => (
-                                <FormItem><FormLabel>ሚና</FormLabel>
+                                <FormItem><FormLabel>ክፍል</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl><SelectTrigger><SelectValue placeholder="ለተማሪው ሚና ይምረጡ" /></SelectTrigger></FormControl>
+                                        <FormControl><SelectTrigger><SelectValue placeholder="ለተማሪው ክፍል ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="children">ቀዳማይ -1 ክፍል</SelectItem>
                                             <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
@@ -164,7 +164,7 @@ export function RegisterStudentForm() {
                                 <FormMessage /></FormItem>
                             )} />
                         ) : (
-                             <FormItem><FormLabel>ሚና</FormLabel><FormControl><Input value={adminRole ? ROLE_NAMES[adminRole] : ''} readOnly disabled /></FormControl></FormItem>
+                             <FormItem><FormLabel>ክፍል</FormLabel><FormControl><Input value={adminRole ? ROLE_NAMES[adminRole] : ''} readOnly disabled /></FormControl></FormItem>
                         )}
 
                         <FormField control={form.control} name="joiningDate" render={({ field }) => (

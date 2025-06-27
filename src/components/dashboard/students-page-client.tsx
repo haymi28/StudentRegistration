@@ -240,12 +240,12 @@ export function StudentsPageClient() {
             }
             if (!['children', 'children2', 'juniors', 'seniors'].includes(studentRole)) {
                 failureCount++;
-                failedStudents.push(`${row.id} (የተሳሳተ ሚና)`);
+                failedStudents.push(`${row.id} (የተሳሳተ ክፍል)`);
                 continue;
             }
             if (role !== 'superadmin' && studentRole !== role) {
                 failureCount++;
-                failedStudents.push(`${row.id} (ያልተፈቀደ ሚና)`);
+                failedStudents.push(`${row.id} (ያልተፈቀደ ክፍል)`);
                 continue;
             }
             if (!(row.dob instanceof Date) || !(row.joiningDate instanceof Date)) {
@@ -396,7 +396,7 @@ export function StudentsPageClient() {
                   <TableHead>የተማሪ መለያ</TableHead>
                   <TableHead>ሙሉ ስም</TableHead>
                   <TableHead>የትምህርት ደረጃ</TableHead>
-                  <TableHead>ሚና</TableHead>
+                  <TableHead>ክፍል</TableHead>
                   <TableHead className="hidden md:table-cell">የትውልድ ቀን</TableHead>
                   <TableHead className="hidden lg:table-cell">የተቀላቀለበት ቀን</TableHead>
                   <TableHead><span className="sr-only">ድርጊቶች</span></TableHead>
@@ -463,7 +463,7 @@ export function StudentsPageClient() {
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ሙሉ ስም</Label><span className="col-span-2 font-semibold">{studentToView.fullName}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የክርስትና ስም</Label><span className="col-span-2">{studentToView.christianName}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የትምህርት ደረጃ</Label><span className="col-span-2">{studentToView.educationLevel}</span></div>
-                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ሚና</Label><span className="col-span-2"><Badge variant="secondary">{ROLE_NAMES[studentToView.role]}</Badge></span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ክፍል</Label><span className="col-span-2"><Badge variant="secondary">{ROLE_NAMES[studentToView.role]}</Badge></span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የትውልድ ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.dob)}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">አድራሻ</Label><span className="col-span-2">{studentToView.address}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የአባት ስልክ</Label><span className="col-span-2">{studentToView.fatherPhone}</span></div>
