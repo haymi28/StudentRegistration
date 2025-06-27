@@ -6,7 +6,7 @@ export function toEthiopianDateString(gregorianDate: Date | null | undefined): s
   }
   
   try {
-    const ethiopianDate = new ETC(gregorianDate.getFullYear(), gregorianDate.getMonth() + 1, gregorianDate.getDate());
+    const ethiopianDate = new ETC(gregorianDate);
     
     const ethMonthName = ethiopianDate.monthName;
     const day = ethiopianDate.day;

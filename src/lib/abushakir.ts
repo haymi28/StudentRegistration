@@ -3,7 +3,7 @@
 // to bypass npm installation issues.
 
 const constants = {
-  🇪🇹: {
+  ET: {
     weekdays: [
       "እሑድ",
       "ሰኞ",
@@ -144,10 +144,10 @@ class BahireHasab {
 
     if (day > 30) {
       day = day % 30;
-      result.month = constants.🇪🇹.months[4]; // Tir
+      result.month = constants.ET.months[4]; // Tir
       result.date = day;
     } else {
-      result.month = constants.🇪🇹.months[3]; // Tahsas
+      result.month = constants.ET.months[3]; // Tahsas
       result.date = day;
     }
     return result;
@@ -158,7 +158,7 @@ class BahireHasab {
     let nenewe = this.nenewe;
 
     if (nenewe.date + 14 > 30) {
-      result.month = constants.🇪🇹.months[5];
+      result.month = constants.ET.months[5];
       result.date = (nenewe.date + 14) % 30;
     } else {
       result.month = nenewe.month;
@@ -293,7 +293,7 @@ class BahireHasab {
     let result = {};
     let tsomeHawaryat = this.tsomeHawaryat;
     if (tsomeHawaryat.date + 1 > 30) {
-      result.month = constants.🇪🇹.months[11];
+      result.month = constants.ET.months[11];
       result.date = tsomeHawaryat.date + 1 - 30;
     } else {
       result.month = tsomeHawaryat.month;
@@ -394,20 +394,20 @@ export class ETC {
     }
   
     get monthName() {
-      return constants.🇪🇹.months[this._month - 1];
+      return constants.ET.months[this._month - 1];
     }
   
     get dayName() {
       let day_of_week = this._gregorian_date.getDay();
-      return constants.🇪🇹.weekdays[day_of_week];
+      return constants.ET.weekdays[day_of_week];
     }
   
     get allMonths() {
-      return constants.🇪🇹.months;
+      return constants.ET.months;
     }
   
     get allDays() {
-      return constants.🇪🇹.weekdays;
+      return constants.ET.weekdays;
     }
   
     toEthiopic(year, month, day) {
