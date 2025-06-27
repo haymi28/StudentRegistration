@@ -39,7 +39,7 @@ const formSchema = z.object({
 export function EditStudentForm({ studentId }: { studentId: string }) {
     const router = useRouter()
     const { toast } = useToast()
-    const { role: adminRole, isLoading } = useAuth();
+    const { isLoading } = useAuth();
     const [student, setStudent] = React.useState<Student | null | undefined>(undefined)
     const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
 
@@ -117,25 +117,40 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
 
     if (student === null) {
         return (
-            <Card className="w-full max-w-2xl mx-auto"><CardHeader><CardTitle className="font-headline text-2xl">Student Not Found</CardTitle><CardDescription>The student you are trying to edit does not exist.</CardDescription></CardHeader><CardFooter><Button variant="outline" onClick={() => router.back()}>Go Back</Button></CardFooter></Card>
+            <Card className="w-full max-w-2xl mx-auto">
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Student Not Found</CardTitle>
+                    <CardDescription>The student you are trying to edit does not exist.</CardDescription>
+                </CardHeader>
+                <CardFooter>
+                    <Button variant="outline" onClick={() => router.back()}>Go Back</Button>
+                </CardFooter>
+            </Card>
         )
     }
 
     return (
         <Card className="w-full max-w-2xl mx-auto">
-            <CardHeader><CardTitle className="font-headline text-2xl">Edit Student Information</CardTitle><CardDescription>Update the details for {student.fullName}.</CardDescription></CardHeader>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">Edit Student Information</CardTitle>
+                <CardDescription>Update the details for {student.fullName}.</CardDescription>
+            </CardHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <CardContent className="space-y-6">
-                        <div><Label>Student ID</Label><Input value={student.id} readOnly disabled className="mt-2" /><FormDescription className="mt-2">The student ID cannot be changed.</FormDescription></div>
+                        <div>
+                            <Label>Student ID</Label>
+                            <Input value={student.id} readOnly disabled className="mt-2" />
+                            <FormDescription className="mt-2">The student ID cannot be changed.</FormDescription>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField control={form.control} name="fullName" render={({ field }) => ( <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="christianName" render={({ field }) => ( <FormItem><FormLabel>Christian Name</FormLabel><FormControl><Input placeholder="John" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                             <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Date of birth</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Date of birth</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>Date of Joining</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="role" render={({ field }) => (
                                 <FormItem><FormLabel>Role</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={adminRole !== 'superadmin'}>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl><SelectTrigger><SelectValue placeholder="Select a role" /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="children">Children</SelectItem>
@@ -143,7 +158,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                             <SelectItem value="seniors">Seniors</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <FormDescription>Only a Super Admin can change the role here.</FormDescription>
+                                    <FormDescription>You can change the student's role here.</FormDescription>
                                 <FormMessage /></FormItem>
                             )} />
                              <FormField
@@ -157,17 +172,17 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                             type="file"
                                             accept="image/*"
                                             onChange={(e) => {
-                                            field.onChange(e.target.files);
-                                            if (e.target.files && e.target.files[0]) {
-                                                const file = e.target.files[0];
-                                                const reader = new FileReader();
-                                                reader.onloadend = () => {
-                                                setPhotoPreview(reader.result as string);
-                                                };
-                                                reader.readAsDataURL(file);
-                                            } else {
-                                                setPhotoPreview(student?.photoUrl || null);
-                                            }
+                                                field.onChange(e.target.files);
+                                                if (e.target.files && e.target.files[0]) {
+                                                    const file = e.target.files[0];
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setPhotoPreview(reader.result as string);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                } else {
+                                                    setPhotoPreview(student?.photoUrl || null);
+                                                }
                                             }}
                                         />
                                         </FormControl>
@@ -177,12 +192,12 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                         {photoPreview && (
                                         <div className="mt-4">
                                             <Image
-                                            src={photoPreview}
-                                            alt={student.fullName}
-                                            width={100}
-                                            height={100}
-                                            className="rounded-full aspect-square object-cover"
-                                            data-ai-hint="person student"
+                                                src={photoPreview}
+                                                alt={student.fullName}
+                                                width={100}
+                                                height={100}
+                                                className="rounded-full aspect-square object-cover"
+                                                data-ai-hint="person student"
                                             />
                                         </div>
                                         )}
@@ -190,9 +205,9 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                     </FormItem>
                                 )}
                             />
-                             <FormField control={form.control} name="address" render={({ field }) => ( <FormItem className="md:col-span-2"><FormLabel>Address</FormLabel><FormControl><Input placeholder="123 Main St, Anytown" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="address" render={({ field }) => ( <FormItem className="md:col-span-2"><FormLabel>Address</FormLabel><FormControl><Input placeholder="123 Main St, Anytown" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>Father's Phone</FormLabel><FormControl><Input type="tel" placeholder="123-456-7890" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>Mother's Phone</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>Mother's Phone</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormItem> )} />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">
@@ -202,5 +217,5 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                 </form>
             </Form>
         </Card>
-    )
+    );
 }
