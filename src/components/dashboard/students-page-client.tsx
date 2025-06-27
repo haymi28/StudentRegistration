@@ -11,7 +11,6 @@ import {
   Users,
   ChevronsRight,
   Loader2,
-  Download,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -45,11 +44,6 @@ export function StudentsPageClient() {
   const [studentToDelete, setStudentToDelete] = React.useState<Student | null>(null);
   const [isTransferring, setIsTransferring] = React.useState(false);
   const [transferToRole, setTransferToRole] = React.useState<Role | null>(null);
-  const [lastTransferInfo, setLastTransferInfo] = React.useState<{
-    transferredIds: string[];
-    fromRole: Role;
-    toRole: Role;
-  } | null>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -165,8 +159,6 @@ export function StudentsPageClient() {
         });
         
         doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
-        
-        toast({ title: 'Report Downloaded', description: 'The PDF report has been saved to your device.' });
 
     } catch (error) {
         console.error("Failed to generate PDF report:", error);
@@ -174,9 +166,9 @@ export function StudentsPageClient() {
     }
   };
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
       if (!transferToRole || selectedStudents.length === 0) {
-          return; // Button should be disabled anyway.
+          return;
       }
       
       const fromRole = role === 'superadmin' 
@@ -191,8 +183,16 @@ export function StudentsPageClient() {
       const transferredIds = [...selectedStudents];
       transferStudents(transferredIds, transferToRole);
       
-      setLastTransferInfo({ transferredIds, fromRole, toRole: transferToRole });
+      await generateTransferReport(transferredIds, fromRole, transferToRole);
+
+      toast({
+        title: "Transfer Complete & Report Downloaded",
+        description: `${transferredIds.length} student(s) moved from ${ROLE_NAMES[fromRole]} to ${ROLE_NAMES[transferToRole]}.`
+      });
+
       setSelectedStudents([]);
+      setIsTransferring(false);
+      setTransferToRole(null);
   };
 
   const filteredStudents = allStudents.filter(
@@ -236,8 +236,6 @@ export function StudentsPageClient() {
                 <Dialog open={isTransferring} onOpenChange={(open) => {
                     setIsTransferring(open);
                     if (!open) {
-                        // Reset states when dialog is closed for the next transfer operation
-                        setLastTransferInfo(null);
                         setTransferToRole(null);
                     }
                 }}>
@@ -253,54 +251,29 @@ export function StudentsPageClient() {
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
-                        {!lastTransferInfo ? (
-                            <>
-                                <DialogHeader>
-                                    <DialogTitle>Confirm Student Transfer</DialogTitle>
-                                    <DialogDescription>
-                                        Select the group to transfer the {selectedStudents.length} selected student(s) to.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <Label htmlFor="transfer-role">Transfer To</Label>
-                                    <Select onValueChange={(v) => setTransferToRole(v as Role)} value={transferToRole || undefined}>
-                                        <SelectTrigger id="transfer-role">
-                                            <SelectValue placeholder="Select destination group..." />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {getTransferOptions().map(opt => (
-                                                <SelectItem key={opt} value={opt}>{ROLE_NAMES[opt]}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <DialogFooter>
-                                    <Button variant="outline" onClick={() => setIsTransferring(false)}>Cancel</Button>
-                                    <Button onClick={handleTransfer} disabled={!transferToRole}>Confirm Transfer</Button>
-                                </DialogFooter>
-                            </>
-                        ) : (
-                            <>
-                                <DialogHeader>
-                                    <DialogTitle>Transfer Complete</DialogTitle>
-                                    <DialogDescription>
-                                        {lastTransferInfo.transferredIds.length} student(s) have been successfully moved from {ROLE_NAMES[lastTransferInfo.fromRole]} to {ROLE_NAMES[lastTransferInfo.toRole]}.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="flex flex-col items-center justify-center gap-4 py-4">
-                                    <Button 
-                                        variant="outline"
-                                        onClick={() => generateTransferReport(lastTransferInfo.transferredIds, lastTransferInfo.fromRole, lastTransferInfo.toRole)}
-                                    >
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Download Report
-                                    </Button>
-                                </div>
-                                <DialogFooter>
-                                    <Button onClick={() => setIsTransferring(false)}>Done</Button>
-                                </DialogFooter>
-                            </>
-                        )}
+                        <DialogHeader>
+                            <DialogTitle>Confirm Student Transfer</DialogTitle>
+                            <DialogDescription>
+                                Select the group to transfer the {selectedStudents.length} selected student(s) to.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <Label htmlFor="transfer-role">Transfer To</Label>
+                            <Select onValueChange={(v) => setTransferToRole(v as Role)} value={transferToRole || undefined}>
+                                <SelectTrigger id="transfer-role">
+                                    <SelectValue placeholder="Select destination group..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {getTransferOptions().map(opt => (
+                                        <SelectItem key={opt} value={opt}>{ROLE_NAMES[opt]}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsTransferring(false)}>Cancel</Button>
+                            <Button onClick={handleTransfer} disabled={!transferToRole}>Confirm & Download Report</Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
               )}

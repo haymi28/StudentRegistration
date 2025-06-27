@@ -47,12 +47,6 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     const fetchAndSetStudent = React.useCallback(() => {
         const studentData = getStudentById(studentId);
         if (studentData) {
-            // Role-based access check
-            if (adminRole !== 'superadmin' && adminRole !== studentData.role) {
-                toast({ variant: 'destructive', title: "Access Denied", description: "You do not have permission to edit this student." });
-                router.replace('/dashboard/students');
-                return;
-            }
             setStudent(studentData);
             form.reset({
                 ...studentData,
@@ -60,15 +54,16 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         } else {
              setStudent(null);
         }
-    }, [studentId, form, adminRole, router, toast]);
+    }, [studentId, form]);
 
     React.useEffect(() => {
         fetchAndSetStudent();
         
-        window.addEventListener('local-storage-update', fetchAndSetStudent);
+        const handleStorageChange = () => fetchAndSetStudent();
+        window.addEventListener('local-storage-update', handleStorageChange);
 
         return () => {
-            window.removeEventListener('local-storage-update', fetchAndSetStudent);
+            window.removeEventListener('local-storage-update', handleStorageChange);
         };
     }, [fetchAndSetStudent]);
 
@@ -91,7 +86,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
 
     if (student === null) {
         return (
-            <Card className="w-full max-w-2xl mx-auto"><CardHeader><CardTitle className="font-headline text-2xl">Student Not Found</CardTitle><CardDescription>The student you are trying to edit does not exist or you don't have permission.</CardDescription></CardHeader><CardFooter><Button variant="outline" onClick={() => router.back()}>Go Back</Button></CardFooter></Card>
+            <Card className="w-full max-w-2xl mx-auto"><CardHeader><CardTitle className="font-headline text-2xl">Student Not Found</CardTitle><CardDescription>The student you are trying to edit does not exist.</CardDescription></CardHeader><CardFooter><Button variant="outline" onClick={() => router.back()}>Go Back</Button></CardFooter></Card>
         )
     }
 
