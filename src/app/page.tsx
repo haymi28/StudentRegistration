@@ -54,7 +54,7 @@ export default function LoginPage() {
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center gap-4 mb-8">
             <BookMarked className="h-12 w-12 text-primary" />
-            <h1 className="text-4xl font-headline font-bold text-primary">አካዳሚ</h1>
+            <h1 className="text-3xl font-headline font-bold text-primary">የተማሪዎች መመዝገቢያ ቅጽ</h1>
         </div>
         <Card className="w-full max-w-sm shadow-2xl">
           <CardHeader>
