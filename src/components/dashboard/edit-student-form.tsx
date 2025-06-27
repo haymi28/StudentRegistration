@@ -44,7 +44,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         resolver: zodResolver(formSchema),
     })
 
-    React.useEffect(() => {
+    const fetchAndSetStudent = React.useCallback(() => {
         const studentData = getStudentById(studentId);
         if (studentData) {
             // Role-based access check
@@ -61,6 +61,16 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
              setStudent(null);
         }
     }, [studentId, form, adminRole, router, toast]);
+
+    React.useEffect(() => {
+        fetchAndSetStudent();
+        
+        window.addEventListener('local-storage-update', fetchAndSetStudent);
+
+        return () => {
+            window.removeEventListener('local-storage-update', fetchAndSetStudent);
+        };
+    }, [fetchAndSetStudent]);
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         if (!student) return;

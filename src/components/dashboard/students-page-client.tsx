@@ -120,39 +120,52 @@ export function StudentsPageClient() {
   }
 
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
-    const { default: jsPDF } = await import('jspdf');
-    const { default: autoTable } = await import('jspdf-autotable');
+    try {
+        const { default: jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
 
-    const doc = new jsPDF();
-    const transferredStudents = transferredStudentIds.map(id => getStudentById(id)).filter(Boolean) as Student[];
+        const doc = new jsPDF();
+        const transferredStudents = transferredStudentIds.map(id => getStudentById(id)).filter(Boolean) as Student[];
 
-    const tableColumn = ["Student ID", "Full Name", "Christian Name"];
-    const tableRows: (string | null)[][] = [];
+        if (transferredStudents.length === 0) {
+            toast({ variant: 'destructive', title: 'Report Error', description: 'No student data found for the report.' });
+            return;
+        }
 
-    transferredStudents.forEach(student => {
-        const studentData = [
-            student.id,
-            student.fullName,
-            student.christianName,
-        ];
-        tableRows.push(studentData);
-    });
+        const tableColumn = ["Student ID", "Full Name", "Christian Name"];
+        const tableRows: (string | null)[][] = [];
 
-    const date = new Date().toLocaleDateString();
-    doc.setFontSize(18);
-    doc.text(`Student Transfer Report - ${date}`, 14, 22);
-    doc.setFontSize(12);
-    doc.text(`Transferred ${transferredStudents.length} student(s) from ${ROLE_NAMES[fromRole]} to ${ROLE_NAMES[toRole]}.`, 14, 30);
+        transferredStudents.forEach(student => {
+            const studentData = [
+                student.id,
+                student.fullName,
+                student.christianName,
+            ];
+            tableRows.push(studentData);
+        });
 
-    autoTable(doc, {
-        startY: 35,
-        head: [tableColumn],
-        body: tableRows,
-        theme: 'grid',
-        headStyles: { fillColor: [41, 128, 185] },
-    });
-    
-    doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
+        const date = new Date().toLocaleDateString();
+        doc.setFontSize(18);
+        doc.text(`Student Transfer Report - ${date}`, 14, 22);
+        doc.setFontSize(12);
+        doc.text(`Transferred ${transferredStudents.length} student(s) from ${ROLE_NAMES[fromRole]} to ${ROLE_NAMES[toRole]}.`, 14, 30);
+
+        autoTable(doc, {
+            startY: 35,
+            head: [tableColumn],
+            body: tableRows,
+            theme: 'grid',
+            headStyles: { fillColor: [41, 128, 185] },
+        });
+        
+        doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
+        
+        toast({ title: 'Transfer Successful!', description: `${transferredStudentIds.length} student(s) have been moved to ${ROLE_NAMES[toRole]}. A report has been downloaded.` });
+
+    } catch (error) {
+        console.error("Failed to generate PDF report:", error);
+        toast({ variant: 'destructive', title: 'Report Generation Failed', description: 'There was an error creating the PDF report.' });
+    }
   };
 
   const handleTransfer = async () => {
@@ -169,15 +182,15 @@ export function StudentsPageClient() {
           toast({ variant: 'destructive', title: 'Transfer Failed', description: 'Could not determine the original group of the students.' });
           return;
       }
-
-      transferStudents(selectedStudents, transferToRole);
-      await generateTransferReport(selectedStudents, fromRole, transferToRole);
       
-      toast({ title: 'Transfer Successful!', description: `${selectedStudents.length} student(s) have been moved to ${ROLE_NAMES[transferToRole]}. A report has been downloaded.` });
+      const transferredIds = [...selectedStudents];
+      transferStudents(transferredIds, transferToRole);
       
       setSelectedStudents([]);
       setIsTransferring(false);
       setTransferToRole(null);
+
+      await generateTransferReport(transferredIds, fromRole, transferToRole);
   };
 
   const filteredStudents = allStudents.filter(
