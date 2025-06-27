@@ -11,7 +11,7 @@ import {
   Users,
   ChevronsRight,
   Loader2,
-  Download,
+  Upload,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +29,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import type { Student, Role } from "@/lib/types";
-import { getStudents, deleteStudent, transferStudents, getStudentById } from "@/lib/data";
+import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
+import * as XLSX from 'xlsx';
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ህፃናት",
@@ -47,6 +48,11 @@ export function StudentsPageClient() {
   const [isTransferring, setIsTransferring] = React.useState(false);
   const [transferToRole, setTransferToRole] = React.useState<Role | null>(null);
   const { toast } = useToast();
+  
+  const [isImporting, setIsImporting] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [isImportProcessing, setIsImportProcessing] = React.useState(false);
+
 
   React.useEffect(() => {
     const loadStudents = () => {
@@ -94,19 +100,25 @@ export function StudentsPageClient() {
 
   const getTransferOptions = (): Role[] => {
     if (selectedStudents.length === 0) return [];
-
+  
     const fromRole = allStudents.find(s => s.id === selectedStudents[0])?.role;
     if (!fromRole) return [];
     
     const allRoles: Role[] = ['children', 'juniors', 'seniors'];
     const currentIndex = allRoles.indexOf(fromRole);
     const options: Role[] = [];
-
-    if (currentIndex > 0) options.push(allRoles[currentIndex - 1]); // Downgrade
-    if (currentIndex < allRoles.length - 1) options.push(allRoles[currentIndex + 1]); // Upgrade
-
+  
+    // Allow downgrade
+    if (currentIndex > 0) {
+      options.push(allRoles[currentIndex - 1]);
+    }
+    // Allow upgrade
+    if (currentIndex < allRoles.length - 1) {
+      options.push(allRoles[currentIndex + 1]);
+    }
+  
     return options;
-  }
+  };
 
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
     try {
@@ -133,9 +145,6 @@ export function StudentsPageClient() {
         });
 
         const date = new Date().toLocaleDateString();
-        // The font needs to be added to jsPDF to support Amharic characters
-        // This requires a .ttf file which we cannot add here.
-        // So we will use default font, which will not render Amharic correctly in the PDF.
         doc.setFontSize(18);
         doc.text(`Student Transfer Report - ${date}`, 14, 22);
         doc.setFontSize(12);
@@ -187,10 +196,101 @@ export function StudentsPageClient() {
       setTransferToRole(null);
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!selectedFile || isImportProcessing) return;
+    setIsImportProcessing(true);
+
+    try {
+        const XLSX = await import('xlsx');
+        const data = await selectedFile.arrayBuffer();
+        const workbook = XLSX.read(data, { type: 'buffer', cellDates: true });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+        let successCount = 0;
+        let failureCount = 0;
+        let failedStudents: string[] = [];
+
+        for (const row of json) {
+            const studentRole = String(row.role || '').toLowerCase() as Role;
+            
+            if (!row.id || !row.fullName || !row.dob || !row.role || !row.joiningDate || !row.christianName || !row.educationLevel || !row.address || !row.fatherPhone || !row.motherPhone) {
+                failureCount++;
+                failedStudents.push(`${row.id || 'ID የለም'} (የጎደለ መረጃ)`);
+                continue;
+            }
+            if (!['children', 'juniors', 'seniors'].includes(studentRole)) {
+                failureCount++;
+                failedStudents.push(`${row.id} (የተሳሳተ ሚና)`);
+                continue;
+            }
+            if (role !== 'superadmin' && studentRole !== role) {
+                failureCount++;
+                failedStudents.push(`${row.id} (ያልተፈቀደ ሚና)`);
+                continue;
+            }
+            if (!(row.dob instanceof Date) || !(row.joiningDate instanceof Date)) {
+                failureCount++;
+                failedStudents.push(`${row.id} (የተሳሳተ የቀን ቅርጸት)`);
+                continue;
+            }
+
+            const studentToAdd: Student = {
+                id: String(row.id).toUpperCase(),
+                fullName: String(row.fullName),
+                christianName: String(row.christianName),
+                educationLevel: String(row.educationLevel),
+                dob: row.dob,
+                address: String(row.address),
+                fatherPhone: String(row.fatherPhone),
+                motherPhone: String(row.motherPhone),
+                joiningDate: row.joiningDate,
+                role: studentRole,
+            };
+
+            const success = addStudent(studentToAdd);
+            if (success) {
+                successCount++;
+            } else {
+                failureCount++;
+                failedStudents.push(`${studentToAdd.id} (የተባዛ)`);
+            }
+        }
+
+        toast({
+            title: "ማስመጣት ተጠናቅቋል",
+            description: `${successCount} ተማሪዎች ገብተዋል። ${failureCount} አልተሳካም።${failureCount > 0 ? ` ያልተሳኩ: ${failedStudents.slice(0, 5).join(', ')}${failedStudents.length > 5 ? '...' : ''}` : ''}`,
+            duration: 10000
+        });
+
+    } catch (error) {
+        console.error("Error processing Excel file:", error);
+        toast({
+            variant: "destructive",
+            title: "ማስመጣት አልተሳካም",
+            description: "ፋይሉን በማስኬድ ላይ ስህተት ተፈጥሯል። ቅርጸቱ ትክክል መሆኑን ያረጋግጡ።",
+        });
+    } finally {
+        setIsImporting(false);
+        setSelectedFile(null);
+        setIsImportProcessing(false);
+    }
+  };
+
   const filteredStudents = allStudents.filter(
     (student) =>
-      student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.id.toLowerCase().includes(searchTerm.toLowerCase())
+      (student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.id.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (role === 'superadmin' || student.role === role)
   );
   
   const isAllSelected = selectedStudents.length > 0 && selectedStudents.length === filteredStudents.length;
@@ -205,6 +305,10 @@ export function StudentsPageClient() {
         <div className="flex items-center">
           <h1 className="text-lg font-semibold md:text-2xl font-headline flex items-center gap-2"><Users /> የተማሪዎች ዝርዝር</h1>
           <div className="ml-auto flex items-center gap-2">
+            <Button size="sm" className="h-8 gap-1" onClick={() => setIsImporting(true)}>
+              <Upload className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">ከኤክሴል አስመጣ</span>
+            </Button>
             <Link href="/dashboard/students/register">
               <Button size="sm" className="h-8 gap-1">
                 <PlusCircle className="h-3.5 w-3.5" />
@@ -369,6 +473,33 @@ export function StudentsPageClient() {
           <AlertDialogFooter><AlertDialogCancel onClick={() => setStudentToDelete(null)}>ሰርዝ</AlertDialogCancel><AlertDialogAction onClick={handleDeleteStudent} className="bg-destructive hover:bg-destructive/90">ተማሪ ሰርዝ</AlertDialogAction></AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={isImporting} onOpenChange={(open) => {
+        setIsImporting(open);
+        if (!open) setSelectedFile(null);
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
+            <DialogDescription>
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob" (በቀን ቅርጸት), "address", "fatherPhone", "motherPhone", "joiningDate" (በቀን ቅርጸት), እና "role" (children, juniors, or seniors) አምዶችን መያዝ አለበት።
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Label htmlFor="excel-file">የኤክሴል ፋይል</Label>
+            <Input id="excel-file" type="file" accept=".xlsx, .xls" onChange={handleFileSelect} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsImporting(false)}>ሰርዝ</Button>
+            <Button onClick={handleImport} disabled={!selectedFile || isImportProcessing}>
+                {isImportProcessing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                አስመጣ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+
+    
