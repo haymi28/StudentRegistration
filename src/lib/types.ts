@@ -11,4 +11,5 @@ export interface Student {
   motherPhone: string;
   joiningDate: Date;
   role: Role;
+  photoUrl?: string;
 }

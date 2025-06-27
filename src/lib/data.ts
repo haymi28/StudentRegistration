@@ -10,7 +10,8 @@ const defaultStudents: Student[] = [
     fatherPhone: '123-456-7890',
     motherPhone: '098-765-4321',
     joiningDate: new Date('2022-09-01'),
-    role: 'children'
+    role: 'children',
+    photoUrl: 'https://placehold.co/100x100.png'
   },
   {
     id: 'STU002',
@@ -21,7 +22,8 @@ const defaultStudents: Student[] = [
     fatherPhone: '111-222-3333',
     motherPhone: '444-555-6666',
     joiningDate: new Date('2022-09-01'),
-    role: 'children'
+    role: 'children',
+    photoUrl: 'https://placehold.co/100x100.png'
   },
   {
     id: 'STU003',

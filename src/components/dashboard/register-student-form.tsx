@@ -2,6 +2,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -20,7 +21,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
-import type { Role } from "@/lib/types"
+import type { Role, Student } from "@/lib/types"
 
 const ROLE_NAMES: Record<string, string> = {
     children: "Children",
@@ -38,12 +39,14 @@ const formSchema = z.object({
   motherPhone: z.string().min(10, "A valid phone number is required."),
   joiningDate: z.date({ required_error: "A joining date is required." }),
   role: z.enum(["children", "juniors", "seniors"], { required_error: "Role is required." }),
+  photo: z.any().optional(),
 })
 
 export function RegisterStudentForm() {
     const router = useRouter()
     const { toast } = useToast()
     const { role: adminRole, isLoading } = useAuth()
+    const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -58,7 +61,6 @@ export function RegisterStudentForm() {
         },
     })
     
-    // Set the role once the admin role is loaded
     React.useEffect(() => {
         if (adminRole && adminRole !== 'superadmin') {
             form.setValue('role', adminRole as Role);
@@ -66,11 +68,36 @@ export function RegisterStudentForm() {
     }, [adminRole, form]);
 
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        const success = addStudent({
-            id: values.studentId.toUpperCase(),
-            ...values
-        })
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        const { photo, ...studentData } = values;
+
+        const studentToSave: Omit<Student, 'dob'|'joiningDate'> & { dob: Date; joiningDate: Date; photoUrl?: string} = {
+            ...studentData,
+            id: studentData.studentId.toUpperCase(),
+        };
+
+        if (photo && photo.length > 0) {
+            const file = photo[0];
+            try {
+                const photoUrl = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => resolve(event.target?.result as string);
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                studentToSave.photoUrl = photoUrl;
+            } catch (error) {
+                console.error("Error reading file:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Image Upload Failed",
+                    description: "There was an error processing the image file.",
+                });
+                return;
+            }
+        }
+        
+        const success = addStudent(studentToSave as Student)
         
         if (success) {
             toast({
@@ -136,6 +163,42 @@ export function RegisterStudentForm() {
                         <FormField control={form.control} name="joiningDate" render={({ field }) => (
                             <FormItem className="flex flex-col"><FormLabel>Date of Joining</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? format(field.value, "PPP") : <span>Pick a date</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>
                         )} />
+                        
+                        <FormField
+                            control={form.control}
+                            name="photo"
+                            render={({ field }) => (
+                                <FormItem className="md:col-span-2">
+                                    <FormLabel>Student Photo</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                field.onChange(e.target.files);
+                                                if (e.target.files && e.target.files[0]) {
+                                                    const file = e.target.files[0];
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setPhotoPreview(reader.result as string);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                } else {
+                                                    setPhotoPreview(null);
+                                                }
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>Optional. Upload a photo of the student.</FormDescription>
+                                    {photoPreview && (
+                                        <div className="mt-4">
+                                            <Image src={photoPreview} alt="Student preview" width={100} height={100} className="rounded-full aspect-square object-cover" data-ai-hint="person student" />
+                                        </div>
+                                    )}
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
                         <FormField control={form.control} name="address" render={({ field }) => (
                             <FormItem className="md:col-span-2"><FormLabel>Address</FormLabel><FormControl><Input placeholder="123 Main St, Anytown" {...field} /></FormControl><FormMessage /></FormItem>

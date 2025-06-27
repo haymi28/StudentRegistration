@@ -2,6 +2,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -32,6 +33,7 @@ const formSchema = z.object({
   motherPhone: z.string().min(10, "A valid phone number is required."),
   joiningDate: z.date({ required_error: "A joining date is required." }),
   role: z.enum(["children", "juniors", "seniors"]),
+  photo: z.any().optional(),
 })
 
 export function EditStudentForm({ studentId }: { studentId: string }) {
@@ -39,6 +41,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     const { toast } = useToast()
     const { role: adminRole, isLoading } = useAuth();
     const [student, setStudent] = React.useState<Student | null | undefined>(undefined)
+    const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -51,6 +54,9 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
             form.reset({
                 ...studentData,
             });
+            if (studentData.photoUrl) {
+                setPhotoPreview(studentData.photoUrl);
+            }
         } else {
              setStudent(null);
         }
@@ -67,11 +73,36 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         };
     }, [fetchAndSetStudent]);
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!student) return;
+
+        const { photo, ...studentData } = values;
+        let photoUrl = student.photoUrl;
+
+        if (photo && photo.length > 0) {
+            const file = photo[0];
+            try {
+                photoUrl = await new Promise<string>((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => resolve(event.target?.result as string);
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            } catch (error) {
+                console.error("Error reading file:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Image Upload Failed",
+                    description: "There was an error processing the image file.",
+                });
+                return;
+            }
+        }
+
         updateStudent({
             ...student,
-            ...values,
+            ...studentData,
+            photoUrl: photoUrl,
         });
         toast({
             title: "Student Updated!",
@@ -115,9 +146,53 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                     <FormDescription>Only a Super Admin can change the role here.</FormDescription>
                                 <FormMessage /></FormItem>
                             )} />
+                             <FormField
+                                control={form.control}
+                                name="photo"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Student Photo</FormLabel>
+                                        <FormControl>
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                            field.onChange(e.target.files);
+                                            if (e.target.files && e.target.files[0]) {
+                                                const file = e.target.files[0];
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                setPhotoPreview(reader.result as string);
+                                                };
+                                                reader.readAsDataURL(file);
+                                            } else {
+                                                setPhotoPreview(student?.photoUrl || null);
+                                            }
+                                            }}
+                                        />
+                                        </FormControl>
+                                        <FormDescription>
+                                        Optional. Upload a new photo to replace the current one.
+                                        </FormDescription>
+                                        {photoPreview && (
+                                        <div className="mt-4">
+                                            <Image
+                                            src={photoPreview}
+                                            alt={student.fullName}
+                                            width={100}
+                                            height={100}
+                                            className="rounded-full aspect-square object-cover"
+                                            data-ai-hint="person student"
+                                            />
+                                        </div>
+                                        )}
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                              <FormField control={form.control} name="address" render={({ field }) => ( <FormItem className="md:col-span-2"><FormLabel>Address</FormLabel><FormControl><Input placeholder="123 Main St, Anytown" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>Father's Phone</FormLabel><FormControl><Input type="tel" placeholder="123-456-7890" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>Mother's Phone</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>Mother's Phone</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormMessage /></FormItem> )} />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">
