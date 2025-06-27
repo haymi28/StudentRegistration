@@ -4,8 +4,6 @@
 import * as React from "react";
 import Link from 'next/link';
 import { format } from "date-fns";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import {
   MoreHorizontal,
   PlusCircle,
@@ -30,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import type { Student, Role } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById } from "@/lib/data";
+import type { jsPDF } from "jspdf";
 
 declare module "jspdf" {
     interface jsPDF {
@@ -93,7 +92,9 @@ export function StudentsPageClient() {
     setStudentToDelete(null);
   };
   
-  const generateTransferReport = (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
+  const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
+    const { jsPDF } = await import('jspdf');
+    await import('jspdf-autotable');
     const doc = new jsPDF();
     const transferredStudents = transferredStudentIds.map(id => getStudentById(id)).filter(Boolean) as Student[];
 
@@ -159,7 +160,7 @@ export function StudentsPageClient() {
     return [];
   }
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
       if (!transferToRole || selectedStudents.length === 0) {
           toast({ variant: 'destructive', title: 'Transfer Failed', description: 'Please select a destination role and at least one student.' });
           return;
@@ -177,7 +178,7 @@ export function StudentsPageClient() {
       transferStudents(selectedStudents, transferToRole);
       toast({ title: 'Transfer Successful!', description: `${selectedStudents.length} student(s) have been moved to ${ROLE_NAMES[transferToRole]}.` });
       
-      generateTransferReport(selectedStudents, fromRole, transferToRole);
+      await generateTransferReport(selectedStudents, fromRole, transferToRole);
       
       setSelectedStudents([]);
       setIsTransferring(false);
