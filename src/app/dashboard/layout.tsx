@@ -29,6 +29,7 @@ import { useAuth } from '@/lib/auth';
 const ROLE_NAMES: Record<string, string> = {
     superadmin: "ዋና አስተዳዳሪ",
     children: "የህፃናት አስተዳዳሪ",
+    children2: "የህፃናት 2 አስተዳዳሪ",
     juniors: "የወጣቶች አስተዳዳሪ",
     seniors: "የአዋቂዎች አስተዳዳሪ"
 };

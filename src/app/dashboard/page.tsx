@@ -8,6 +8,7 @@ import { Loader2, Shield } from "lucide-react";
 const ROLE_FRIENDLY_NAMES: Record<string, string> = {
     superadmin: "ዋና አስተዳዳሪ",
     children: "የህፃናት ቡድን",
+    children2: "የህፃናት 2 ቡድን",
     juniors: "የወጣቶች ቡድን",
     seniors: "የአዋቂዎች ቡድን",
 };

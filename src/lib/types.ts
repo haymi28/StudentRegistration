@@ -1,4 +1,4 @@
-export type Role = 'children' | 'juniors' | 'seniors';
+export type Role = 'children' | 'children2' | 'juniors' | 'seniors';
 export type UserRole = Role | 'superadmin';
 
 export interface Student {

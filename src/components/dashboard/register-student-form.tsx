@@ -25,6 +25,7 @@ import type { Role, Student } from "@/lib/types"
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ህፃናት",
+    children2: "ህፃናት 2",
     juniors: "ወጣቶች",
     seniors: "አዋቂዎች"
 };
@@ -39,7 +40,7 @@ const formSchema = z.object({
   fatherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   motherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
-  role: z.enum(["children", "juniors", "seniors"], { required_error: "ሚና ያስፈልጋል።" }),
+  role: z.enum(["children", "children2", "juniors", "seniors"], { required_error: "ሚና ያስፈልጋል።" }),
   photo: z.any().optional(),
 })
 
@@ -155,6 +156,7 @@ export function RegisterStudentForm() {
                                         <FormControl><SelectTrigger><SelectValue placeholder="ለተማሪው ሚና ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="children">ህፃናት</SelectItem>
+                                            <SelectItem value="children2">ህፃናት 2</SelectItem>
                                             <SelectItem value="juniors">ወጣቶች</SelectItem>
                                             <SelectItem value="seniors">አዋቂዎች</SelectItem>
                                         </SelectContent>

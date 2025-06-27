@@ -28,6 +28,7 @@ import type { UserRole } from "@/lib/types";
 const ROLE_CREDENTIALS: Record<UserRole, { password: string }> = {
     superadmin: { password: "superpassword" },
     children: { password: "childrenpassword" },
+    children2: { password: "children2password" },
     juniors: { password: "juniorspassword" },
     seniors: { password: "seniorspassword" },
 }
@@ -71,6 +72,7 @@ export default function LoginPage() {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="children">የህፃናት አስተዳዳሪ</SelectItem>
+                        <SelectItem value="children2">የህፃናት 2 አስተዳዳሪ</SelectItem>
                         <SelectItem value="juniors">የወጣቶች አስተዳዳሪ</SelectItem>
                         <SelectItem value="seniors">የአዋቂዎች አስተዳዳሪ</SelectItem>
                         <SelectItem value="superadmin">ዋና አስተዳዳሪ</SelectItem>

@@ -33,14 +33,14 @@ const formSchema = z.object({
   fatherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   motherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
-  role: z.enum(["children", "juniors", "seniors"]),
+  role: z.enum(["children", "children2", "juniors", "seniors"]),
   photo: z.any().optional(),
 })
 
 export function EditStudentForm({ studentId }: { studentId: string }) {
     const router = useRouter()
     const { toast } = useToast()
-    const { isLoading } = useAuth()
+    const { role: adminRole, isLoading } = useAuth()
     const [student, setStudent] = React.useState<Student | null | undefined>(undefined)
     const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
 
@@ -51,6 +51,14 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     const fetchAndSetStudent = React.useCallback(() => {
         const studentData = getStudentById(studentId);
         if (studentData) {
+            if (adminRole !== 'superadmin' && studentData.role !== adminRole) {
+                // This admin is not allowed to edit this student anymore
+                // But the user requested all admins can edit all students
+                // So this check is commented out for now.
+                // toast({ variant: "destructive", title: "Unauthorized", description: "You do not have permission to edit this student." });
+                // router.push("/dashboard/students");
+                // return;
+            }
             setStudent(studentData);
             form.reset({
                 ...studentData,
@@ -61,7 +69,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         } else {
              setStudent(null);
         }
-    }, [studentId, form]);
+    }, [studentId, form, adminRole, router, toast]);
 
     React.useEffect(() => {
         fetchAndSetStudent();
@@ -157,6 +165,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                         <FormControl><SelectTrigger><SelectValue placeholder="ሚና ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="children">ህፃናት</SelectItem>
+                                            <SelectItem value="children2">ህፃናት 2</SelectItem>
                                             <SelectItem value="juniors">ወጣቶች</SelectItem>
                                             <SelectItem value="seniors">አዋቂዎች</SelectItem>
                                         </SelectContent>
