@@ -42,8 +42,8 @@ const formSchema = z.object({
   kebele: z.string().min(1, "ቀበሌ ያስፈልጋል።"),
   houseNumber: z.string().min(1, "የቤት ቁጥር ያስፈልጋል።"),
   houseAddressDetail: z.string().min(1, "የቤት ልዩ አድራሻ ያስፈልጋል።"),
-  fatherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
-  motherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
+  phone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
+  additionalPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
   role: z.enum(["children", "children2", "juniors", "seniors"], { required_error: "ክፍል ያስፈልጋል።" }),
   photo: z.any().optional(),
@@ -66,8 +66,8 @@ export function RegisterStudentForm() {
             kebele: "",
             houseNumber: "",
             houseAddressDetail: "",
-            fatherPhone: "",
-            motherPhone: "",
+            phone: "",
+            additionalPhone: "",
             role: adminRole !== 'superadmin' ? adminRole as Role : undefined,
         },
     })
@@ -246,11 +246,11 @@ export function RegisterStudentForm() {
                             <FormField control={form.control} name="houseAddressDetail" render={({ field }) => ( <FormItem><FormLabel>የቤት ልዩ አድራሻ</FormLabel><FormControl><Textarea placeholder="የቤቱን አድራሻ በዝርዝር ያስገቡ (ለምሳሌ: ከትምህርት ቤቱ ጀርባ)" {...field} /></FormControl><FormMessage /></FormItem> )} />
                         </div>
 
-                        <FormField control={form.control} name="fatherPhone" render={({ field }) => (
-                            <FormItem><FormLabel>የአባት ስልክ</FormLabel><FormControl><Input type="tel" placeholder="123-456-7890" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormField control={form.control} name="phone" render={({ field }) => (
+                            <FormItem><FormLabel>ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
-                        <FormField control={form.control} name="motherPhone" render={({ field }) => (
-                            <FormItem><FormLabel>የእናት ስልክ</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormField control={form.control} name="additionalPhone" render={({ field }) => (
+                            <FormItem><FormLabel>ተጨማሪ ስልክ</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem>
                         )} />
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">

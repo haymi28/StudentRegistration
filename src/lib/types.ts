@@ -13,8 +13,8 @@ export interface Student {
   kebele: string;
   houseNumber: string;
   houseAddressDetail: string;
-  fatherPhone: string;
-  motherPhone: string;
+  phone: string;
+  additionalPhone?: string;
   joiningDate: Date;
   role: Role;
   photoUrl?: string;

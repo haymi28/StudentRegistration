@@ -239,7 +239,7 @@ export function StudentsPageClient() {
             const studentRole = AMHARIC_TO_ROLE[amharicRole];
             const gender = String(row.gender || '').trim();
             
-            if (!row.id || !row.fullName || !row.dob || !studentRole || !row.joiningDate || !row.christianName || !row.educationLevel || !row.subcity || !row.kebele || !row.houseNumber || !row.houseAddressDetail || !row.fatherPhone || !row.motherPhone || !gender) {
+            if (!row.id || !row.fullName || !row.dob || !studentRole || !row.joiningDate || !row.christianName || !row.educationLevel || !row.subcity || !row.kebele || !row.houseNumber || !row.houseAddressDetail || !row.phone || !gender) {
                 failureCount++;
                 failedStudents.push(`${row.id || 'ID የለም'} (የጎደለ መረጃ)`);
                 continue;
@@ -276,8 +276,8 @@ export function StudentsPageClient() {
                 kebele: String(row.kebele),
                 houseNumber: String(row.houseNumber),
                 houseAddressDetail: String(row.houseAddressDetail),
-                fatherPhone: String(row.fatherPhone),
-                motherPhone: String(row.motherPhone),
+                phone: String(row.phone),
+                additionalPhone: row.additionalPhone ? String(row.additionalPhone) : undefined,
                 joiningDate: row.joiningDate,
                 role: studentRole,
             };
@@ -487,8 +487,8 @@ export function StudentsPageClient() {
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ቀበሌ</Label><span className="col-span-2">{studentToView.kebele}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የቤት ቁጥር</Label><span className="col-span-2">{studentToView.houseNumber}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የቤት ልዩ አድራሻ</Label><span className="col-span-2">{studentToView.houseAddressDetail}</span></div>
-                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የአባት ስልክ</Label><span className="col-span-2">{studentToView.fatherPhone}</span></div>
-                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የእናት ስልክ</Label><span className="col-span-2">{studentToView.motherPhone}</span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.phone}</span></div>
+                {studentToView.additionalPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ተጨማሪ ስልክ</Label><span className="col-span-2">{studentToView.additionalPhone}</span></div>}
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተቀላቀለበት ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.joiningDate)}</span></div>
               </div>
             </div>
@@ -513,7 +513,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "fatherPhone", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው። "additionalPhone" አማራጭ ነው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -532,7 +532,3 @@ export function StudentsPageClient() {
     </>
   );
 }
-
-    
-
-    
