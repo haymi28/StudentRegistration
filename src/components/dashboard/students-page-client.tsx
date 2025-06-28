@@ -12,6 +12,8 @@ import {
   Loader2,
   Upload,
 } from "lucide-react";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,7 @@ import { useAuth } from "@/lib/auth";
 import type { Student, Role, Gender } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
+import { amharicFont } from "@/lib/noto-sans-ethiopic-regular-font";
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
@@ -128,12 +131,8 @@ export function StudentsPageClient() {
     return options;
   };
 
-  const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
+  const generateTransferReport = (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
     try {
-        const { default: jsPDF } = await import('jspdf');
-        const { default: autoTable } = await import('jspdf-autotable');
-        const { amharicFont } = await import('@/lib/noto-sans-ethiopic-regular-font');
-
         const doc = new jsPDF();
         
         doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
@@ -185,7 +184,7 @@ export function StudentsPageClient() {
     }
   };
 
-  const handleTransfer = async () => {
+  const handleTransfer = () => {
       if (!transferToRole || selectedStudents.length === 0) {
           return;
       }
@@ -199,7 +198,7 @@ export function StudentsPageClient() {
       const transferredIds = [...selectedStudents];
       transferStudents(transferredIds, transferToRole);
       
-      await generateTransferReport(transferredIds, fromRole, transferToRole);
+      generateTransferReport(transferredIds, fromRole, transferToRole);
       
       toast({
         title: "ዝውውር ተጠናቅቋል።",
