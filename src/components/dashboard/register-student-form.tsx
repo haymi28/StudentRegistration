@@ -22,6 +22,7 @@ import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
 import type { Role, Student, Gender } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
+import { Textarea } from "@/components/ui/textarea"
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
@@ -40,6 +41,7 @@ const formSchema = z.object({
   subcity: z.string().min(1, "ክፍለ ከተማ ያስፈልጋል።"),
   kebele: z.string().min(1, "ቀበሌ ያስፈልጋል።"),
   houseNumber: z.string().min(1, "የቤት ቁጥር ያስፈልጋል።"),
+  houseAddressDetail: z.string().min(1, "የቤት ልዩ አድራሻ ያስፈልጋል።"),
   fatherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   motherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
@@ -63,6 +65,7 @@ export function RegisterStudentForm() {
             subcity: "",
             kebele: "",
             houseNumber: "",
+            houseAddressDetail: "",
             fatherPhone: "",
             motherPhone: "",
             role: adminRole !== 'superadmin' ? adminRole as Role : undefined,
@@ -240,6 +243,7 @@ export function RegisterStudentForm() {
                                 <FormField control={form.control} name="kebele" render={({ field }) => ( <FormItem><FormLabel>ቀበሌ</FormLabel><FormControl><Input placeholder="ለምሳሌ 08" {...field} /></FormControl><FormMessage /></FormItem> )} />
                                 <FormField control={form.control} name="houseNumber" render={({ field }) => ( <FormItem><FormLabel>የቤት ቁጥር</FormLabel><FormControl><Input placeholder="ለምሳሌ 123" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             </div>
+                            <FormField control={form.control} name="houseAddressDetail" render={({ field }) => ( <FormItem><FormLabel>የቤት ልዩ አድራሻ</FormLabel><FormControl><Textarea placeholder="የቤቱን አድራሻ በዝርዝር ያስገቡ (ለምሳሌ: ከትምህርት ቤቱ ጀርባ)" {...field} /></FormControl><FormMessage /></FormItem> )} />
                         </div>
 
                         <FormField control={form.control} name="fatherPhone" render={({ field }) => (

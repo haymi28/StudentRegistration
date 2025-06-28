@@ -12,6 +12,7 @@ export interface Student {
   subcity: string;
   kebele: string;
   houseNumber: string;
+  houseAddressDetail: string;
   fatherPhone: string;
   motherPhone: string;
   joiningDate: Date;

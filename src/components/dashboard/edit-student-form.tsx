@@ -23,6 +23,7 @@ import { useAuth } from "@/lib/auth"
 import { getStudentById, updateStudent } from "@/lib/data"
 import type { Student, Role, Gender } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
+import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "ሙሉ ስም ያስፈልጋል።"),
@@ -33,6 +34,7 @@ const formSchema = z.object({
   subcity: z.string().min(1, "ክፍለ ከተማ ያስፈልጋል።"),
   kebele: z.string().min(1, "ቀበሌ ያስፈልጋል።"),
   houseNumber: z.string().min(1, "የቤት ቁጥር ያስፈልጋል።"),
+  houseAddressDetail: z.string().min(1, "የቤት ልዩ አድራሻ ያስፈልጋል።"),
   fatherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   motherPhone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
@@ -241,6 +243,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                     <FormField control={form.control} name="kebele" render={({ field }) => ( <FormItem><FormLabel>ቀበሌ</FormLabel><FormControl><Input placeholder="ለምሳሌ 08" {...field} /></FormControl><FormMessage /></FormItem> )} />
                                     <FormField control={form.control} name="houseNumber" render={({ field }) => ( <FormItem><FormLabel>የቤት ቁጥር</FormLabel><FormControl><Input placeholder="ለምሳሌ 123" {...field} /></FormControl><FormMessage /></FormItem> )} />
                                 </div>
+                                <FormField control={form.control} name="houseAddressDetail" render={({ field }) => ( <FormItem><FormLabel>የቤት ልዩ አድራሻ</FormLabel><FormControl><Textarea placeholder="የቤቱን አድራሻ በዝርዝር ያስገቡ (ለምሳሌ: ከትምህርት ቤቱ ጀርባ)" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             </div>
                             <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ</FormLabel><FormControl><Input type="tel" placeholder="123-456-7890" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ</FormLabel><FormControl><Input type="tel" placeholder="098-765-4321" {...field} /></FormControl><FormMessage /></FormItem> )} />
