@@ -9,7 +9,9 @@ export interface Student {
   gender: Gender;
   educationLevel: string;
   dob: Date;
-  address: string;
+  subcity: string;
+  kebele: string;
+  houseNumber: string;
   fatherPhone: string;
   motherPhone: string;
   joiningDate: Date;
