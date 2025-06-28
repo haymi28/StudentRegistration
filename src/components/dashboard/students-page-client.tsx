@@ -29,7 +29,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import type { Student, Role, Gender } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
-import *XLSX from 'xlsx';
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
 
 const ROLE_NAMES: Record<string, string> = {
