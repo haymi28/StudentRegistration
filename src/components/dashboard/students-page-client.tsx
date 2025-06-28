@@ -29,7 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import type { Student, Role, Gender } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
-import * as XLSX from 'xlsx';
+import *XLSX from 'xlsx';
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
 
 const ROLE_NAMES: Record<string, string> = {
@@ -132,7 +132,7 @@ export function StudentsPageClient() {
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
     try {
         const { default: jsPDF } = await import('jspdf');
-        const { default: autoTable } = await import('jspdf-autotable');
+        await import('jspdf-autotable');
         const { amharicFont } = await import('@/lib/noto-sans-ethiopic-regular-font');
 
         const doc = new jsPDF();
@@ -165,7 +165,7 @@ export function StudentsPageClient() {
         doc.setFontSize(12);
         doc.text(`${transferredStudents.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[toRole]} ተዘዋውረዋል።`, 14, 30);
 
-        autoTable(doc, {
+        (doc as any).autoTable({
             startY: 35,
             head: [tableColumn],
             body: tableRows,
@@ -532,3 +532,5 @@ export function StudentsPageClient() {
     </>
   );
 }
+
+    
