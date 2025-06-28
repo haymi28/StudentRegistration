@@ -133,8 +133,14 @@ export function StudentsPageClient() {
     try {
         const { default: jsPDF } = await import('jspdf');
         const { default: autoTable } = await import('jspdf-autotable');
+        const { amharicFont } = await import('@/lib/noto-sans-ethiopic-regular-font');
 
         const doc = new jsPDF();
+        
+        doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
+        doc.addFont('NotoSansEthiopic-Regular.ttf', 'NotoSansEthiopic', 'normal');
+        doc.setFont('NotoSansEthiopic');
+        
         const transferredStudents = transferredStudentIds.map(id => getStudentById(id)).filter(Boolean) as Student[];
 
         if (transferredStudents.length === 0) {
@@ -153,24 +159,25 @@ export function StudentsPageClient() {
             tableRows.push(studentData);
         });
 
-        const date = new Date().toLocaleDateString();
+        const date = toEthiopianDateString(new Date());
         doc.setFontSize(18);
-        doc.text(`Student Transfer Report - ${date}`, 14, 22);
+        doc.text(`የተማሪ ዝውውር ሪፖርት - ${date}`, 14, 22);
         doc.setFontSize(12);
-        doc.text(`Transferred ${transferredStudents.length} student(s) from ${ROLE_NAMES[fromRole]} to ${ROLE_NAMES[toRole]}.`, 14, 30);
+        doc.text(`${transferredStudents.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[toRole]} ተዘዋውረዋል።`, 14, 30);
 
         autoTable(doc, {
             startY: 35,
             head: [tableColumn],
             body: tableRows,
             theme: 'grid',
-            headStyles: { fillColor: [41, 128, 185] },
+            styles: { font: 'NotoSansEthiopic', fontStyle: 'normal' },
+            headStyles: { font: 'NotoSansEthiopic', fillColor: [41, 128, 185], fontStyle: 'bold' },
         });
         
         doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
         toast({
             title: "የዝውውር ሪፖርት ወርዷል።",
-            description: `የዝውውር ሪፖርቱ ወርዷል።`,
+            description: `የፒዲኤፍ ሪፖርቱ በተሳካ ሁኔታ ተፈጥሯል።`,
         });
 
     } catch (error) {
@@ -511,5 +518,7 @@ export function StudentsPageClient() {
     </>
   );
 }
+
+    
 
     
