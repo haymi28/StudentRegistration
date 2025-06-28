@@ -131,7 +131,7 @@ export function StudentsPageClient() {
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
     try {
         const { default: jsPDF } = await import('jspdf');
-        await import('jspdf-autotable');
+        const { default: autoTable } = await import('jspdf-autotable');
         const { amharicFont } = await import('@/lib/noto-sans-ethiopic-regular-font');
 
         const doc = new jsPDF();
@@ -164,7 +164,7 @@ export function StudentsPageClient() {
         doc.setFontSize(12);
         doc.text(`${transferredStudents.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[toRole]} ተዘዋውረዋል።`, 14, 30);
 
-        (doc as any).autoTable({
+        autoTable(doc, {
             startY: 35,
             head: [tableColumn],
             body: tableRows,
@@ -347,7 +347,7 @@ export function StudentsPageClient() {
           <CardHeader>
             <CardTitle>ተማሪዎችን ያስተዳድሩ</CardTitle>
             <CardDescription>
-                {role === 'superadmin' ? 'ሁሉንም ተማሪዎች በማየት ላይ።' : `በ${ROLE_NAMES[role!] || ''} ቡድን ውስጥ ያሉ ተማሪዎችን በማየት ላይ።`}
+                {role === 'superadmin' ? 'ሁሉንም ተማሪዎች በማየት ላይ።' : `በ${ROLE_NAMES[role!] || ''} ክፍል ውስጥ ያሉ ተማሪዎችን በማየት ላይ።`}
             </CardDescription>
             <div className="flex flex-col sm:flex-row gap-2 mt-4 items-center">
               <div className="relative flex-1 w-full">
@@ -366,7 +366,7 @@ export function StudentsPageClient() {
                             variant="outline" 
                             className="h-9 gap-1"
                             disabled={isTransferDisabled}
-                            title={isTransferDisabled ? 'እንደ ሱፐር አስተዳዳሪ፣ ተማሪዎችን ከአንድ ቡድን ብቻ በአንድ ጊዜ ማስተላለፍ ይችላሉ።' : 'የተመረጡ ተማሪዎችን ያስተላልፉ'}
+                            title={isTransferDisabled ? 'እንደ ሱፐር አስተዳዳሪ፣ ተማሪዎችን ከአንድ ክፍል ብቻ በአንድ ጊዜ ማስተላለፍ ይችላሉ።' : 'የተመረጡ ተማሪዎችን ያስተላልፉ'}
                         >
                             <ChevronsRight className="h-4 w-4" />
                             <span>{selectedStudents.length} ተማሪ(ዎች) ያስተላልፉ</span>
@@ -376,14 +376,14 @@ export function StudentsPageClient() {
                         <DialogHeader>
                             <DialogTitle>የተማሪ ዝውውርን ያረጋግጡ</DialogTitle>
                             <DialogDescription>
-                               የተመረጡትን {selectedStudents.length} ተማሪ(ዎች) የሚያስተላልፉበትን ቡድን ይምረጡ።
+                               የተመረጡትን {selectedStudents.length} ተማሪ(ዎች) የሚያስተላልፉበትን ክፍል ይምረጡ።
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                             <Label htmlFor="transfer-role">ማስተላለፊያ</Label>
                             <Select onValueChange={(v) => setTransferToRole(v as Role)} value={transferToRole || undefined}>
                                 <SelectTrigger id="transfer-role">
-                                    <SelectValue placeholder="የመድረሻ ቡድን ይምረጡ..." />
+                                    <SelectValue placeholder="የመድረሻ ክፍል ይምረጡ..." />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {getTransferOptions().map(opt => (
@@ -533,5 +533,7 @@ export function StudentsPageClient() {
     </>
   );
 }
+
+    
 
     
