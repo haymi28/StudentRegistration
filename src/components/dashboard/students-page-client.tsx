@@ -27,7 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import type { Student, Role } from "@/lib/types";
+import type { Student, Role, Gender } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
 import * as XLSX from 'xlsx';
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
@@ -239,10 +239,16 @@ export function StudentsPageClient() {
         for (const row of json) {
             const amharicRole = String(row.role || '').trim();
             const studentRole = AMHARIC_TO_ROLE[amharicRole];
+            const gender = String(row.gender || '').trim();
             
-            if (!row.id || !row.fullName || !row.dob || !studentRole || !row.joiningDate || !row.christianName || !row.educationLevel || !row.address || !row.fatherPhone || !row.motherPhone) {
+            if (!row.id || !row.fullName || !row.dob || !studentRole || !row.joiningDate || !row.christianName || !row.educationLevel || !row.address || !row.fatherPhone || !row.motherPhone || !gender) {
                 failureCount++;
                 failedStudents.push(`${row.id || 'ID የለም'} (የጎደለ መረጃ)`);
+                continue;
+            }
+             if (gender !== 'ወንድ' && gender !== 'ሴት') {
+                failureCount++;
+                failedStudents.push(`${row.id} (የተሳሳተ ጾታ)`);
                 continue;
             }
             if (!['children', 'children2', 'juniors', 'seniors'].includes(studentRole)) {
@@ -265,6 +271,7 @@ export function StudentsPageClient() {
                 id: String(row.id).toUpperCase(),
                 fullName: String(row.fullName),
                 christianName: String(row.christianName),
+                gender: gender as Gender,
                 educationLevel: String(row.educationLevel),
                 dob: row.dob,
                 address: String(row.address),
@@ -402,6 +409,7 @@ export function StudentsPageClient() {
                   <TableHead className="w-16">ፎቶ</TableHead>
                   <TableHead>የተማሪ መለያ</TableHead>
                   <TableHead>ሙሉ ስም</TableHead>
+                  <TableHead>ጾታ</TableHead>
                   <TableHead>የትምህርት ደረጃ</TableHead>
                   <TableHead>ክፍል</TableHead>
                   <TableHead className="hidden md:table-cell">የትውልድ ቀን</TableHead>
@@ -423,6 +431,7 @@ export function StudentsPageClient() {
                     </TableCell>
                     <TableCell className="font-medium"><Badge variant="outline">{student.id}</Badge></TableCell>
                     <TableCell>{student.fullName}</TableCell>
+                    <TableCell>{student.gender}</TableCell>
                     <TableCell>{student.educationLevel}</TableCell>
                     <TableCell><Badge variant="secondary">{ROLE_NAMES[student.role]}</Badge></TableCell>
                     <TableCell className="hidden md:table-cell">{toEthiopianDateString(student.dob)}</TableCell>
@@ -442,7 +451,7 @@ export function StudentsPageClient() {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center">
+                    <TableCell colSpan={10} className="h-24 text-center">
                         ምንም ተማሪዎች አልተገኙም።
                     </TableCell>
                   </TableRow>
@@ -469,6 +478,7 @@ export function StudentsPageClient() {
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተማሪ መለያ</Label><span className="col-span-2 font-mono"><Badge variant="outline">{studentToView.id}</Badge></span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ሙሉ ስም</Label><span className="col-span-2 font-semibold">{studentToView.fullName}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የክርስትና ስም</Label><span className="col-span-2">{studentToView.christianName}</span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ጾታ</Label><span className="col-span-2">{studentToView.gender}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የትምህርት ደረጃ</Label><span className="col-span-2">{studentToView.educationLevel}</span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ክፍል</Label><span className="col-span-2"><Badge variant="secondary">{ROLE_NAMES[studentToView.role]}</Badge></span></div>
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የትውልድ ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.dob)}</span></div>
@@ -499,7 +509,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "educationLevel", "dob", "address", "fatherPhone", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "address", "fatherPhone", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
-import type { Role, Student } from "@/lib/types"
+import type { Role, Student, Gender } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
 
 const ROLE_NAMES: Record<string, string> = {
@@ -34,6 +34,7 @@ const formSchema = z.object({
   studentId: z.string().min(2, { message: "የተማሪ መለያ ቢያንስ 2 ቁምፊዎች መሆን አለበት።" }),
   fullName: z.string().min(2, "ሙሉ ስም ያስፈልጋል።"),
   christianName: z.string().min(2, "የክርስትና ስም ያስፈልጋል።"),
+  gender: z.enum(["ወንድ", "ሴት"], { required_error: "ጾታ ያስፈልጋል።" }),
   educationLevel: z.string().min(1, "የትምህርት ደረጃ ያስፈልጋል።"),
   dob: z.date({ required_error: "የትውልድ ቀን ያስፈልጋል።" }),
   address: z.string().min(5, "አድራሻ ያስፈልጋል።"),
@@ -140,6 +141,27 @@ export function RegisterStudentForm() {
                         <FormField control={form.control} name="christianName" render={({ field }) => (
                             <FormItem><FormLabel>የክርስትና ስም</FormLabel><FormControl><Input placeholder="ዮሐንስ" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />
+                        <FormField
+                            control={form.control}
+                            name="gender"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>ጾታ</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="ጾታ ይምረጡ" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="ወንድ">ወንድ</SelectItem>
+                                            <SelectItem value="ሴት">ሴት</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                          <FormField control={form.control} name="educationLevel" render={({ field }) => (
                             <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} /></FormControl><FormMessage /></FormItem>
                         )} />

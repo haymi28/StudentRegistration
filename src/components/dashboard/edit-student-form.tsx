@@ -21,12 +21,13 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { getStudentById, updateStudent } from "@/lib/data"
-import type { Student, Role } from "@/lib/types"
+import type { Student, Role, Gender } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "ሙሉ ስም ያስፈልጋል።"),
   christianName: z.string().min(2, "የክርስትና ስም ያስፈልጋል።"),
+  gender: z.enum(["ወንድ", "ሴት"], { required_error: "ጾታ ያስፈልጋል።" }),
   educationLevel: z.string().min(1, "የትምህርት ደረጃ ያስፈልጋል።"),
   dob: z.date({ required_error: "የትውልድ ቀን ያስፈልጋል።" }),
   address: z.string().min(5, "አድራሻ ያስፈልጋል።"),
@@ -147,6 +148,27 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField control={form.control} name="fullName" render={({ field }) => ( <FormItem><FormLabel>ሙሉ ስም</FormLabel><FormControl><Input placeholder="እከሌ እከሌ" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="christianName" render={({ field }) => ( <FormItem><FormLabel>የክርስትና ስም</FormLabel><FormControl><Input placeholder="ዮሐንስ" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField
+                                control={form.control}
+                                name="gender"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>ጾታ</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="ጾታ ይምረጡ" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="ወንድ">ወንድ</SelectItem>
+                                                <SelectItem value="ሴት">ሴት</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <FormField control={form.control} name="educationLevel" render={({ field }) => ( <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የተቀላቀለበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
