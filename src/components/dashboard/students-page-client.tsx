@@ -13,7 +13,7 @@ import {
   Upload,
 } from "lucide-react";
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -163,7 +163,7 @@ export function StudentsPageClient() {
         doc.setFontSize(12);
         doc.text(`${transferredStudents.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[toRole]} ተዘዋውረዋል።`, 14, 30);
 
-        (doc as any).autoTable({
+        autoTable(doc, {
             startY: 35,
             head: [tableColumn],
             body: tableRows,
