@@ -1,158 +1,62 @@
+'use server';
+
+import prisma from './prisma';
 import type { Student, Role } from './types';
 
-const defaultStudents: Student[] = [
-  {
-    id: 'STU001',
-    fullName: 'አበበ ከበደ',
-    christianName: 'ዮሐንስ',
-    gender: 'ወንድ',
-    educationLevel: 'መዋለ ህፃናት',
-    dob: new Date('2015-04-12'),
-    subcity: 'ቂርቆስ',
-    kebele: '08',
-    houseNumber: '123A',
-    houseAddressDetail: 'ከቤተክርስቲያኑ አጠገብ',
-    phone: '123-456-7890',
-    additionalPhone: '098-765-4321',
-    fatherPhone: '123-456-7890',
-    motherPhone: '098-765-4321',
-    joiningDate: new Date('2022-09-01'),
-    role: 'children',
-    photoUrl: 'https://placehold.co/100x100.png'
-  },
-  {
-    id: 'STU002',
-    fullName: 'አለሚቱ ጫላ',
-    christianName: 'አለሚቱ',
-    gender: 'ሴት',
-    educationLevel: 'ቅድመ-መዋለ ህፃናት',
-    dob: new Date('2016-08-22'),
-    subcity: 'ቦሌ',
-    kebele: '03',
-    houseNumber: '456B',
-    houseAddressDetail: 'ከዋናው መንገድ ገባ ብሎ',
-    phone: '111-222-3333',
-    additionalPhone: '444-555-6666',
-    fatherPhone: '111-222-3333',
-    motherPhone: '444-555-6666',
-    joiningDate: new Date('2022-09-01'),
-    role: 'children',
-    photoUrl: 'https://placehold.co/100x100.png'
-  },
-  {
-    id: 'STU003',
-    fullName: 'ጴጥሮስ ዮሐንስ',
-    christianName: 'ጴጥሮስ',
-    gender: 'ወንድ',
-    educationLevel: '3ኛ ክፍል',
-    dob: new Date('2012-01-30'),
-    subcity: 'ንፋስ ስልክ ላፍቶ',
-    kebele: '12',
-    houseNumber: '789C',
-    houseAddressDetail: 'የጋራ መኖሪያ ቤቶች',
-    phone: '777-888-9999',
-    additionalPhone: '000-111-2222',
-    fatherPhone: '777-888-9999',
-    motherPhone: '000-111-2222',
-    joiningDate: new Date('2023-01-15'),
-    role: 'juniors'
-  },
-  {
-    id: 'STU004',
-    fullName: 'ማርያም ጌታቸው',
-    christianName: 'ማርያም',
-    gender: 'ሴት',
-    educationLevel: '6ኛ ክፍል',
-    dob: new Date('2009-03-15'),
-    subcity: 'አራዳ',
-    kebele: '01',
-    houseNumber: '321D',
-    houseAddressDetail: 'ከአዲሱ ገበያ ጀርባ',
-    phone: '321-654-9870',
-    additionalPhone: '654-321-0987',
-    fatherPhone: '321-654-9870',
-    motherPhone: '654-321-0987',
-    joiningDate: new Date('2023-02-20'),
-    role: 'seniors'
-  },
-];
-
-const isServer = typeof window === 'undefined';
-
-const studentReviver = (key: string, value: any) => {
-    if ((key === 'dob' || key === 'joiningDate') && value) {
-        return new Date(value);
-    }
-    return value;
-};
-
-const getRawStudents = (): Student[] => {
-    if (isServer) return [...defaultStudents];
-    try {
-        const item = window.localStorage.getItem('students');
-        if (item) {
-            return JSON.parse(item, studentReviver);
-        } else {
-            const students = [...defaultStudents];
-            window.localStorage.setItem('students', JSON.stringify(students));
-            return students;
+export const getStudents = async (): Promise<Student[]> => {
+    return prisma.student.findMany({
+        orderBy: {
+            fullName: 'asc'
         }
-    } catch (error) {
-        console.error("Error with localStorage 'students'", error);
-        return [...defaultStudents];
-    }
+    });
 }
 
-const saveStudents = (students: Student[]) => {
-    if (isServer) return;
+export const addStudent = async (student: Student): Promise<boolean> => {
     try {
-        window.localStorage.setItem('students', JSON.stringify(students));
-        window.dispatchEvent(new Event("local-storage-update"));
+        const existingStudent = await prisma.student.findUnique({
+            where: { id: student.id },
+        });
+        if (existingStudent) {
+            console.warn(`Student with ID ${student.id} already exists.`);
+            return false;
+        }
+        await prisma.student.create({
+            data: student,
+        });
+        return true;
     } catch (error) {
-        console.error("Error writing students to localStorage", error);
-    }
-}
-
-export const getStudents = (): Student[] => {
-    return getRawStudents();
-}
-
-export const addStudent = (student: Student): boolean => {
-    const students = getRawStudents();
-    const studentExists = students.some(s => s.id.toLowerCase() === student.id.toLowerCase());
-    if (studentExists) {
-        console.warn(`Student with ID ${student.id} already exists.`);
+        console.error("Error adding student:", error);
         return false;
     }
-    students.push(student);
-    saveStudents(students);
-    return true;
 }
 
-export const getStudentById = (id: string): Student | undefined => {
-    const students = getRawStudents();
-    return students.find(s => s.id === id);
-}
-
-export const updateStudent = (updatedStudent: Student) => {
-    let students = getRawStudents();
-    students = students.map(s => s.id === updatedStudent.id ? updatedStudent : s);
-    saveStudents(students);
-}
-
-export const deleteStudent = (studentId: string) => {
-    let students = getRawStudents();
-    students = students.filter(s => s.id !== studentId);
-    saveStudents(students);
-}
-
-export const transferStudents = (studentIds: string[], newRole: Role) => {
-    let students = getRawStudents();
-    students = students.map(student => {
-        if (studentIds.includes(student.id)) {
-            return { ...student, role: newRole };
-        }
-        return student;
+export const getStudentById = async (id: string): Promise<Student | null> => {
+    return prisma.student.findUnique({
+        where: { id },
     });
-    saveStudents(students);
+}
+
+export const updateStudent = async (updatedStudent: Student): Promise<Student> => {
+    const { id, ...dataToUpdate } = updatedStudent;
+    return prisma.student.update({
+        where: { id: id },
+        data: dataToUpdate,
+    });
+}
+
+export const deleteStudent = async (studentId: string): Promise<void> => {
+    await prisma.student.delete({
+        where: { id: studentId },
+    });
+}
+
+export const transferStudents = async (studentIds: string[], newRole: Role): Promise<void> => {
+    await prisma.student.updateMany({
+        where: {
+            id: { in: studentIds },
+        },
+        data: {
+            role: newRole,
+        },
+    });
 }

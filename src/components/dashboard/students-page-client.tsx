@@ -30,7 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import type { Student, Role, Gender } from "@/lib/types";
+import type { Student, Role } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
 import { amharicFont } from "@/lib/noto-sans-ethiopic-regular-font";
@@ -51,8 +51,9 @@ const AMHARIC_TO_ROLE: Record<string, Role> = {
 
 
 export function StudentsPageClient() {
-  const { role, isLoading } = useAuth();
+  const { role, isLoading: isAuthLoading } = useAuth();
   const [allStudents, setAllStudents] = React.useState<Student[]>([]);
+  const [isDataLoading, setIsDataLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedStudents, setSelectedStudents] = React.useState<string[]>([]);
   const [studentToView, setStudentToView] = React.useState<Student | null>(null);
@@ -65,17 +66,28 @@ export function StudentsPageClient() {
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [isImportProcessing, setIsImportProcessing] = React.useState(false);
 
+  const fetchStudents = React.useCallback(async () => {
+    setIsDataLoading(true);
+    try {
+        const students = await getStudents();
+        setAllStudents(students);
+    } catch (error) {
+        console.error("Failed to fetch students", error);
+        toast({
+            variant: "destructive",
+            title: "የተማሪዎችን ዝርዝር ማምጣት አልተሳካም።",
+            description: "እባክዎ ገጹን እንደገና ይጫኑ።",
+        });
+    } finally {
+        setIsDataLoading(false);
+    }
+  }, [toast]);
 
   React.useEffect(() => {
-    const loadStudents = () => {
-      setAllStudents(getStudents());
-    };
-    loadStudents();
-    window.addEventListener("local-storage-update", loadStudents);
-    return () => {
-      window.removeEventListener("local-storage-update", loadStudents);
-    };
-  }, []);
+    if (!isAuthLoading) {
+      fetchStudents();
+    }
+  }, [isAuthLoading, fetchStudents]);
 
   const handleSelectStudent = (studentId: string) => {
     setSelectedStudents(prev => 
@@ -93,14 +105,15 @@ export function StudentsPageClient() {
     }
   };
 
-  const handleDeleteStudent = () => {
+  const handleDeleteStudent = async () => {
     if (!studentToDelete) return;
-    deleteStudent(studentToDelete.id);
+    await deleteStudent(studentToDelete.id);
     toast({
       title: "ተማሪ ተሰርዟል።",
       description: `${studentToDelete.fullName} ከስርዓቱ ተወግዷል።`,
     });
     setStudentToDelete(null);
+    await fetchStudents();
   };
 
   const isTransferDisabled = React.useMemo(() => {
@@ -132,15 +145,17 @@ export function StudentsPageClient() {
     return options;
   };
 
-  const generateTransferReport = (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
+  const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
     try {
         const doc = new jsPDF();
         
         doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
         doc.addFont('NotoSansEthiopic-Regular.ttf', 'NotoSansEthiopic', 'normal');
-        doc.setFont('NotoSansEthiopic');
-        
-        const transferredStudents = transferredStudentIds.map(id => getStudentById(id)).filter(Boolean) as Student[];
+        doc.setFont('NotoSansEthiopic', 'normal');
+
+        const transferredStudents = (await Promise.all(
+            transferredStudentIds.map(id => getStudentById(id))
+        )).filter(Boolean) as Student[];
 
         if (transferredStudents.length === 0) {
             return;
@@ -195,7 +210,7 @@ export function StudentsPageClient() {
     }
   };
 
-  const handleTransfer = () => {
+  const handleTransfer = async () => {
       if (!transferToRole || selectedStudents.length === 0) {
           return;
       }
@@ -208,9 +223,9 @@ export function StudentsPageClient() {
       
       const transferredIds = [...selectedStudents];
       
-      generateTransferReport(transferredIds, fromRole, transferToRole);
+      await generateTransferReport(transferredIds, fromRole, transferToRole);
       
-      transferStudents(transferredIds, transferToRole);
+      await transferStudents(transferredIds, transferToRole);
       
       toast({
         title: "ዝውውር ተጠናቅቋል።",
@@ -220,6 +235,7 @@ export function StudentsPageClient() {
       setSelectedStudents([]);
       setIsTransferring(false);
       setTransferToRole(null);
+      await fetchStudents();
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -280,7 +296,7 @@ export function StudentsPageClient() {
                 id: String(row.id).toUpperCase(),
                 fullName: String(row.fullName),
                 christianName: String(row.christianName),
-                gender: gender as Gender,
+                gender: gender,
                 educationLevel: String(row.educationLevel),
                 dob: row.dob,
                 subcity: String(row.subcity),
@@ -288,14 +304,15 @@ export function StudentsPageClient() {
                 houseNumber: String(row.houseNumber),
                 houseAddressDetail: String(row.houseAddressDetail),
                 phone: String(row.phone),
-                additionalPhone: row.additionalPhone ? String(row.additionalPhone) : undefined,
-                fatherPhone: row.fatherPhone ? String(row.fatherPhone) : undefined,
-                motherPhone: row.motherPhone ? String(row.motherPhone) : undefined,
+                additionalPhone: row.additionalPhone ? String(row.additionalPhone) : null,
+                fatherPhone: row.fatherPhone ? String(row.fatherPhone) : null,
+                motherPhone: row.motherPhone ? String(row.motherPhone) : null,
                 joiningDate: row.joiningDate,
                 role: studentRole,
+                photoUrl: null,
             };
 
-            const success = addStudent(studentToAdd);
+            const success = await addStudent(studentToAdd);
             if (success) {
                 successCount++;
             } else {
@@ -321,6 +338,7 @@ export function StudentsPageClient() {
         setIsImporting(false);
         setSelectedFile(null);
         setIsImportProcessing(false);
+        await fetchStudents();
     }
   };
 
@@ -333,7 +351,7 @@ export function StudentsPageClient() {
   
   const isAllSelected = selectedStudents.length > 0 && selectedStudents.length === filteredStudents.length;
 
-  if (isLoading) {
+  if (isAuthLoading || isDataLoading) {
       return <div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
   }
 
@@ -439,7 +457,7 @@ export function StudentsPageClient() {
                     </TableCell>
                     <TableCell>
                         <Avatar className="h-10 w-10">
-                            <AvatarImage src={student.photoUrl} alt={student.fullName} data-ai-hint="person student" />
+                            {student.photoUrl && <AvatarImage src={student.photoUrl} alt={student.fullName} data-ai-hint="person student" />}
                             <AvatarFallback>{student.fullName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                         </Avatar>
                     </TableCell>
@@ -482,7 +500,7 @@ export function StudentsPageClient() {
             <div>
               <div className="flex justify-center my-4">
                   <Avatar className="h-24 w-24">
-                      <AvatarImage src={studentToView.photoUrl} alt={studentToView.fullName} data-ai-hint="person student" />
+                      {studentToView.photoUrl && <AvatarImage src={studentToView.photoUrl} alt={studentToView.fullName} data-ai-hint="person student" />}
                       <AvatarFallback className="text-3xl">
                           {studentToView.fullName.split(' ').map(n => n[0]).join('')}
                       </AvatarFallback>
@@ -547,7 +565,3 @@ export function StudentsPageClient() {
     </>
   );
 }
-
-    
-
-    

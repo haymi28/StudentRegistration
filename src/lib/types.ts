@@ -1,23 +1,9 @@
-export type Role = 'children' | 'children2' | 'juniors' | 'seniors';
+import type { Student as PrismaStudent, Role as PrismaRole } from '@prisma/client';
+
+export type Role = PrismaRole;
 export type UserRole = Role | 'superadmin';
 export type Gender = 'ወንድ' | 'ሴት';
 
-export interface Student {
-  id: string;
-  fullName: string;
-  christianName: string;
-  gender: Gender;
-  educationLevel: string;
-  dob: Date;
-  subcity: string;
-  kebele: string;
-  houseNumber: string;
-  houseAddressDetail: string;
-  phone: string;
-  additionalPhone?: string;
-  fatherPhone?: string;
-  motherPhone?: string;
-  joiningDate: Date;
-  role: Role;
-  photoUrl?: string;
-}
+// Re-export Prisma's generated Student type.
+// This ensures our application types are always in sync with the database schema.
+export type Student = PrismaStudent;

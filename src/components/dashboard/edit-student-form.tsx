@@ -19,9 +19,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarIcon, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
-import { useAuth } from "@/lib/auth"
 import { getStudentById, updateStudent } from "@/lib/data"
-import type { Student, Role, Gender } from "@/lib/types"
+import type { Student, Role } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -47,7 +46,6 @@ const formSchema = z.object({
 export function EditStudentForm({ studentId }: { studentId: string }) {
     const router = useRouter()
     const { toast } = useToast()
-    const { isLoading } = useAuth()
     const [student, setStudent] = React.useState<Student | null | undefined>(undefined)
     const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
 
@@ -55,31 +53,27 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         resolver: zodResolver(formSchema),
     })
 
-    const fetchAndSetStudent = React.useCallback(() => {
-        const studentData = getStudentById(studentId);
-        if (studentData) {
-            setStudent(studentData);
-            form.reset({
-                ...studentData,
-            });
-            if (studentData.photoUrl) {
-                setPhotoPreview(studentData.photoUrl);
-            }
-        } else {
-             setStudent(null);
-        }
-    }, [studentId, form]);
-
     React.useEffect(() => {
-        fetchAndSetStudent();
-        
-        const handleStorageChange = () => fetchAndSetStudent();
-        window.addEventListener('local-storage-update', handleStorageChange);
-
-        return () => {
-            window.removeEventListener('local-storage-update', handleStorageChange);
+        const fetchStudentData = async () => {
+            const studentData = await getStudentById(studentId);
+            if (studentData) {
+                setStudent(studentData);
+                form.reset({
+                    ...studentData,
+                    additionalPhone: studentData.additionalPhone ?? '',
+                    fatherPhone: studentData.fatherPhone ?? '',
+                    motherPhone: studentData.motherPhone ?? '',
+                });
+                if (studentData.photoUrl) {
+                    setPhotoPreview(studentData.photoUrl);
+                }
+            } else {
+                 setStudent(null);
+            }
         };
-    }, [fetchAndSetStudent]);
+
+        fetchStudentData();
+    }, [studentId, form]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!student) return;
@@ -106,12 +100,17 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                 return;
             }
         }
-
-        updateStudent({
+        
+        const studentToUpdate: Student = {
             ...student,
             ...studentData,
             photoUrl: photoUrl,
-        });
+            additionalPhone: values.additionalPhone || null,
+            fatherPhone: values.fatherPhone || null,
+            motherPhone: values.motherPhone || null,
+        }
+
+        await updateStudent(studentToUpdate);
         toast({
             title: "የተማሪ መረጃ ተዘምኗል!",
             description: `የ${values.fullName} መረጃ ተዘምኗል።`,
@@ -119,7 +118,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         router.push("/dashboard/students")
     }
 
-    if (student === undefined || isLoading) {
+    if (student === undefined) {
         return <div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
     }
 

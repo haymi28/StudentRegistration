@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
-import type { Role, Student, Gender } from "@/lib/types"
+import type { Role, Student } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -84,23 +84,16 @@ export function RegisterStudentForm() {
 
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        const { photo, ...studentData } = values;
-
-        const studentToSave: Omit<Student, 'dob'|'joiningDate'> & { dob: Date; joiningDate: Date; photoUrl?: string} = {
-            ...studentData,
-            id: studentData.studentId.toUpperCase(),
-        };
-
-        if (photo && photo.length > 0) {
-            const file = photo[0];
+        let photoUrl: string | null = null;
+        if (values.photo && values.photo.length > 0) {
+            const file = values.photo[0];
             try {
-                const photoUrl = await new Promise<string>((resolve, reject) => {
+                photoUrl = await new Promise<string>((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = (event) => resolve(event.target?.result as string);
                     reader.onerror = (error) => reject(error);
                     reader.readAsDataURL(file);
                 });
-                studentToSave.photoUrl = photoUrl;
             } catch (error) {
                 console.error("Error reading file:", error);
                 toast({
@@ -112,7 +105,27 @@ export function RegisterStudentForm() {
             }
         }
         
-        const success = addStudent(studentToSave as Student)
+        const studentToSave: Student = {
+          id: values.studentId.toUpperCase(),
+          fullName: values.fullName,
+          christianName: values.christianName,
+          gender: values.gender,
+          educationLevel: values.educationLevel,
+          dob: values.dob,
+          subcity: values.subcity,
+          kebele: values.kebele,
+          houseNumber: values.houseNumber,
+          houseAddressDetail: values.houseAddressDetail,
+          phone: values.phone,
+          additionalPhone: values.additionalPhone || null,
+          fatherPhone: values.fatherPhone || null,
+          motherPhone: values.motherPhone || null,
+          joiningDate: values.joiningDate,
+          role: values.role,
+          photoUrl: photoUrl,
+        };
+        
+        const success = await addStudent(studentToSave)
         
         if (success) {
             toast({
