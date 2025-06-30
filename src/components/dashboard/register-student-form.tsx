@@ -174,6 +174,7 @@ export function RegisterStudentForm() {
                         <FormField control={form.control} name="fullName" render={({ field }) => (
                             <FormItem><FormLabel>ሙሉ ስም</FormLabel><FormControl><Input placeholder="እከሌ እከሌ" {...field} name="fullName" autoComplete="name" /></FormControl><FormMessage /></FormItem>
                         )} />
+                        <FormField control={form.control} name="motherName" render={({ field }) => ( <FormItem><FormLabel>የእናት ስም</FormLabel><FormControl><Input placeholder="እትት እከሌ" {...field} name="motherName" autoComplete="name" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                         <FormField control={form.control} name="christianName" render={({ field }) => (
                             <FormItem><FormLabel>የክርስትና ስም</FormLabel><FormControl><Input placeholder="ዮሐንስ" {...field} name="christianName" autoComplete="off" /></FormControl><FormMessage /></FormItem>
                         )} />
@@ -279,7 +280,6 @@ export function RegisterStudentForm() {
                         <FormField control={form.control} name="phone" render={({ field }) => ( <FormItem><FormLabel>ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="phone" autoComplete="tel" /></FormControl><FormMessage /></FormItem> )} />
                         <FormField control={form.control} name="additionalPhone" render={({ field }) => ( <FormItem><FormLabel>ተጨማሪ ስልክ</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="additionalPhone" autoComplete="tel-additional" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                         <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="fatherPhone" autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
-                        <FormField control={form.control} name="motherName" render={({ field }) => ( <FormItem><FormLabel>የእናት ስም</FormLabel><FormControl><Input placeholder="እትት እከሌ" {...field} name="motherName" autoComplete="name" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                         <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="motherPhone" autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
 
                     </CardContent>
@@ -292,3 +292,5 @@ export function RegisterStudentForm() {
         </Card>
     )
 }
+
+    
