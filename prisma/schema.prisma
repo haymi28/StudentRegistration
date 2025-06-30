@@ -11,32 +11,23 @@ datasource db {
 }
 
 model Student {
-  id                  String    @id @unique
-  fullName            String
-  christianName       String
-  motherName          String?
-  gender              String
-  educationLevel      String
-  dob                 DateTime
-  subcity             String
-  kebele              String
-  houseNumber         String
-  houseAddressDetail  String
-  phone               String
-  additionalPhone     String?
-  fatherPhone         String?
-  motherPhone         String?
-  joiningDate         DateTime
-  formFilledDate      DateTime
-  role                Role
-  photoUrl            String?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-}
-
-enum Role {
-  children
-  children2
-  juniors
-  seniors
+  id                 String    @id
+  fullName           String
+  christianName      String
+  gender             String
+  educationLevel     String
+  dob                DateTime
+  subcity            String
+  kebele             String
+  houseNumber        String
+  houseAddressDetail String
+  phone              String
+  additionalPhone    String?
+  fatherPhone        String?
+  motherName         String?
+  motherPhone        String?
+  joiningDate        DateTime
+  formFilledDate     DateTime
+  photoUrl           String?
+  role               String
 }

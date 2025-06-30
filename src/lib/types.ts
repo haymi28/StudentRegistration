@@ -1,6 +1,6 @@
-import type { Student as PrismaStudent, Role as PrismaRole, Prisma } from '@prisma/client';
+import type { Student as PrismaStudent, Prisma } from '@prisma/client';
 
-export type Role = PrismaRole;
+export type Role = 'children' | 'children2' | 'juniors' | 'seniors';
 export type UserRole = Role | 'superadmin';
 export type Gender = 'ወንድ' | 'ሴት';
 
