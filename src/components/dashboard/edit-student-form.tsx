@@ -40,6 +40,7 @@ const formSchema = z.object({
   motherName: z.string().min(2, "የእናት ስም ቢያንስ 2 ፊደላት መሆን አለበት።").optional().or(z.literal('')),
   motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
+  formFilledDate: z.date({ required_error: "ቅጹ የተሞላበት ቀን ያስፈልጋል።" }),
   role: z.enum(["children", "children2", "juniors", "seniors"]),
   photo: z.any().optional(),
 })
@@ -254,6 +255,45 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                             <FormField control={form.control} name="additionalPhone" render={({ field }) => ( <FormItem><FormLabel>ተጨማሪ ስልክ</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
+                            
+                            <FormField
+                                control={form.control}
+                                name="formFilledDate"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col md:col-span-2">
+                                        <FormLabel>ቅጹ የተሞላበት ቀን</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {field.value ? (
+                                                            toEthiopianDateString(field.value)
+                                                        ) : (
+                                                            <span>ቀን ይምረጡ</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">
@@ -265,5 +305,3 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         </Card>
     );
 }
-
-    

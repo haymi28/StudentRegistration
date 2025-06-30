@@ -261,7 +261,7 @@ export function StudentsPageClient() {
             const studentRole = AMHARIC_TO_ROLE[amharicRole];
             const gender = String(row.gender || '').trim();
             
-            if (!row.id || !row.fullName || !row.dob || !studentRole || !row.joiningDate || !row.christianName || !row.educationLevel || !row.subcity || !row.kebele || !row.houseNumber || !row.houseAddressDetail || !row.phone || !gender) {
+            if (!row.id || !row.fullName || !row.dob || !studentRole || !row.joiningDate || !row.formFilledDate || !row.christianName || !row.educationLevel || !row.subcity || !row.kebele || !row.houseNumber || !row.houseAddressDetail || !row.phone || !gender) {
                 failureCount++;
                 failedStudents.push(`${row.id || 'ID የለም'} (የጎደለ መረጃ)`);
                 continue;
@@ -281,7 +281,7 @@ export function StudentsPageClient() {
                 failedStudents.push(`${row.id} (ያልተፈቀደ ክፍል)`);
                 continue;
             }
-            if (!(row.dob instanceof Date) || !(row.joiningDate instanceof Date)) {
+            if (!(row.dob instanceof Date) || !(row.joiningDate instanceof Date) || !(row.formFilledDate instanceof Date)) {
                 failureCount++;
                 failedStudents.push(`${row.id} (የተሳሳተ የቀን ቅርጸት)`);
                 continue;
@@ -304,6 +304,7 @@ export function StudentsPageClient() {
                 motherName: row.motherName ? String(row.motherName) : undefined,
                 motherPhone: row.motherPhone ? String(row.motherPhone) : undefined,
                 joiningDate: row.joiningDate,
+                formFilledDate: row.formFilledDate,
                 role: studentRole,
                 photoUrl: undefined,
             };
@@ -447,6 +448,7 @@ export function StudentsPageClient() {
                   <TableHead>ክፍል</TableHead>
                   <TableHead className="hidden md:table-cell">የትውልድ ቀን</TableHead>
                   <TableHead className="hidden lg:table-cell">የተመዘገበበት ቀን</TableHead>
+                  <TableHead className="hidden lg:table-cell">ቅጹ የተሞላበት ቀን</TableHead>
                   <TableHead><span className="sr-only">ድርጊቶች</span></TableHead>
                 </TableRow>
               </TableHeader>
@@ -469,6 +471,7 @@ export function StudentsPageClient() {
                     <TableCell><Badge variant="secondary">{ROLE_NAMES[student.role]}</Badge></TableCell>
                     <TableCell className="hidden md:table-cell">{toEthiopianDateString(student.dob)}</TableCell>
                     <TableCell className="hidden lg:table-cell">{toEthiopianDateString(student.joiningDate)}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{toEthiopianDateString(student.formFilledDate)}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button aria-haspopup="true" size="icon" variant="ghost"><MoreHorizontal className="h-4 w-4" /><span className="sr-only">ምናሌ ቀይር</span></Button></DropdownMenuTrigger>
@@ -484,7 +487,7 @@ export function StudentsPageClient() {
                   </TableRow>
                 )) : (
                   <TableRow>
-                    <TableCell colSpan={10} className="h-24 text-center">
+                    <TableCell colSpan={11} className="h-24 text-center">
                         ምንም ተማሪዎች አልተገኙም።
                     </TableCell>
                   </TableRow>
@@ -525,6 +528,7 @@ export function StudentsPageClient() {
                 {studentToView.fatherPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የአባት ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.fatherPhone}</span></div>}
                 {studentToView.motherPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የእናት ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.motherPhone}</span></div>}
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተመዘገበበት ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.joiningDate)}</span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ቅጹ የተሞላበት ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.formFilledDate)}</span></div>
               </div>
             </div>
           )}
@@ -548,7 +552,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", "formFilledDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob", "joiningDate", እና "formFilledDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -567,5 +571,3 @@ export function StudentsPageClient() {
     </>
   );
 }
-
-    
