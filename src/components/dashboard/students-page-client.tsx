@@ -13,7 +13,7 @@ import {
   Upload,
 } from "lucide-react";
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 import { Badge } from "@/components/ui/badge";
@@ -164,7 +164,7 @@ export function StudentsPageClient() {
         doc.setFontSize(12);
         doc.text(`${transferredStudents.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[toRole]} ተዘዋውረዋል።`, 14, 30);
 
-        autoTable(doc, {
+        (doc as any).autoTable({
             startY: 35,
             head: [tableColumn],
             body: tableRows,
@@ -197,9 +197,10 @@ export function StudentsPageClient() {
       }
       
       const transferredIds = [...selectedStudents];
-      transferStudents(transferredIds, transferToRole);
       
       generateTransferReport(transferredIds, fromRole, transferToRole);
+      
+      transferStudents(transferredIds, transferToRole);
       
       toast({
         title: "ዝውውር ተጠናቅቋል።",
@@ -536,3 +537,5 @@ export function StudentsPageClient() {
     </>
   );
 }
+
+    
