@@ -169,7 +169,7 @@ export function StudentsPageClient() {
             body: tableRows,
             theme: 'grid',
             styles: { font: 'NotoSansEthiopic', fontStyle: 'normal' },
-            headStyles: { font: 'NotoSansEthiopic', fillColor: [41, 128, 185], fontStyle: 'bold' },
+            headStyles: { font: 'NotoSansEthiopic', fillColor: [41, 128, 185], fontStyle: 'normal' },
         });
         
         doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
