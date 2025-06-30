@@ -37,6 +37,7 @@ const formSchema = z.object({
   phone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
   additionalPhone: z.string().min(10, "ትክክለኛ ተጨማሪ ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   fatherPhone: z.string().min(10, "ትክክለኛ የአባት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
+  motherName: z.string().min(2, "የእናት ስም ቢያንስ 2 ፊደላት መሆን አለበት።").optional().or(z.literal('')),
   motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
   role: z.enum(["children", "children2", "juniors", "seniors"]),
@@ -62,6 +63,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                     ...studentData,
                     additionalPhone: studentData.additionalPhone ?? '',
                     fatherPhone: studentData.fatherPhone ?? '',
+                    motherName: studentData.motherName ?? '',
                     motherPhone: studentData.motherPhone ?? '',
                 });
                 if (studentData.photoUrl) {
@@ -107,6 +109,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
             photoUrl: photoUrl,
             additionalPhone: values.additionalPhone || null,
             fatherPhone: values.fatherPhone || null,
+            motherName: values.motherName || null,
             motherPhone: values.motherPhone || null,
         }
 
@@ -249,6 +252,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                             <FormField control={form.control} name="phone" render={({ field }) => ( <FormItem><FormLabel>ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="additionalPhone" render={({ field }) => ( <FormItem><FormLabel>ተጨማሪ ስልክ</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="motherName" render={({ field }) => ( <FormItem><FormLabel>የእናት ስም</FormLabel><FormControl><Input placeholder="እትት እከሌ" {...field} autoComplete="name" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                         </div>
                     </CardContent>

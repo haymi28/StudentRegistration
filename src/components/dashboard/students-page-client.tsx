@@ -301,6 +301,7 @@ export function StudentsPageClient() {
                 phone: String(row.phone),
                 additionalPhone: row.additionalPhone ? String(row.additionalPhone) : undefined,
                 fatherPhone: row.fatherPhone ? String(row.fatherPhone) : undefined,
+                motherName: row.motherName ? String(row.motherName) : undefined,
                 motherPhone: row.motherPhone ? String(row.motherPhone) : undefined,
                 joiningDate: row.joiningDate,
                 role: studentRole,
@@ -521,6 +522,7 @@ export function StudentsPageClient() {
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.phone}</span></div>
                 {studentToView.additionalPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ተጨማሪ ስልክ</Label><span className="col-span-2">{studentToView.additionalPhone}</span></div>}
                 {studentToView.fatherPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የአባት ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.fatherPhone}</span></div>}
+                {studentToView.motherName && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የእናት ስም</Label><span className="col-span-2">{studentToView.motherName}</span></div>}
                 {studentToView.motherPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የእናት ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.motherPhone}</span></div>}
                 <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተመዘገበበት ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.joiningDate)}</span></div>
               </div>
@@ -546,7 +548,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
