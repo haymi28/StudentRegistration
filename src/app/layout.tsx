@@ -3,8 +3,11 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'Academia የተማሪዎች ክትትል',
+  title: 'የተማሪዎች መመዝገቢያ ቅጽ',
   description: 'የተማሪዎች ክትትል እና አስተዳደር ስርዓት',
+  icons: {
+    icon: '/dgc.jpg',
+  }
 };
 
 export default function RootLayout({
