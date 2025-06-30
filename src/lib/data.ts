@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from './prisma';
-import type { Student, Role } from './types';
+import type { Student, Role, StudentCreateInput } from './types';
 
 export const getStudents = async (): Promise<Student[]> => {
     return prisma.student.findMany({
@@ -11,28 +11,10 @@ export const getStudents = async (): Promise<Student[]> => {
     });
 }
 
-export const addStudent = async (student: Student): Promise<{ data: Student | null; error: { code?: string; message: string } | null }> => {
+export const addStudent = async (student: StudentCreateInput): Promise<{ data: Student | null; error: { code?: string; message: string } | null }> => {
     try {
         const newStudent = await prisma.student.create({
-            data: {
-                id: student.id,
-                fullName: student.fullName,
-                christianName: student.christianName,
-                gender: student.gender,
-                educationLevel: student.educationLevel,
-                dob: student.dob,
-                subcity: student.subcity,
-                kebele: student.kebele,
-                houseNumber: student.houseNumber,
-                houseAddressDetail: student.houseAddressDetail,
-                phone: student.phone,
-                additionalPhone: student.additionalPhone,
-                fatherPhone: student.fatherPhone,
-                motherPhone: student.motherPhone,
-                joiningDate: student.joiningDate,
-                role: student.role,
-                photoUrl: student.photoUrl,
-            },
+            data: student,
         });
         return { data: newStudent, error: null };
     } catch (error: any) {

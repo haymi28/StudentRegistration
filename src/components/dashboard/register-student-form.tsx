@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
-import type { Role, Student } from "@/lib/types"
+import type { Role, StudentCreateInput } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -105,7 +105,7 @@ export function RegisterStudentForm() {
             }
         }
         
-        const studentToSave: Student = {
+        const studentToSave: StudentCreateInput = {
           id: values.studentId.toUpperCase(),
           fullName: values.fullName,
           christianName: values.christianName,
@@ -117,12 +117,12 @@ export function RegisterStudentForm() {
           houseNumber: values.houseNumber,
           houseAddressDetail: values.houseAddressDetail,
           phone: values.phone,
-          additionalPhone: values.additionalPhone || null,
-          fatherPhone: values.fatherPhone || null,
-          motherPhone: values.motherPhone || null,
+          additionalPhone: values.additionalPhone || undefined,
+          fatherPhone: values.fatherPhone || undefined,
+          motherPhone: values.motherPhone || undefined,
           joiningDate: values.joiningDate,
           role: values.role,
-          photoUrl: photoUrl,
+          photoUrl: photoUrl || undefined,
         };
         
         const result = await addStudent(studentToSave);

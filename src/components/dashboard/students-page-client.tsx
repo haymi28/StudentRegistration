@@ -30,7 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import type { Student, Role } from "@/lib/types";
+import type { Student, Role, StudentCreateInput } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
 import { amharicFont } from "@/lib/noto-sans-ethiopic-regular-font";
@@ -183,7 +183,7 @@ export function StudentsPageClient() {
     doc.text(`የተማሪዎች ብዛት: ${transferredStudents.length}`, 205, 32, { align: 'right' });
 
 
-    doc.autoTable({
+    (doc as any).autoTable({
         startY: 40,
         head: [tableColumn],
         body: tableRows,
@@ -287,7 +287,7 @@ export function StudentsPageClient() {
                 continue;
             }
 
-            const studentToAdd: Student = {
+            const studentToAdd: StudentCreateInput = {
                 id: String(row.id).toUpperCase(),
                 fullName: String(row.fullName),
                 christianName: String(row.christianName),
@@ -299,12 +299,12 @@ export function StudentsPageClient() {
                 houseNumber: String(row.houseNumber),
                 houseAddressDetail: String(row.houseAddressDetail),
                 phone: String(row.phone),
-                additionalPhone: row.additionalPhone ? String(row.additionalPhone) : null,
-                fatherPhone: row.fatherPhone ? String(row.fatherPhone) : null,
-                motherPhone: row.motherPhone ? String(row.motherPhone) : null,
+                additionalPhone: row.additionalPhone ? String(row.additionalPhone) : undefined,
+                fatherPhone: row.fatherPhone ? String(row.fatherPhone) : undefined,
+                motherPhone: row.motherPhone ? String(row.motherPhone) : undefined,
                 joiningDate: row.joiningDate,
                 role: studentRole,
-                photoUrl: null,
+                photoUrl: undefined,
             };
 
             const result = await addStudent(studentToAdd);
