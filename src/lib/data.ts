@@ -20,8 +20,28 @@ export const addStudent = async (student: Student): Promise<boolean> => {
             console.warn(`Student with ID ${student.id} already exists.`);
             return false;
         }
+
+        // Explicitly build the data object to ensure no unexpected properties are passed.
         await prisma.student.create({
-            data: student,
+            data: {
+                id: student.id,
+                fullName: student.fullName,
+                christianName: student.christianName,
+                gender: student.gender,
+                educationLevel: student.educationLevel,
+                dob: student.dob,
+                subcity: student.subcity,
+                kebele: student.kebele,
+                houseNumber: student.houseNumber,
+                houseAddressDetail: student.houseAddressDetail,
+                phone: student.phone,
+                additionalPhone: student.additionalPhone,
+                fatherPhone: student.fatherPhone,
+                motherPhone: student.motherPhone,
+                joiningDate: student.joiningDate,
+                role: student.role,
+                photoUrl: student.photoUrl,
+            },
         });
         return true;
     } catch (error) {
