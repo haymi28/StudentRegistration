@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums based on the types defined in src/lib/types.ts
+// Note: Enum values in Prisma must be valid identifiers (e.g., no Amharic characters).
+// A mapping would be required in the application code.
+enum Gender {
+  MALE // Corresponds to 'ወንድ'
+  FEMALE // Corresponds to 'ሴት'
+}
+
+enum Role {
+  children
+  children2
+  juniors
+  seniors
+}
+
+enum UserRole {
+  superadmin
+  children
+  children2
+  juniors
+  seniors
+}
+
+// Model for the student data, based on the Student interface in src/lib/types.ts
+model Student {
+  id                 String    @id
+  fullName           String
+  christianName      String
+  gender             Gender
+  educationLevel     String
+  dob                DateTime  @db.Date
+  subcity            String
+  kebele             String
+  houseNumber        String
+  houseAddressDetail String
+  phone              String
+  additionalPhone    String?
+  fatherPhone        String?
+  motherPhone        String?
+  joiningDate        DateTime  @db.Date
+  role               Role
+  photoUrl           String?
+  
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+// Model for the user/admin data, based on the authentication logic in the app
+model User {
+  id           String   @id @default(cuid())
+  role         UserRole @unique // Based on the current app structure of one password per role
+  passwordHash String
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
