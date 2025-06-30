@@ -13,7 +13,7 @@ import {
   Upload,
 } from "lucide-react";
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 import { Badge } from "@/components/ui/badge";
@@ -164,7 +164,7 @@ export function StudentsPageClient() {
         doc.setFontSize(12);
         doc.text(`${transferredStudents.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[toRole]} ተዘዋውረዋል።`, 14, 30);
 
-        (doc as any).autoTable({
+        autoTable(doc, {
             startY: 35,
             head: [tableColumn],
             body: tableRows,
@@ -517,7 +517,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherPhone", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherPhone", "joiningDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob" እና "joiningDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -536,5 +536,3 @@ export function StudentsPageClient() {
     </>
   );
 }
-
-    
