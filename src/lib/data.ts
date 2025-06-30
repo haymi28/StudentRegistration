@@ -11,18 +11,9 @@ export const getStudents = async (): Promise<Student[]> => {
     });
 }
 
-export const addStudent = async (student: Student): Promise<boolean> => {
+export const addStudent = async (student: Student): Promise<Student> => {
     try {
-        const existingStudent = await prisma.student.findUnique({
-            where: { id: student.id },
-        });
-        if (existingStudent) {
-            console.warn(`Student with ID ${student.id} already exists.`);
-            return false;
-        }
-
-        // Explicitly build the data object to ensure no unexpected properties are passed.
-        await prisma.student.create({
+        const newStudent = await prisma.student.create({
             data: {
                 id: student.id,
                 fullName: student.fullName,
@@ -43,10 +34,12 @@ export const addStudent = async (student: Student): Promise<boolean> => {
                 photoUrl: student.photoUrl,
             },
         });
-        return true;
+        return newStudent;
     } catch (error) {
+        // Log the actual error on the server for debugging
         console.error("Error adding student:", error);
-        return false;
+        // Re-throw the error so the client can handle it specifically
+        throw error;
     }
 }
 

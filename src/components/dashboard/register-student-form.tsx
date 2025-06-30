@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
+import { Prisma } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -125,24 +126,32 @@ export function RegisterStudentForm() {
           photoUrl: photoUrl,
         };
         
-        const success = await addStudent(studentToSave)
-        
-        if (success) {
+        try {
+            await addStudent(studentToSave);
             toast({
                 title: "ተማሪ ተመዝግቧል!",
                 description: `${values.fullName} ወደ ስርዓቱ ተጨምሯል።`,
-            })
-            router.push("/dashboard/students")
-        } else {
-             form.setError("studentId", {
-                type: "manual",
-                message: "ይህ የተማሪ መለያ አስቀድሞ አለ። እባክዎ ልዩ መለያ ይጠቀሙ።",
             });
-            toast({
-                variant: "destructive",
-                title: "ምዝገባ አልተሳካም።",
-                description: `መለያ ${values.studentId.toUpperCase()} ያለው ተማሪ አስቀድሞ አለ።`,
-            })
+            router.push("/dashboard/students");
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+                form.setError("studentId", {
+                    type: "manual",
+                    message: "ይህ የተማሪ መለያ አስቀድሞ አለ። እባክዎ ልዩ መለያ ይጠቀሙ።",
+                });
+                toast({
+                    variant: "destructive",
+                    title: "ምዝገባ አልተሳካም።",
+                    description: `መለያ ${values.studentId.toUpperCase()} ያለው ተማሪ አስቀድሞ አለ።`,
+                });
+            } else {
+                console.error("Failed to register student:", error);
+                toast({
+                    variant: "destructive",
+                    title: "ምዝገባ አልተሳካም።",
+                    description: "ያልተጠበቀ ስህተት ተፈጥሯል። እባክዎ ቆይተው እንደገና ይሞክሩ።",
+                });
+            }
         }
     }
     

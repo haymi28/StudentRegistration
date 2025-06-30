@@ -15,6 +15,7 @@ import {
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { Prisma } from "@prisma/client";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -146,68 +147,63 @@ export function StudentsPageClient() {
   };
 
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
-    try {
-        const doc = new jsPDF();
-        
-        doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
-        doc.addFont('NotoSansEthiopic-Regular.ttf', 'NotoSansEthiopic', 'normal');
-        doc.setFont('NotoSansEthiopic', 'normal');
+    const doc = new jsPDF();
+    
+    doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
+    doc.addFont('NotoSansEthiopic-Regular.ttf', 'NotoSansEthiopic', 'normal');
+    doc.setFont('NotoSansEthiopic');
 
-        const transferredStudents = (await Promise.all(
-            transferredStudentIds.map(id => getStudentById(id))
-        )).filter(Boolean) as Student[];
+    const transferredStudents = (await Promise.all(
+        transferredStudentIds.map(id => getStudentById(id))
+    )).filter(Boolean) as Student[];
 
-        if (transferredStudents.length === 0) {
-            return;
-        }
-
-        const tableColumn = ["የተማሪ መለያ", "ሙሉ ስም", "የክርስትና ስም"];
-        const tableRows: (string | null)[][] = [];
-
-        transferredStudents.forEach(student => {
-            const studentData = [
-                student.id,
-                student.fullName,
-                student.christianName,
-            ];
-            tableRows.push(studentData);
-        });
-
-        const date = toEthiopianDateString(new Date());
-        doc.setFontSize(18);
-        doc.text(`የተማሪ ዝውውር ሪፖርት`, 105, 15, { align: 'center' });
-        doc.setFontSize(12);
-        doc.text(`ከ: ${ROLE_NAMES[fromRole]}`, 14, 25);
-        doc.text(`ወደ: ${ROLE_NAMES[toRole]}`, 14, 32);
-        doc.text(`ቀን: ${date}`, 205, 25, { align: 'right' });
-        doc.text(`የተማሪዎች ብዛት: ${transferredStudents.length}`, 205, 32, { align: 'right' });
-
-
-        autoTable(doc, {
-            startY: 40,
-            head: [tableColumn],
-            body: tableRows,
-            theme: 'grid',
-            styles: { font: 'NotoSansEthiopic', fontStyle: 'normal', cellPadding: 3, fontSize: 10 },
-            headStyles: { font: 'NotoSansEthiopic', fontStyle: 'normal', fillColor: [34, 139, 34], textColor: 255, fontSize: 12 },
-            didDrawPage: function (data) {
-              // Footer
-              doc.setFontSize(10);
-              const pageCount = (doc.internal as any).getNumberOfPages();
-              doc.text(`ገጽ ${data.pageNumber} ከ ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
-            }
-        });
-        
-        doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
-        toast({
-            title: "የዝውውር ሪፖርት ወርዷል።",
-            description: `የፒዲኤፍ ሪፖርቱ በተሳካ ሁኔታ ተፈጥሯል።`,
-        });
-
-    } catch (error) {
-        console.error("Failed to generate PDF report:", error);
-        toast({ variant: 'destructive', title: 'ሪፖርት መፍጠር አልተሳካም።', description: 'የፒዲኤፍ ሪፖርቱን በመፍጠር ላይ ስህተት ነበር።' });
+    if (transferredStudents.length === 0) {
+        toast({ variant: 'destructive', title: 'ሪፖርት መፍጠር አልተሳካም።', description: 'የተዘዋወሩ ተማሪዎችን ማምጣት አልተቻለም።' });
+        return;
     }
+
+    const tableColumn = ["የተማሪ መለያ", "ሙሉ ስም", "የክርስትና ስም"];
+    const tableRows: (string | null)[][] = [];
+
+    transferredStudents.forEach(student => {
+        const studentData = [
+            student.id,
+            student.fullName,
+            student.christianName,
+        ];
+        tableRows.push(studentData);
+    });
+
+    const date = toEthiopianDateString(new Date());
+    doc.setFontSize(18);
+    doc.text(`የተማሪ ዝውውር ሪፖርት`, 105, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(`ከ: ${ROLE_NAMES[fromRole]}`, 14, 25);
+    doc.text(`ወደ: ${ROLE_NAMES[toRole]}`, 14, 32);
+    doc.text(`ቀን: ${date}`, 205, 25, { align: 'right' });
+    doc.text(`የተማሪዎች ብዛት: ${transferredStudents.length}`, 205, 32, { align: 'right' });
+
+
+    autoTable(doc, {
+        startY: 40,
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'grid',
+        styles: { font: 'NotoSansEthiopic', fontStyle: 'normal', cellPadding: 3, fontSize: 10 },
+        headStyles: { font: 'NotoSansEthiopic', fontStyle: 'normal', fillColor: [34, 139, 34], textColor: 255, fontSize: 12 },
+        didDrawPage: function (data) {
+          // Footer
+          doc.setFontSize(10);
+          const pageCount = (doc.internal as any).getNumberOfPages();
+          doc.text(`ገጽ ${data.pageNumber} ከ ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
+        }
+    });
+    
+    doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
+    toast({
+        title: "የዝውውር ሪፖርት ወርዷል።",
+        description: `የፒዲኤፍ ሪፖርቱ በተሳካ ሁኔታ ተፈጥሯል።`,
+    });
   };
 
   const handleTransfer = async () => {
@@ -312,12 +308,16 @@ export function StudentsPageClient() {
                 photoUrl: null,
             };
 
-            const success = await addStudent(studentToAdd);
-            if (success) {
+            try {
+                await addStudent(studentToAdd);
                 successCount++;
-            } else {
+            } catch (error) {
                 failureCount++;
-                failedStudents.push(`${studentToAdd.id} (የተባዛ)`);
+                 if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+                    failedStudents.push(`${studentToAdd.id} (የተባዛ)`);
+                } else {
+                    failedStudents.push(`${studentToAdd.id} (ያልታወቀ ስህተት)`);
+                }
             }
         }
 
