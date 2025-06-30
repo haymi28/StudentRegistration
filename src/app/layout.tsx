@@ -5,9 +5,6 @@ import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: 'የተማሪዎች መመዝገቢያ ቅጽ',
   description: 'የተማሪዎች ክትትል እና አስተዳደር ስርዓት',
-  icons: {
-    icon: '/dgc.jpg',
-  }
 };
 
 export default function RootLayout({
