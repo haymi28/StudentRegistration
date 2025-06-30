@@ -38,7 +38,7 @@ const formSchema = z.object({
   additionalPhone: z.string().min(10, "ትክክለኛ ተጨማሪ ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   fatherPhone: z.string().min(10, "ትክክለኛ የአባት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
-  joiningDate: z.date({ required_error: "የተቀላቀለበት ቀን ያስፈልጋል።" }),
+  joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
   role: z.enum(["children", "children2", "juniors", "seniors"]),
   photo: z.any().optional(),
 })
@@ -176,7 +176,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                             />
                             <FormField control={form.control} name="educationLevel" render={({ field }) => ( <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የተቀላቀለበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የተመዘገበበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="role" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>ክፍል</FormLabel>

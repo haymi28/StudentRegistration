@@ -445,7 +445,7 @@ export function StudentsPageClient() {
                   <TableHead>የትምህርት ደረጃ</TableHead>
                   <TableHead>ክፍል</TableHead>
                   <TableHead className="hidden md:table-cell">የትውልድ ቀን</TableHead>
-                  <TableHead className="hidden lg:table-cell">የተቀላቀለበት ቀን</TableHead>
+                  <TableHead className="hidden lg:table-cell">የተመዘገበበት ቀን</TableHead>
                   <TableHead><span className="sr-only">ድርጊቶች</span></TableHead>
                 </TableRow>
               </TableHeader>
@@ -522,7 +522,7 @@ export function StudentsPageClient() {
                 {studentToView.additionalPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">ተጨማሪ ስልክ</Label><span className="col-span-2">{studentToView.additionalPhone}</span></div>}
                 {studentToView.fatherPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የአባት ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.fatherPhone}</span></div>}
                 {studentToView.motherPhone && <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የእናት ስልክ ቁጥር</Label><span className="col-span-2">{studentToView.motherPhone}</span></div>}
-                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተቀላቀለበት ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.joiningDate)}</span></div>
+                <div className="grid grid-cols-3 items-center gap-2"><Label className="text-right text-muted-foreground">የተመዘገበበት ቀን</Label><span className="col-span-2">{toEthiopianDateString(studentToView.joiningDate)}</span></div>
               </div>
             </div>
           )}
