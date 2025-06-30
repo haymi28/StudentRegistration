@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
-import { Prisma } from "@prisma/client"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -134,7 +133,7 @@ export function RegisterStudentForm() {
             });
             router.push("/dashboard/students");
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            if (error && typeof error === 'object' && (error as any).code === 'P2002') {
                 form.setError("studentId", {
                     type: "manual",
                     message: "ይህ የተማሪ መለያ አስቀድሞ አለ። እባክዎ ልዩ መለያ ይጠቀሙ።",

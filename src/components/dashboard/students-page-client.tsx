@@ -15,7 +15,6 @@ import {
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { Prisma } from "@prisma/client";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -151,7 +150,7 @@ export function StudentsPageClient() {
     
     doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
     doc.addFont('NotoSansEthiopic-Regular.ttf', 'NotoSansEthiopic', 'normal');
-    doc.setFont('NotoSansEthiopic');
+    doc.setFont('NotoSansEthiopic', 'normal');
 
     const transferredStudents = (await Promise.all(
         transferredStudentIds.map(id => getStudentById(id))
@@ -313,7 +312,7 @@ export function StudentsPageClient() {
                 successCount++;
             } catch (error) {
                 failureCount++;
-                 if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+                 if (error && typeof error === 'object' && (error as any).code === 'P2002') {
                     failedStudents.push(`${studentToAdd.id} (የተባዛ)`);
                 } else {
                     failedStudents.push(`${studentToAdd.id} (ያልታወቀ ስህተት)`);
