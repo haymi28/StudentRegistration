@@ -1,19 +1,17 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 model Student {
-  id                 String    @id
+  id                 String    @id @unique
   fullName           String
   christianName      String
+  motherName         String?
   gender             String
   educationLevel     String
   dob                DateTime
@@ -24,10 +22,11 @@ model Student {
   phone              String
   additionalPhone    String?
   fatherPhone        String?
-  motherName         String?
   motherPhone        String?
   joiningDate        DateTime
   formFilledDate     DateTime
-  photoUrl           String?
   role               String
+  photoUrl           String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }
