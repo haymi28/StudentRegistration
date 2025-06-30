@@ -117,13 +117,22 @@ export function RegisterStudentForm() {
           houseNumber: values.houseNumber,
           houseAddressDetail: values.houseAddressDetail,
           phone: values.phone,
-          additionalPhone: values.additionalPhone ? values.additionalPhone : null,
-          fatherPhone: values.fatherPhone ? values.fatherPhone : null,
-          motherPhone: values.motherPhone ? values.motherPhone : null,
           joiningDate: values.joiningDate,
           role: values.role,
           photoUrl: photoUrl,
         };
+        
+        // Only include optional fields if they have a value.
+        // This avoids sending empty strings or nulls for optional fields.
+        if (values.additionalPhone) {
+            studentToSave.additionalPhone = values.additionalPhone;
+        }
+        if (values.fatherPhone) {
+            studentToSave.fatherPhone = values.fatherPhone;
+        }
+        if (values.motherPhone) {
+            studentToSave.motherPhone = values.motherPhone;
+        }
         
         const result = await addStudent(studentToSave);
 
@@ -288,7 +297,5 @@ export function RegisterStudentForm() {
         </Card>
     )
 }
-
-    
 
     
