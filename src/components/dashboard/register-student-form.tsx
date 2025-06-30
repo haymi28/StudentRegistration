@@ -125,16 +125,11 @@ export function RegisterStudentForm() {
           photoUrl: photoUrl,
         };
         
-        try {
-            await addStudent(studentToSave);
-            toast({
-                title: "ተማሪ ተመዝግቧል!",
-                description: `${values.fullName} ወደ ስርዓቱ ተጨምሯል።`,
-            });
-            router.push("/dashboard/students");
-        } catch (error) {
-            if (error && typeof error === 'object' && (error as any).code === 'P2002') {
-                form.setError("studentId", {
+        const result = await addStudent(studentToSave);
+
+        if (result.error) {
+            if (result.error.code === 'P2002') {
+                 form.setError("studentId", {
                     type: "manual",
                     message: "ይህ የተማሪ መለያ አስቀድሞ አለ። እባክዎ ልዩ መለያ ይጠቀሙ።",
                 });
@@ -144,13 +139,19 @@ export function RegisterStudentForm() {
                     description: `መለያ ${values.studentId.toUpperCase()} ያለው ተማሪ አስቀድሞ አለ።`,
                 });
             } else {
-                console.error("Failed to register student:", error);
+                console.error("Failed to register student:", result.error.message);
                 toast({
                     variant: "destructive",
                     title: "ምዝገባ አልተሳካም።",
                     description: "ያልተጠበቀ ስህተት ተፈጥሯል። እባክዎ ቆይተው እንደገና ይሞክሩ።",
                 });
             }
+        } else {
+             toast({
+                title: "ተማሪ ተመዝግቧል!",
+                description: `${values.fullName} ወደ ስርዓቱ ተጨምሯል።`,
+            });
+            router.push("/dashboard/students");
         }
     }
     

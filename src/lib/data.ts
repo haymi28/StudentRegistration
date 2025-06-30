@@ -11,7 +11,7 @@ export const getStudents = async (): Promise<Student[]> => {
     });
 }
 
-export const addStudent = async (student: Student): Promise<Student> => {
+export const addStudent = async (student: Student): Promise<{ data: Student | null; error: { code?: string; message: string } | null }> => {
     try {
         const newStudent = await prisma.student.create({
             data: {
@@ -34,12 +34,17 @@ export const addStudent = async (student: Student): Promise<Student> => {
                 photoUrl: student.photoUrl,
             },
         });
-        return newStudent;
-    } catch (error) {
+        return { data: newStudent, error: null };
+    } catch (error: any) {
         // Log the actual error on the server for debugging
         console.error("Error adding student:", error);
-        // Re-throw the error so the client can handle it specifically
-        throw error;
+        
+        // If it's a known Prisma error, pass the code.
+        if (error.code) {
+             return { data: null, error: { code: error.code, message: error.message } };
+        }
+        // Otherwise, return a generic error.
+        return { data: null, error: { message: "An unexpected error occurred." } };
     }
 }
 

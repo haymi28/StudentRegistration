@@ -13,7 +13,7 @@ import {
   Upload,
 } from "lucide-react";
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 import { Badge } from "@/components/ui/badge";
@@ -146,7 +146,7 @@ export function StudentsPageClient() {
   };
 
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
-    const doc = new jsPDF();
+    const doc = new (jsPDF as any)();
     
     doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
     doc.addFont('NotoSansEthiopic-Regular.ttf', 'NotoSansEthiopic', 'normal');
@@ -183,17 +183,17 @@ export function StudentsPageClient() {
     doc.text(`የተማሪዎች ብዛት: ${transferredStudents.length}`, 205, 32, { align: 'right' });
 
 
-    autoTable(doc, {
+    doc.autoTable({
         startY: 40,
         head: [tableColumn],
         body: tableRows,
         theme: 'grid',
         styles: { font: 'NotoSansEthiopic', fontStyle: 'normal', cellPadding: 3, fontSize: 10 },
         headStyles: { font: 'NotoSansEthiopic', fontStyle: 'normal', fillColor: [34, 139, 34], textColor: 255, fontSize: 12 },
-        didDrawPage: function (data) {
+        didDrawPage: function (data: any) {
           // Footer
           doc.setFontSize(10);
-          const pageCount = (doc.internal as any).getNumberOfPages();
+          const pageCount = doc.internal.getNumberOfPages();
           doc.text(`ገጽ ${data.pageNumber} ከ ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
         }
     });
@@ -307,16 +307,17 @@ export function StudentsPageClient() {
                 photoUrl: null,
             };
 
-            try {
-                await addStudent(studentToAdd);
-                successCount++;
-            } catch (error) {
+            const result = await addStudent(studentToAdd);
+            if (result.error) {
                 failureCount++;
-                 if (error && typeof error === 'object' && (error as any).code === 'P2002') {
+                if (result.error.code === 'P2002') {
                     failedStudents.push(`${studentToAdd.id} (የተባዛ)`);
                 } else {
+                    console.error(`Failed to import student ${studentToAdd.id}:`, result.error.message);
                     failedStudents.push(`${studentToAdd.id} (ያልታወቀ ስህተት)`);
                 }
+            } else {
+                successCount++;
             }
         }
 
