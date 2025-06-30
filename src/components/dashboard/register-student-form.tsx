@@ -117,12 +117,12 @@ export function RegisterStudentForm() {
           houseNumber: values.houseNumber,
           houseAddressDetail: values.houseAddressDetail,
           phone: values.phone,
-          additionalPhone: values.additionalPhone || undefined,
-          fatherPhone: values.fatherPhone || undefined,
-          motherPhone: values.motherPhone || undefined,
+          additionalPhone: values.additionalPhone ? values.additionalPhone : null,
+          fatherPhone: values.fatherPhone ? values.fatherPhone : null,
+          motherPhone: values.motherPhone ? values.motherPhone : null,
           joiningDate: values.joiningDate,
           role: values.role,
-          photoUrl: photoUrl || undefined,
+          photoUrl: photoUrl ? photoUrl : null,
         };
         
         const result = await addStudent(studentToSave);
@@ -287,3 +287,5 @@ export function RegisterStudentForm() {
         </Card>
     )
 }
+
+    
