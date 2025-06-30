@@ -13,7 +13,7 @@ import {
   Upload,
 } from "lucide-react";
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 import { Badge } from "@/components/ui/badge";
@@ -160,17 +160,27 @@ export function StudentsPageClient() {
 
         const date = toEthiopianDateString(new Date());
         doc.setFontSize(18);
-        doc.text(`የተማሪ ዝውውር ሪፖርት - ${date}`, 14, 22);
+        doc.text(`የተማሪ ዝውውር ሪፖርት`, 105, 15, { align: 'center' });
         doc.setFontSize(12);
-        doc.text(`${transferredStudents.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[toRole]} ተዘዋውረዋል።`, 14, 30);
+        doc.text(`ከ: ${ROLE_NAMES[fromRole]}`, 14, 25);
+        doc.text(`ወደ: ${ROLE_NAMES[toRole]}`, 14, 32);
+        doc.text(`ቀን: ${date}`, 205, 25, { align: 'right' });
+        doc.text(`የተማሪዎች ብዛት: ${transferredStudents.length}`, 205, 32, { align: 'right' });
 
-        (doc as any).autoTable({
-            startY: 35,
+
+        autoTable(doc, {
+            startY: 40,
             head: [tableColumn],
             body: tableRows,
             theme: 'grid',
-            styles: { font: 'NotoSansEthiopic', fontStyle: 'normal' },
-            headStyles: { font: 'NotoSansEthiopic', fillColor: [41, 128, 185], fontStyle: 'normal' },
+            styles: { font: 'NotoSansEthiopic', fontStyle: 'normal', cellPadding: 3, fontSize: 10 },
+            headStyles: { font: 'NotoSansEthiopic', fontStyle: 'normal', fillColor: [34, 139, 34], textColor: 255, fontSize: 12 },
+            didDrawPage: function (data) {
+              // Footer
+              doc.setFontSize(10);
+              const pageCount = (doc.internal as any).getNumberOfPages();
+              doc.text(`ገጽ ${data.pageNumber} ከ ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
+            }
         });
         
         doc.save(`transfer_report_${fromRole}_to_${toRole}_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -537,5 +547,7 @@ export function StudentsPageClient() {
     </>
   );
 }
+
+    
 
     
