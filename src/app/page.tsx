@@ -66,7 +66,7 @@ export default function LoginPage() {
             <CardContent className="grid gap-4">
               <div className="grid gap-2 text-left">
                 <Label htmlFor="role">ክፍል</Label>
-                <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)}>
+                <Select name="role" value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)} autoComplete="off">
                     <SelectTrigger id="role">
                         <SelectValue placeholder="ክፍል ይምረጡ" />
                     </SelectTrigger>
@@ -81,7 +81,7 @@ export default function LoginPage() {
               </div>
               <div className="grid gap-2 text-left">
                 <Label htmlFor="password">የይለፍ ቃል</Label>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input id="password" name="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             </CardContent>

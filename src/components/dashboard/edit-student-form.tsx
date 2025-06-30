@@ -147,19 +147,19 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                     <CardContent className="space-y-6">
                         <div>
                             <Label>የተማሪ መለያ</Label>
-                            <Input value={student.id} readOnly disabled className="mt-2" />
+                            <Input value={student.id} readOnly disabled className="mt-2" id="student-id" name="student-id" />
                             <FormDescription className="mt-2">የተማሪው መለያ ሊቀየር አይችልም።</FormDescription>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <FormField control={form.control} name="fullName" render={({ field }) => ( <FormItem><FormLabel>ሙሉ ስም</FormLabel><FormControl><Input placeholder="እከሌ እከሌ" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="christianName" render={({ field }) => ( <FormItem><FormLabel>የክርስትና ስም</FormLabel><FormControl><Input placeholder="ዮሐንስ" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="fullName" render={({ field }) => ( <FormItem><FormLabel>ሙሉ ስም</FormLabel><FormControl><Input placeholder="እከሌ እከሌ" {...field} autoComplete="name" /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="christianName" render={({ field }) => ( <FormItem><FormLabel>የክርስትና ስም</FormLabel><FormControl><Input placeholder="ዮሐንስ" {...field} autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
                             <FormField
                                 control={form.control}
                                 name="gender"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>ጾታ</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} name="gender" autoComplete="off">
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="ጾታ ይምረጡ" />
@@ -174,13 +174,13 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                     </FormItem>
                                 )}
                             />
-                            <FormField control={form.control} name="educationLevel" render={({ field }) => ( <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="educationLevel" render={({ field }) => ( <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የተቀላቀለበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem> )} />
                             <FormField control={form.control} name="role" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>ክፍል</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value} name="role" autoComplete="off">
                                         <FormControl><SelectTrigger><SelectValue placeholder="ክፍል ይምረጡ" /></SelectTrigger></FormControl>
                                         <SelectContent>
                                             <SelectItem value="children">ቀዳማይ -1 ክፍል</SelectItem>
@@ -240,16 +240,16 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                             <div className="md:col-span-2 space-y-4 rounded-lg border p-4">
                                 <h3 className="text-lg font-medium">አድራሻ</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <FormField control={form.control} name="subcity" render={({ field }) => ( <FormItem><FormLabel>ክፍለ ከተማ</FormLabel><FormControl><Input placeholder="ለምሳሌ ቂርቆስ" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                                    <FormField control={form.control} name="kebele" render={({ field }) => ( <FormItem><FormLabel>ቀበሌ</FormLabel><FormControl><Input placeholder="ለምሳሌ 08" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                                    <FormField control={form.control} name="houseNumber" render={({ field }) => ( <FormItem><FormLabel>የቤት ቁጥር</FormLabel><FormControl><Input placeholder="ለምሳሌ 123" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                    <FormField control={form.control} name="subcity" render={({ field }) => ( <FormItem><FormLabel>ክፍለ ከተማ</FormLabel><FormControl><Input placeholder="ለምሳሌ ቂርቆስ" {...field} autoComplete="address-level1" /></FormControl><FormMessage /></FormItem> )} />
+                                    <FormField control={form.control} name="kebele" render={({ field }) => ( <FormItem><FormLabel>ቀበሌ</FormLabel><FormControl><Input placeholder="ለምሳሌ 08" {...field} autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
+                                    <FormField control={form.control} name="houseNumber" render={({ field }) => ( <FormItem><FormLabel>የቤት ቁጥር</FormLabel><FormControl><Input placeholder="ለምሳሌ 123" {...field} autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
                                 </div>
-                                <FormField control={form.control} name="houseAddressDetail" render={({ field }) => ( <FormItem><FormLabel>የቤት ልዩ አድራሻ</FormLabel><FormControl><Textarea placeholder="የቤቱን አድራሻ በዝርዝር ያስገቡ (ለምሳሌ: ከትምህርት ቤቱ ጀርባ)" {...field} /></FormControl><FormMessage /></FormItem> )} />
+                                <FormField control={form.control} name="houseAddressDetail" render={({ field }) => ( <FormItem><FormLabel>የቤት ልዩ አድራሻ</FormLabel><FormControl><Textarea placeholder="የቤቱን አድራሻ በዝርዝር ያስገቡ (ለምሳሌ: ከትምህርት ቤቱ ጀርባ)" {...field} autoComplete="street-address" /></FormControl><FormMessage /></FormItem> )} />
                             </div>
-                            <FormField control={form.control} name="phone" render={({ field }) => ( <FormItem><FormLabel>ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="additionalPhone" render={({ field }) => ( <FormItem><FormLabel>ተጨማሪ ስልክ</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="phone" render={({ field }) => ( <FormItem><FormLabel>ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="additionalPhone" render={({ field }) => ( <FormItem><FormLabel>ተጨማሪ ስልክ</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
+                            <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">
