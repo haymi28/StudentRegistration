@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
-import type { Role, StudentCreateInput } from "@/lib/types"
+import type { Role, StudentCreateInput, UserRole } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -228,7 +228,7 @@ export function RegisterStudentForm() {
                                 <FormMessage /></FormItem>
                             )} />
                         ) : (
-                             <FormItem><FormLabel>ክፍል</FormLabel><FormControl><Input id="role" name="role" value={adminRole ? ROLE_NAMES[adminRole] : ''} readOnly disabled /></FormControl></FormItem>
+                             <FormItem><FormLabel>ክፍል</FormLabel><FormControl><Input id="role" name="role" value={adminRole ? ROLE_NAMES[adminRole as UserRole] : ''} readOnly disabled /></FormControl></FormItem>
                         )}
 
                         <FormField control={form.control} name="joiningDate" render={({ field }) => (

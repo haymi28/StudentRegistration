@@ -1,7 +1,7 @@
 import type { Student as PrismaStudent, Prisma } from '@prisma/client';
 
 export type Role = 'children' | 'children2' | 'juniors' | 'seniors' | 'youth';
-export type UserRole = Role | 'superadmin';
+export type UserRole = 'children' | 'children2' | 'juniors' | 'seniors' | 'superadmin';
 export type Gender = 'ወንድ' | 'ሴት';
 
 // Re-export Prisma's generated Student type.
