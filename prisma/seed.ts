@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
     console.log(`Start seeding ...`);
 
-    await prisma.adminCredential.upsert({
+    const superAdmin = await prisma.adminCredential.upsert({
         where: { role: 'superadmin' },
         update: {},
         create: {
@@ -13,8 +13,9 @@ async function main() {
             password: 'superpassword',
         },
     });
+    console.log(`Upserted superadmin credential.`);
 
-    await prisma.adminCredential.upsert({
+    const childrenAdmin = await prisma.adminCredential.upsert({
         where: { role: 'children' },
         update: {},
         create: {
@@ -22,8 +23,10 @@ async function main() {
             password: 'childrenpassword',
         },
     });
+    console.log(`Upserted children admin credential.`);
 
-    await prisma.adminCredential.upsert({
+
+    const children2Admin = await prisma.adminCredential.upsert({
         where: { role: 'children2' },
         update: {},
         create: {
@@ -31,8 +34,9 @@ async function main() {
             password: 'children2password',
         },
     });
+    console.log(`Upserted children2 admin credential.`);
 
-    await prisma.adminCredential.upsert({
+    const juniorsAdmin = await prisma.adminCredential.upsert({
         where: { role: 'juniors' },
         update: {},
         create: {
@@ -40,8 +44,9 @@ async function main() {
             password: 'juniorspassword',
         },
     });
+    console.log(`Upserted juniors admin credential.`);
     
-    await prisma.adminCredential.upsert({
+    const seniorsAdmin = await prisma.adminCredential.upsert({
         where: { role: 'seniors' },
         update: {},
         create: {
@@ -49,13 +54,15 @@ async function main() {
             password: 'seniorspassword',
         },
     });
+    console.log(`Upserted seniors admin credential.`);
 
-    console.log(`Seeding finished.`);
+    console.log(`\nSeeding finished successfully.`);
+    console.log(`Default passwords have been set. For example, the password for 'seniors' is 'seniorspassword'.`);
 }
 
 main()
     .catch((e) => {
-        console.error(e);
+        console.error("An error occurred during seeding:", e);
         process.exit(1);
     })
     .finally(async () => {
