@@ -67,12 +67,26 @@ export const verifyAdminPassword = async (role: UserRole, password: string): Pro
         const credential = await prisma.adminCredential.findUnique({
             where: { role },
         });
-        return !!credential && credential.password === password;
+
+        // If a credential is found in the database, use it
+        if (credential) {
+            return credential.password === password;
+        }
     } catch (error) {
-        // In case of a DB error, deny login
-        console.error("DB Error during password verification:", error);
-        return false;
+        console.error("DB Error during password verification. Falling back to defaults.", error);
     }
+    
+    // Fallback to hardcoded passwords if DB check fails or no credential exists
+    console.warn(`No database credential found for role '${role}'. Using hardcoded fallback passwords. Please run 'npx prisma db seed' to set passwords in the database.`);
+    const fallbackPasswords: Record<UserRole, string> = {
+        superadmin: 'superpassword',
+        children: 'childrenpassword',
+        children2: 'children2password',
+        juniors: 'juniorspassword',
+        seniors: 'seniorspassword',
+    };
+    
+    return fallbackPasswords[role] === password;
 }
 
 export const updateAdminPassword = async (role: UserRole, password: string) => {
