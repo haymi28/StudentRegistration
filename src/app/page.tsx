@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users } from "lucide-react";
+import { Users, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/types";
 
@@ -40,6 +40,7 @@ export default function LoginPage() {
   const [selectedRole, setSelectedRole] = React.useState<UserRole>('children');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +94,26 @@ export default function LoginPage() {
               </div>
               <div className="grid gap-2 text-left">
                 <Label htmlFor="password">የይለፍ ቃል</Label>
-                <Input id="password" name="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <div className="relative">
+                  <Input 
+                    id="password" 
+                    name="password" 
+                    type={showPassword ? "text" : "password"} 
+                    autoComplete="current-password" 
+                    required 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pr-10"
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)} 
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             </CardContent>
