@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BookMarked, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/types";
 
@@ -53,10 +54,18 @@ export default function LoginPage() {
   return (
     <main className="flex items-center justify-center min-h-screen bg-background">
       <div className="flex flex-col items-center text-center">
-        <div className="mb-8">
+        <div className="mb-8 flex flex-col items-center">
+            <Image
+              src="/dgc_logo.png"
+              alt="የደብረ ገሊላ ቅዱስ ዐማኑኤል ካቴድራል እግዚአብሔር ምስሌነ ሰ/ት/ቤት Logo"
+              width={150}
+              height={150}
+              className="mb-4"
+              data-ai-hint="church logo"
+              priority
+            />
             <h2 className="text-2xl font-headline font-bold text-primary mb-2 text-center">የደብረ ገሊላ ቅዱስ ዐማኑኤል ካቴድራል እግዚአብሔር ምስሌነ ሰ/ት/ቤት</h2>
             <div className="flex items-center justify-center gap-4">
-                <BookMarked className="h-12 w-12 text-primary" />
                 <h1 className="text-2xl font-headline font-bold text-primary">የተማሪዎች መመዝገቢያ ቅጽ</h1>
             </div>
         </div>
