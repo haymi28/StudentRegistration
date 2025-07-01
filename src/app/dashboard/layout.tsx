@@ -21,6 +21,7 @@ import {
   BookMarked,
   Shield,
   Loader2,
+  KeyRound,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/logout-button';
@@ -99,6 +100,12 @@ export default function DashboardLayout({
                         <span className="text-sidebar-foreground/70">{role}@academia.com</span>
                     </div>
                 </div>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton tooltip="የይለፍ ቃል ቀይር" onClick={() => router.push('/dashboard/settings')} isActive={getIsActive('/dashboard/settings')}>
+                    <KeyRound />
+                    <span>የይለፍ ቃል ቀይር</span>
+                </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <LogoutButton />
