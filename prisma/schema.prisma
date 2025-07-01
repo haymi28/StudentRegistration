@@ -1,26 +1,26 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Student {
-  id                 String    @id
+  id                 String    @id @unique
   fullName           String
   christianName      String
-  gender             String // Represents 'ወንድ' or 'ሴት'
+  gender             Gender
   educationLevel     String
   dob                DateTime
   subcity            String
   kebele             String
   houseNumber        String
-  houseAddressDetail String    @db.Text
+  houseAddressDetail String
   phone              String
   additionalPhone    String?
   fatherPhone        String?
@@ -28,8 +28,21 @@ model Student {
   motherPhone        String?
   joiningDate        DateTime
   formFilledDate     DateTime
-  role               String // Represents Role: 'children', 'children2', 'juniors', 'seniors', 'youth'
-  photoUrl           String?   @db.Text
+  role               Role
+  photoUrl           String?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+}
+
+enum Role {
+  children
+  children2
+  juniors
+  seniors
+  youth
+}
+
+enum Gender {
+  ወንድ
+  ሴት
 }
