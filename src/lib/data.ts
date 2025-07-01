@@ -97,9 +97,10 @@ export const updateAdminPassword = async (role: UserRole, currentPassword: strin
     }
 
     try {
-        await prisma.adminCredential.update({
+        await prisma.adminCredential.upsert({
             where: { role },
-            data: { password: newPassword },
+            update: { password: newPassword },
+            create: { role: role, password: newPassword },
         });
         return { success: true, message: "የይለፍ ቃል በተሳካ ሁኔታ ተዘምኗል።" };
     } catch (error) {
