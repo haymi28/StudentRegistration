@@ -1,3 +1,4 @@
+
 'use server';
 
 import prisma from './prisma';
@@ -89,9 +90,20 @@ export const verifyAdminPassword = async (role: UserRole, password: string): Pro
     return fallbackPasswords[role] === password;
 }
 
-export const updateAdminPassword = async (role: UserRole, password: string) => {
-    return prisma.adminCredential.update({
-        where: { role },
-        data: { password },
-    });
+export const updateAdminPassword = async (role: UserRole, currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
+    const isValid = await verifyAdminPassword(role, currentPassword);
+    if (!isValid) {
+        return { success: false, message: "የአሁኑ የይለፍ ቃል የተሳሳተ ነው።" };
+    }
+
+    try {
+        await prisma.adminCredential.update({
+            where: { role },
+            data: { password: newPassword },
+        });
+        return { success: true, message: "የይለፍ ቃል በተሳካ ሁኔታ ተዘምኗል።" };
+    } catch (error) {
+        console.error("Error updating password:", error);
+        return { success: false, message: "የይለፍ ቃሉን ማዘመን አልተቻለም። እባክዎ እንደገና ይሞክሩ።" };
+    }
 }

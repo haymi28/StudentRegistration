@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const formSchema = z.object({
+  currentPassword: z.string().min(1, "የአሁኑን የይለፍ ቃል ማስገባት አለብዎት።"),
   password: z.string().min(6, "የይለፍ ቃል ቢያንስ 6 ቁምፊዎች መሆን አለበት።"),
   confirmPassword: z.string().min(6, "የይለፍ ቃል ቢያንስ 6 ቁምፊዎች መሆን አለበት።"),
 }).refine(data => data.password === data.confirmPassword, {
@@ -38,12 +39,14 @@ export function PasswordSettingsForm() {
     const { role, isLoading: isAuthLoading } = useAuth();
     const { toast } = useToast();
     const router = useRouter();
+    const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            currentPassword: "",
             password: "",
             confirmPassword: "",
         },
@@ -52,19 +55,29 @@ export function PasswordSettingsForm() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!role) return;
 
-        try {
-            await updateAdminPassword(role, values.password);
+        form.clearErrors();
+
+        const result = await updateAdminPassword(role, values.currentPassword, values.password);
+
+        if (result.success) {
             toast({
                 title: "የይለፍ ቃል ተዘምኗል",
                 description: `የይለፍ ቃልዎ በተሳካ ሁኔታ ተቀይሯል።`,
             });
             form.reset();
-        } catch (error) {
-            toast({
-                variant: "destructive",
-                title: "ስህተት",
-                description: "የይለፍ ቃሉን ማዘመን አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
-            });
+        } else {
+             if (result.message.includes("የአሁኑ የይለፍ ቃል")) {
+                form.setError("currentPassword", {
+                    type: "manual",
+                    message: result.message,
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "ስህተት",
+                    description: result.message,
+                });
+            }
         }
     }
 
@@ -86,6 +99,29 @@ export function PasswordSettingsForm() {
                       <Input value={ROLE_NAMES[role]} readOnly disabled className="mt-2" />
                       <p className="text-sm text-muted-foreground mt-2">የዚህን ሚና የይለፍ ቃል እየቀየሩ ነው።</p>
                     </div>
+                    <FormField
+                        control={form.control}
+                        name="currentPassword"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>የአሁኑ የይለፍ ቃል</FormLabel>
+                                <div className="relative">
+                                    <FormControl>
+                                        <Input type={showCurrentPassword ? 'text' : 'password'} placeholder="••••••••" {...field} />
+                                    </FormControl>
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowCurrentPassword(!showCurrentPassword)} 
+                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground"
+                                        aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                    </button>
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                     <FormField
                         control={form.control}
                         name="password"
