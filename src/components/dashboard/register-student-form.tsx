@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
-import type { Role, StudentCreateInput } from "@/lib/types"
+import type { Role, StudentCreateInput, UserRole } from "@/lib/types"
 import { toEthiopianDateString } from "@/lib/ethiopian-date"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -28,7 +28,8 @@ const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
     children2: "ቀዳማይ -2 ክፍል",
     juniors: "ካእላይ ክፍል",
-    seniors: "ማእከላይ ክፍል"
+    seniors: "ማእከላይ ክፍል",
+    youth: "የወጣት ክፍል"
 };
 
 const formSchema = z.object({
@@ -49,7 +50,7 @@ const formSchema = z.object({
   motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
   formFilledDate: z.date({ required_error: "ቅጹ የተሞላበት ቀን ያስፈልጋል።" }),
-  role: z.enum(["children", "children2", "juniors", "seniors"], { required_error: "ክፍል ያስፈልጋል።" }),
+  role: z.enum(["children", "children2", "juniors", "seniors", "youth"], { required_error: "ክፍል ያስፈልጋል።" }),
   photo: z.any().optional(),
 })
 
@@ -221,12 +222,13 @@ export function RegisterStudentForm() {
                                             <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
                                             <SelectItem value="juniors">ካእላይ ክፍል</SelectItem>
                                             <SelectItem value="seniors">ማእከላይ ክፍል</SelectItem>
+                                            <SelectItem value="youth">የወጣት ክፍል</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 <FormMessage /></FormItem>
                             )} />
                         ) : (
-                             <FormItem><FormLabel>ክፍል</FormLabel><FormControl><Input id="role" name="role" value={adminRole ? ROLE_NAMES[adminRole] : ''} readOnly disabled /></FormControl></FormItem>
+                             <FormItem><FormLabel>ክፍል</FormLabel><FormControl><Input id="role" name="role" value={adminRole ? ROLE_NAMES[adminRole as UserRole] : ''} readOnly disabled /></FormControl></FormItem>
                         )}
 
                         <FormField control={form.control} name="joiningDate" render={({ field }) => (

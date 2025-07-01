@@ -14,7 +14,7 @@ model Student {
   id                 String    @id @unique
   fullName           String
   christianName      String
-  gender             String
+  gender             Gender
   educationLevel     String
   dob                DateTime
   subcity            String
@@ -28,6 +28,21 @@ model Student {
   motherPhone        String?
   joiningDate        DateTime
   formFilledDate     DateTime
-  role               String
+  role               Role
   photoUrl           String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+enum Role {
+  children
+  children2
+  juniors
+  seniors
+  youth
+}
+
+enum Gender {
+  ወንድ
+  ሴት
 }
