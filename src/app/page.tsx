@@ -53,9 +53,12 @@ export default function LoginPage() {
   return (
     <main className="flex items-center justify-center min-h-screen bg-background">
       <div className="flex flex-col items-center text-center">
-        <div className="flex items-center gap-4 mb-8">
-            <BookMarked className="h-12 w-12 text-primary" />
-            <h1 className="text-3xl font-headline font-bold text-primary">የተማሪዎች መመዝገቢያ ቅጽ</h1>
+        <div className="mb-8">
+            <h2 className="text-xl font-headline font-semibold text-foreground mb-2">የደብረ ገሊላ ቅዱስ ዐማኑኤል ካቴድራል እግዚአብሔር ምስሌነ ሰ/ት/ቤት</h2>
+            <div className="flex items-center justify-center gap-4">
+                <BookMarked className="h-12 w-12 text-primary" />
+                <h1 className="text-3xl font-headline font-bold text-primary">የተማሪዎች መመዝገቢያ ቅጽ</h1>
+            </div>
         </div>
         <Card className="w-full max-w-sm shadow-2xl">
           <CardHeader>
