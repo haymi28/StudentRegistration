@@ -19,9 +19,6 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'የተማሪዎች መመዝገቢያ ቅጽ',
   description: 'የተማሪዎች ክትትል እና አስተዳደር ስርዓት',
-  icons: {
-    icon: '/icon.png',
-  },
 };
 
 export default function RootLayout({
