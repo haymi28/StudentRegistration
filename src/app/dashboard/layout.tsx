@@ -20,7 +20,8 @@ import {
   Users,
   BookMarked,
   Shield,
-  Loader2
+  Loader2,
+  Settings
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogoutButton } from '@/components/logout-button';
@@ -85,6 +86,14 @@ export default function DashboardLayout({
                     <span>ተማሪዎች</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
+             {role === 'superadmin' && (
+              <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="ቅንብሮች" onClick={() => router.push('/dashboard/settings')} isActive={getIsActive('/dashboard/settings')}>
+                      <Settings />
+                      <span>ቅንብሮች</span>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>

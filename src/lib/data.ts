@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from './prisma';
-import type { Student, Role, StudentCreateInput } from './types';
+import type { Student, Role, StudentCreateInput, UserRole } from './types';
 
 export const getStudents = async (): Promise<Student[]> => {
     return prisma.student.findMany({
@@ -58,5 +58,26 @@ export const transferStudents = async (studentIds: string[], newRole: Role): Pro
         data: {
             role: newRole,
         },
+    });
+}
+
+// Admin Credential Functions
+export const verifyAdminPassword = async (role: UserRole, password: string): Promise<boolean> => {
+    try {
+        const credential = await prisma.adminCredential.findUnique({
+            where: { role },
+        });
+        return !!credential && credential.password === password;
+    } catch (error) {
+        // In case of a DB error, deny login
+        console.error("DB Error during password verification:", error);
+        return false;
+    }
+}
+
+export const updateAdminPassword = async (role: UserRole, password: string) => {
+    return prisma.adminCredential.update({
+        where: { role },
+        data: { password },
     });
 }

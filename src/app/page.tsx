@@ -22,17 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, Eye, EyeOff } from "lucide-react";
+import { Users, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import type { UserRole } from "@/lib/types";
-
-const ROLE_CREDENTIALS: Record<UserRole, { password: string }> = {
-    superadmin: { password: "superpassword" },
-    children: { password: "childrenpassword" },
-    children2: { password: "children2password" },
-    juniors: { password: "juniorspassword" },
-    seniors: { password: "seniorspassword" },
-}
+import { verifyAdminPassword } from "@/lib/data";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,14 +34,21 @@ export default function LoginPage() {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoggingIn, setIsLoggingIn] = React.useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (ROLE_CREDENTIALS[selectedRole].password === password) {
+    setError('');
+    setIsLoggingIn(true);
+    
+    const isValid = await verifyAdminPassword(selectedRole, password);
+
+    if (isValid) {
       login(selectedRole);
       router.push('/dashboard');
     } else {
       setError('ለምርጥ ክፍል የተሳሳተ የይለፍ ቃል።');
+      setIsLoggingIn(false);
     }
   };
 
@@ -118,7 +118,10 @@ export default function LoginPage() {
               {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full">ይግቡ</Button>
+              <Button type="submit" className="w-full" disabled={isLoggingIn}>
+                {isLoggingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                ይግቡ
+              </Button>
             </CardFooter>
           </form>
         </Card>

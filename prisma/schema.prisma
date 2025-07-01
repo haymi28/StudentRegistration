@@ -11,10 +11,10 @@ datasource db {
 }
 
 model Student {
-  id                 String    @id @unique
+  id                 String   @id @unique
   fullName           String
   christianName      String
-  gender             Gender
+  gender             String
   educationLevel     String
   dob                DateTime
   subcity            String
@@ -30,8 +30,13 @@ model Student {
   formFilledDate     DateTime
   role               Role
   photoUrl           String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+
+  @@map("students")
+}
+
+model AdminCredential {
+  role     UserRole @id
+  password String
 }
 
 enum Role {
@@ -42,7 +47,10 @@ enum Role {
   youth
 }
 
-enum Gender {
-  ወንድ
-  ሴት
+enum UserRole {
+  children
+  children2
+  juniors
+  seniors
+  superadmin
 }
