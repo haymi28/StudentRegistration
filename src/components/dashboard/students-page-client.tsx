@@ -39,14 +39,16 @@ const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
     children2: "ቀዳማይ -2 ክፍል",
     juniors: "ካእላይ ክፍል",
-    seniors: "ማእከላይ ክፍል"
+    seniors: "ማእከላይ ክፍል",
+    youth: "የወጣት ክፍል"
 };
 
 const AMHARIC_TO_ROLE: Record<string, Role> = {
     "ቀዳማይ -1 ክፍል": "children",
     "ቀዳማይ -2 ክፍል": "children2",
     "ካእላይ ክፍል": "juniors",
-    "ማእከላይ ክፍል": "seniors"
+    "ማእከላይ ክፍል": "seniors",
+    "የወጣት ክፍል": "youth"
 };
 
 
@@ -129,8 +131,8 @@ export function StudentsPageClient() {
     const fromRole = allStudents.find(s => s.id === selectedStudents[0])?.role;
     if (!fromRole) return [];
     
-    const allRoles: Role[] = ['children', 'children2', 'juniors', 'seniors'];
-    const currentIndex = allRoles.indexOf(fromRole);
+    const allRoles: Role[] = ['children', 'children2', 'juniors', 'seniors', 'youth'];
+    const currentIndex = allRoles.indexOf(fromRole as Role);
     const options: Role[] = [];
   
     // Allow downgrade
@@ -218,7 +220,7 @@ export function StudentsPageClient() {
       
       const transferredIds = [...selectedStudents];
       
-      await generateTransferReport(transferredIds, fromRole, transferToRole);
+      await generateTransferReport(transferredIds, fromRole as Role, transferToRole);
       
       await transferStudents(transferredIds, transferToRole);
       
@@ -271,7 +273,7 @@ export function StudentsPageClient() {
                 failedStudents.push(`${row.id} (የተሳሳተ ጾታ)`);
                 continue;
             }
-            if (!['children', 'children2', 'juniors', 'seniors'].includes(studentRole)) {
+            if (!['children', 'children2', 'juniors', 'seniors', 'youth'].includes(studentRole)) {
                 failureCount++;
                 failedStudents.push(`${row.id} (የተሳሳተ ክፍል)`);
                 continue;
@@ -552,7 +554,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", "formFilledDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል” ወይም “ማእከላይ ክፍል” መሆን አለባቸው። ለ "dob", "joiningDate", እና "formFilledDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", "formFilledDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል”፣ “ማእከላይ ክፍል” ወይም “የወጣት ክፍል” መሆን አለባቸው። ለ "dob", "joiningDate", እና "formFilledDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

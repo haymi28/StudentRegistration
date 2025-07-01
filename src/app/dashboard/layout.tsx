@@ -31,7 +31,8 @@ const ROLE_NAMES: Record<string, string> = {
     children: "የቀዳማይ -1 ክፍል አስተዳዳሪ",
     children2: "የቀዳማይ -2 ክፍል አስተዳዳሪ",
     juniors: "የካእላይ ክፍል አስተዳዳሪ",
-    seniors: "የማእከላይ ክፍል አስተዳዳሪ"
+    seniors: "የማእከላይ ክፍል አስተዳዳሪ",
+    youth: "የወጣት ክፍል አስተዳዳሪ"
 };
 
 export default function DashboardLayout({

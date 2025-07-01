@@ -41,7 +41,7 @@ const formSchema = z.object({
   motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
   formFilledDate: z.date({ required_error: "ቅጹ የተሞላበት ቀን ያስፈልጋል።" }),
-  role: z.enum(["children", "children2", "juniors", "seniors"]),
+  role: z.enum(["children", "children2", "juniors", "seniors", "youth"]),
   photo: z.any().optional(),
 })
 
@@ -192,6 +192,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                             <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
                                             <SelectItem value="juniors">ካእላይ ክፍል</SelectItem>
                                             <SelectItem value="seniors">ማእከላይ ክፍል</SelectItem>
+                                            <SelectItem value="youth">የወጣት ክፍል</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormDescription>ተማሪውን ወደ ሌላ ቡድን ያስተላልፉ።</FormDescription>

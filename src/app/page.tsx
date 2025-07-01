@@ -32,6 +32,7 @@ const ROLE_CREDENTIALS: Record<UserRole, { password: string }> = {
     children2: { password: "children2password" },
     juniors: { password: "juniorspassword" },
     seniors: { password: "seniorspassword" },
+    youth: { password: "youthpassword" },
 }
 
 export default function LoginPage() {
@@ -87,6 +88,7 @@ export default function LoginPage() {
                         <SelectItem value="children2">ቀዳማይ -2 ክፍል አስተዳዳሪ</SelectItem>
                         <SelectItem value="juniors">ካእላይ ክፍል አስተዳዳሪ</SelectItem>
                         <SelectItem value="seniors">ማእከላይ ክፍል አስተዳዳሪ</SelectItem>
+                        <SelectItem value="youth">የወጣት ክፍል አስተዳዳሪ</SelectItem>
                         <SelectItem value="superadmin">ዋና አስተዳዳሪ</SelectItem>
                     </SelectContent>
                 </Select>

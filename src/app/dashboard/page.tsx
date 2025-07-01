@@ -11,6 +11,7 @@ const ROLE_FRIENDLY_NAMES: Record<string, string> = {
     children2: "ቀዳማይ -2 ክፍል",
     juniors: "ካእላይ ክፍል",
     seniors: "ማእከላይ ክፍል",
+    youth: "የወጣት ክፍል"
 };
 
 export default function DashboardPage() {

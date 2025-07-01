@@ -28,7 +28,8 @@ const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
     children2: "ቀዳማይ -2 ክፍል",
     juniors: "ካእላይ ክፍል",
-    seniors: "ማእከላይ ክፍል"
+    seniors: "ማእከላይ ክፍል",
+    youth: "የወጣት ክፍል"
 };
 
 const formSchema = z.object({
@@ -49,7 +50,7 @@ const formSchema = z.object({
   motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
   formFilledDate: z.date({ required_error: "ቅጹ የተሞላበት ቀን ያስፈልጋል።" }),
-  role: z.enum(["children", "children2", "juniors", "seniors"], { required_error: "ክፍል ያስፈልጋል።" }),
+  role: z.enum(["children", "children2", "juniors", "seniors", "youth"], { required_error: "ክፍል ያስፈልጋል።" }),
   photo: z.any().optional(),
 })
 
@@ -221,6 +222,7 @@ export function RegisterStudentForm() {
                                             <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
                                             <SelectItem value="juniors">ካእላይ ክፍል</SelectItem>
                                             <SelectItem value="seniors">ማእከላይ ክፍል</SelectItem>
+                                            <SelectItem value="youth">የወጣት ክፍል</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 <FormMessage /></FormItem>
