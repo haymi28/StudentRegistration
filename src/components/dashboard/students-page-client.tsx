@@ -189,8 +189,8 @@ export function StudentsPageClient() {
     doc.setFontSize(12);
     doc.text(`ከ: ${ROLE_NAMES[fromRole]}`, 14, 25);
     doc.text(`ወደ: ${ROLE_NAMES[toRole]}`, 14, 32);
-    doc.text(`ቀን: ${date}`, 205, 25, { align: 'right' });
-    doc.text(`የተማሪዎች ብዛት: ${transferredStudents.length}`, 205, 32, { align: 'right' });
+    doc.text(`የተማሪዎች ብዛት: ${transferredStudents.length}`, 205, 25, { align: 'right' });
+    doc.text(`ቀን: ${date}`, 205, 32, { align: 'right' });
 
 
     (doc as any).autoTable({
