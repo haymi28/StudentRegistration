@@ -69,38 +69,37 @@ export const verifyAdminPassword = async (role: UserRole, password: string): Pro
             where: { role },
         });
 
-        // If a credential is found in the database, use it
-        if (credential) {
-            return credential.password === password;
+        // If a credential is not found, or if the password doesn't match, return false.
+        if (!credential) {
+            return false;
         }
+        
+        return credential.password === password;
+        
     } catch (error) {
-        console.error("DB Error during password verification. Falling back to defaults.", error);
+        console.error("DB Error during password verification. Assuming failure.", error);
+        return false;
     }
-    
-    // Fallback to hardcoded passwords if DB check fails or no credential exists
-    console.warn(`No database credential found for role '${role}'. Using hardcoded fallback passwords. Please run 'npx prisma db seed' to set passwords in the database.`);
-    const fallbackPasswords: Record<UserRole, string> = {
-        superadmin: 'superpassword',
-        children: 'childrenpassword',
-        children2: 'children2password',
-        juniors: 'juniorspassword',
-        seniors: 'seniorspassword',
-    };
-    
-    return fallbackPasswords[role] === password;
 }
 
 export const updateAdminPassword = async (role: UserRole, currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
-    const isValid = await verifyAdminPassword(role, currentPassword);
-    if (!isValid) {
+    const credential = await prisma.adminCredential.findUnique({
+        where: { role },
+    });
+
+    if (!credential) {
+        // This case should ideally not be reached if the user is logged in.
+        return { success: false, message: "የአስተዳዳሪ መረጃ አልተገኘም። እባክዎ እንደገና ይግቡ።" };
+    }
+
+    if (credential.password !== currentPassword) {
         return { success: false, message: "የአሁኑ የይለፍ ቃል የተሳሳተ ነው።" };
     }
 
     try {
-        await prisma.adminCredential.upsert({
-            where: { role },
-            update: { password: newPassword },
-            create: { role: role, password: newPassword },
+        await prisma.adminCredential.update({
+            where: { role: role },
+            data: { password: newPassword },
         });
         return { success: true, message: "የይለፍ ቃል በተሳካ ሁኔታ ተዘምኗል።" };
     } catch (error) {
