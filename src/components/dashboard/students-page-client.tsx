@@ -216,31 +216,45 @@ export function StudentsPageClient() {
   };
 
   const handleTransfer = async () => {
-      if (!transferToRole || selectedStudents.length === 0) {
-          return;
-      }
-      
-      const fromRole = allStudents.find(s => s.id === selectedStudents[0])?.role;
+    if (!transferToRole || selectedStudents.length === 0) {
+      return;
+    }
 
-      if (!fromRole) {
-          return;
-      }
-      
-      const transferredIds = [...selectedStudents];
-      
+    const fromRole = allStudents.find(
+      (s) => s.id === selectedStudents[0]
+    )?.role;
+
+    if (!fromRole) {
+      return;
+    }
+
+    const transferredIds = [...selectedStudents];
+
+    try {
       await generateTransferReport(transferredIds, fromRole as Role, transferToRole);
-      
-      await transferStudents(transferredIds, transferToRole);
-      
+    } catch (error) {
+      console.error("PDF generation failed:", error);
       toast({
-        title: "ዝውውር ተጠናቅቋል።",
-        description: `${transferredIds.length} ተማሪ(ዎች) ከ${ROLE_NAMES[fromRole]} ወደ ${ROLE_NAMES[transferToRole]} ተዘዋውረዋል።`
+        variant: "destructive",
+        title: "የፒዲኤፍ ሪፖርት መፍጠር አልተሳካም።",
+        description: "የፎንት ዳታው የተበላሸ ይመስላል። ዝውውሩ ያለ ሪፖርት ይቀጥላል።",
+        duration: 8000,
       });
+    }
 
-      setSelectedStudents([]);
-      setIsTransferring(false);
-      setTransferToRole(null);
-      await fetchStudents();
+    await transferStudents(transferredIds, transferToRole);
+
+    toast({
+      title: "ዝውውር ተጠናቅቋል።",
+      description: `${transferredIds.length} ተማሪ(ዎች) ከ${
+        ROLE_NAMES[fromRole]
+      } ወደ ${ROLE_NAMES[transferToRole]} ተዘዋውረዋል።`,
+    });
+
+    setSelectedStudents([]);
+    setIsTransferring(false);
+    setTransferToRole(null);
+    await fetchStudents();
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
