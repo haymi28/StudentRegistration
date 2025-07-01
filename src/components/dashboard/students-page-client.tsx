@@ -30,10 +30,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
-import type { Student, Role, StudentCreateInput } from "@/lib/types";
+import type { Student, Role, StudentCreateInput, UserRole } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
-import { amharicFont } from "@/lib/noto-sans-ethiopic-regular-font";
+// import { amharicFont } from "@/lib/noto-sans-ethiopic-regular-font";
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
@@ -120,10 +120,11 @@ export function StudentsPageClient() {
 
   const isTransferDisabled = React.useMemo(() => {
     if (selectedStudents.length === 0) return true;
+    if (role !== 'superadmin') return false;
     const firstStudentRole = allStudents.find(s => s.id === selectedStudents[0])?.role;
     if (!firstStudentRole) return true;
     return !selectedStudents.every(id => allStudents.find(s => s.id === id)?.role === firstStudentRole);
-  }, [selectedStudents, allStudents]);
+  }, [selectedStudents, allStudents, role]);
 
   const getTransferOptions = (): Role[] => {
     if (selectedStudents.length === 0) return [];
@@ -133,13 +134,17 @@ export function StudentsPageClient() {
     
     const allRoles: Role[] = ['children', 'children2', 'juniors', 'seniors', 'youth'];
     const currentIndex = allRoles.indexOf(fromRole as Role);
+    
+    // For superadmin, allow transfer to any other group
+    if (role === 'superadmin') {
+      return allRoles.filter(r => r !== fromRole);
+    }
+    
+    // For regular admins, only allow sequential transfer
     const options: Role[] = [];
-  
-    // Allow downgrade
     if (currentIndex > 0) {
       options.push(allRoles[currentIndex - 1]);
     }
-    // Allow upgrade
     if (currentIndex < allRoles.length - 1) {
       options.push(allRoles[currentIndex + 1]);
     }
@@ -148,6 +153,17 @@ export function StudentsPageClient() {
   };
 
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
+    // NOTE: PDF generation is temporarily disabled due to a corrupted font file.
+    // To re-enable, please restore the correct base64 font data in src/lib/noto-sans-ethiopic-regular-font.ts
+    // and uncomment the code below, along with the font import at the top of the file.
+    toast({
+        title: "የሪፖርት ማመንጨት ለጊዜው ተሰናክሏል",
+        description: "የቅርጸ-ቁምፊ ፋይል ችግር ለመፍታት ባህሪው በቅርቡ ይመለሳል።",
+        variant: "destructive",
+        duration: 8000
+    });
+    return;
+    /*
     const doc = new (jsPDF as any)();
     
     doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
@@ -205,6 +221,7 @@ export function StudentsPageClient() {
         title: "የዝውውር ሪፖርት ወርዷል።",
         description: `የፒዲኤፍ ሪፖርቱ በተሳካ ሁኔታ ተፈጥሯል።`,
     });
+    */
   };
 
   const handleTransfer = async () => {
@@ -220,6 +237,7 @@ export function StudentsPageClient() {
       
       const transferredIds = [...selectedStudents];
       
+      // We still call this function to show the disabled message.
       await generateTransferReport(transferredIds, fromRole as Role, transferToRole);
       
       await transferStudents(transferredIds, transferToRole);
@@ -293,7 +311,7 @@ export function StudentsPageClient() {
                 id: String(row.id).toUpperCase(),
                 fullName: String(row.fullName),
                 christianName: String(row.christianName),
-                gender: gender,
+                gender: gender as 'ወንድ' | 'ሴት',
                 educationLevel: String(row.educationLevel),
                 dob: row.dob,
                 subcity: String(row.subcity),
@@ -301,14 +319,14 @@ export function StudentsPageClient() {
                 houseNumber: String(row.houseNumber),
                 houseAddressDetail: String(row.houseAddressDetail),
                 phone: String(row.phone),
-                additionalPhone: row.additionalPhone ? String(row.additionalPhone) : undefined,
-                fatherPhone: row.fatherPhone ? String(row.fatherPhone) : undefined,
-                motherName: row.motherName ? String(row.motherName) : undefined,
-                motherPhone: row.motherPhone ? String(row.motherPhone) : undefined,
+                additionalPhone: row.additionalPhone ? String(row.additionalPhone) : null,
+                fatherPhone: row.fatherPhone ? String(row.fatherPhone) : null,
+                motherName: row.motherName ? String(row.motherName) : null,
+                motherPhone: row.motherPhone ? String(row.motherPhone) : null,
                 joiningDate: row.joiningDate,
                 formFilledDate: row.formFilledDate,
                 role: studentRole,
-                photoUrl: undefined,
+                photoUrl: null,
             };
 
             const result = await addStudent(studentToAdd);
@@ -353,7 +371,7 @@ export function StudentsPageClient() {
       (role === 'superadmin' || student.role === role)
   );
   
-  const isAllSelected = selectedStudents.length > 0 && selectedStudents.length === filteredStudents.length;
+  const isAllSelected = selectedStudents.length > 0 && selectedStudents.length === filteredStudents.length && filteredStudents.length > 0;
 
   if (isAuthLoading || isDataLoading) {
       return <div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
@@ -400,7 +418,7 @@ export function StudentsPageClient() {
                             variant="outline" 
                             className="h-9 gap-1"
                             disabled={isTransferDisabled}
-                            title={isTransferDisabled ? 'እንደ ሱፐር አስተዳዳሪ፣ ተማሪዎችን ከአንድ ክፍል ብቻ በአንድ ጊዜ ማስተላለፍ ይችላሉ።' : 'የተመረጡ ተማሪዎችን ያስተላልፉ'}
+                            title={isTransferDisabled ? 'ተማሪዎችን ከአንድ ክፍል ብቻ በአንድ ጊዜ ማስተላለፍ ይችላሉ።' : 'የተመረጡ ተማሪዎችን ያስተላልፉ'}
                         >
                             <ChevronsRight className="h-4 w-4" />
                             <span>{selectedStudents.length} ተማሪ(ዎች) ያስተላልፉ</span>
