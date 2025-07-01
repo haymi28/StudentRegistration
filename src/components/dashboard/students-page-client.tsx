@@ -33,7 +33,7 @@ import { useAuth } from "@/lib/auth";
 import type { Student, Role, StudentCreateInput, UserRole } from "@/lib/types";
 import { getStudents, deleteStudent, transferStudents, getStudentById, addStudent } from "@/lib/data";
 import { toEthiopianDateString } from "@/lib/ethiopian-date";
-// import { amharicFont } from "@/lib/noto-sans-ethiopic-regular-font";
+import { amharicFont } from "@/lib/noto-sans-ethiopic-regular-font";
 
 const ROLE_NAMES: Record<string, string> = {
     children: "ቀዳማይ -1 ክፍል",
@@ -135,35 +135,27 @@ export function StudentsPageClient() {
     const allRoles: Role[] = ['children', 'children2', 'juniors', 'seniors', 'youth'];
     const currentIndex = allRoles.indexOf(fromRole as Role);
     
+    let options: Role[] = [];
+    
     // For superadmin, allow transfer to any other group
     if (role === 'superadmin') {
-      return allRoles.filter(r => r !== fromRole);
-    }
-    
-    // For regular admins, only allow sequential transfer
-    const options: Role[] = [];
-    if (currentIndex > 0) {
-      options.push(allRoles[currentIndex - 1]);
-    }
-    if (currentIndex < allRoles.length - 1) {
-      options.push(allRoles[currentIndex + 1]);
+      options = allRoles.filter(r => r !== fromRole);
+    } else {
+        // Normal role-based transfers
+        if (fromRole === 'seniors') {
+            options.push('youth');
+        } else {
+            // For regular admins, only allow sequential transfer
+            if (currentIndex < allRoles.length - 1) {
+                options.push(allRoles[currentIndex + 1]);
+            }
+        }
     }
   
     return options;
   };
 
   const generateTransferReport = async (transferredStudentIds: string[], fromRole: Role, toRole: Role) => {
-    // NOTE: PDF generation is temporarily disabled due to a corrupted font file.
-    // To re-enable, please restore the correct base64 font data in src/lib/noto-sans-ethiopic-regular-font.ts
-    // and uncomment the code below, along with the font import at the top of the file.
-    toast({
-        title: "የሪፖርት ማመንጨት ለጊዜው ተሰናክሏል",
-        description: "የቅርጸ-ቁምፊ ፋይል ችግር ለመፍታት ባህሪው በቅርቡ ይመለሳል።",
-        variant: "destructive",
-        duration: 8000
-    });
-    return;
-    /*
     const doc = new (jsPDF as any)();
     
     doc.addFileToVFS('NotoSansEthiopic-Regular.ttf', amharicFont);
@@ -221,7 +213,6 @@ export function StudentsPageClient() {
         title: "የዝውውር ሪፖርት ወርዷል።",
         description: `የፒዲኤፍ ሪፖርቱ በተሳካ ሁኔታ ተፈጥሯል።`,
     });
-    */
   };
 
   const handleTransfer = async () => {
@@ -237,7 +228,6 @@ export function StudentsPageClient() {
       
       const transferredIds = [...selectedStudents];
       
-      // We still call this function to show the disabled message.
       await generateTransferReport(transferredIds, fromRole as Role, transferToRole);
       
       await transferStudents(transferredIds, transferToRole);
@@ -572,7 +562,7 @@ export function StudentsPageClient() {
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
             <DialogDescription>
-            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", "formFilledDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ፣ እሴቶቹ “ቀዳማይ -1 ክፍል”፣ “ቀዳማይ -2 ክፍል”፣ “ካእላይ ክፍል”፣ “ማእከላይ ክፍል” ወይም “የወጣት ክፍል” መሆን አለባቸው። ለ "dob", "joiningDate", እና "formFilledDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
+            የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", "formFilledDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ、 እሴቶቹ “ቀዳማይ -1 ክፍል”、 “ቀዳማይ -2 ክፍል”、 “ካእላይ ክፍል”、 “ማእከላይ ክፍል” ወይም “የወጣት ክፍል” መሆን አለባቸው። ለ "dob", "joiningDate", እና "formFilledDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -591,3 +581,5 @@ export function StudentsPageClient() {
     </>
   );
 }
+
+    
