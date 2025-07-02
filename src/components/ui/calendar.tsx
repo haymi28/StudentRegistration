@@ -1,13 +1,15 @@
+
 "use client"
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker, DropdownProps } from "react-day-picker"
+import { DayPicker, DropdownProps, useDayPicker } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 import { ScrollArea } from "./scroll-area"
+import { ETC } from "@/lib/abushakir"
 
 
 const gregorianAmharicMonths = [
@@ -44,7 +46,7 @@ function Calendar({
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
+        caption_label: "text-sm font-medium hidden",
         caption_dropdowns: "flex justify-center gap-1",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
@@ -82,6 +84,8 @@ function Calendar({
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
         Dropdown: ({ name, value, onChange, fromYear, toYear, fromMonth, toMonth }: DropdownProps) => {
+            const { goToMonth, displayMonth } = useDayPicker();
+
             const handleValueChange = (newValue: string) => {
                 if (onChange) {
                     const event = { target: { value: newValue } } as React.ChangeEvent<HTMLSelectElement>;
@@ -111,18 +115,43 @@ function Calendar({
             }
 
             if (name === "years") {
-                const years: number[] = [];
-                for (let i = fromYear!; i <= toYear!; i++) {
-                    years.push(i);
+                const gregYears: number[] = [];
+                if (fromYear && toYear) {
+                    for (let i = fromYear; i <= toYear; i++) {
+                        gregYears.push(i);
+                    }
                 }
+
+                const currentGregYear = displayMonth.getFullYear();
+                const displayedEthYear = new ETC(displayMonth).year;
+
+                const ethYearMap = new Map<number, number>();
+                gregYears.reverse().forEach(gregYear => {
+                    const ethYear = new ETC(new Date(gregYear, 6, 1)).year;
+                    if (!ethYearMap.has(ethYear)) {
+                        ethYearMap.set(ethYear, gregYear);
+                    }
+                });
+
+                const uniqueEthYears = Array.from(ethYearMap.keys());
+                
+                const handleEthYearChange = (ethYearString: string) => {
+                    const ethYear = parseInt(ethYearString, 10);
+                    const correspondingGregYear = ethYearMap.get(ethYear) ?? currentGregYear;
+                    
+                    const newDate = new Date(displayMonth);
+                    newDate.setFullYear(correspondingGregYear);
+                    goToMonth(newDate);
+                }
+
                 return (
-                    <Select onValueChange={handleValueChange} value={value?.toString()}>
-                        <SelectTrigger>{value}</SelectTrigger>
+                    <Select onValueChange={handleEthYearChange} value={displayedEthYear.toString()}>
+                        <SelectTrigger>{displayedEthYear}</SelectTrigger>
                         <SelectContent>
                             <ScrollArea className="h-80">
-                                {years.map((year) => (
-                                    <SelectItem key={year} value={year.toString()}>
-                                        {year}
+                                {uniqueEthYears.map((ethYear) => (
+                                    <SelectItem key={ethYear} value={ethYear.toString()}>
+                                        {ethYear}
                                     </SelectItem>
                                 ))}
                             </ScrollArea>
