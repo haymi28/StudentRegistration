@@ -236,7 +236,7 @@ export function StudentsPageClient() {
       console.error("PDF generation failed:", error);
       toast({
         variant: "destructive",
-        title: "የፒዲኤፍ ሪፖርት መፍጠር አልተሳካም።",
+        title: "የፒዲኤፍ ሪፖርት መፍጠር አልተቻለም።",
         description: "የፎንት ዳታው የተበላሸ ይመስላል። ዝውውሩ ያለ ሪፖርት ይቀጥላል።",
         duration: 8000,
       });
@@ -595,5 +595,3 @@ export function StudentsPageClient() {
     </>
   );
 }
-
-    
