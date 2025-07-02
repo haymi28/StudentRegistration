@@ -86,6 +86,10 @@ function Calendar({
         Dropdown: ({ name, value, onChange, fromYear, toYear, fromMonth, toMonth }: DropdownProps) => {
             const { goToMonth, displayMonth } = useDayPicker();
 
+            if (!displayMonth) {
+              return null;
+            }
+
             const handleValueChange = (newValue: string) => {
                 if (onChange) {
                     const event = { target: { value: newValue } } as React.ChangeEvent<HTMLSelectElement>;
