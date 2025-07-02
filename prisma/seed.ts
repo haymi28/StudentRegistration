@@ -61,8 +61,17 @@ async function main() {
 }
 
 main()
-    .catch((e) => {
-        console.error("An error occurred during seeding:", e);
+    .catch((e: any) => {
+        if (e.code === 'P2021') {
+            console.error("\n❌ Database is not ready for seeding.");
+            console.error(`The seed command failed because the 'AdminCredential' table is missing.`);
+            console.error("\n✅ To fix this, you need to update your database schema. Run this command:");
+            console.error("\n  npx prisma db push\n");
+            console.error("After that finishes, run the seed command again:");
+            console.error("\n  npx prisma db seed\n");
+        } else {
+            console.error("An unexpected error occurred during seeding:", e);
+        }
         process.exit(1);
     })
     .finally(async () => {
