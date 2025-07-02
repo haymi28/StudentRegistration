@@ -47,20 +47,8 @@ export default function LoginPage() {
       login(selectedRole);
       router.push('/dashboard');
     } else {
-        const defaultPasswords: Record<UserRole, string> = {
-            superadmin: 'superpassword',
-            children: 'childrenpassword',
-            children2: 'children2password',
-            juniors: 'juniorspassword',
-            seniors: 'seniorspassword',
-        };
-
-        if (defaultPasswords[selectedRole] === password) {
-            setError('የይለፍ ቃል በዳታቤዝ ውስጥ አልተገኘም። እባክዎ `npx prisma db seed` በማሄድ ዳታቤዙን ያዘጋጁ።');
-        } else {
-            setError('ለምርጥ ክፍል የተሳሳተ የይለፍ ቃል።');
-        }
-        setIsLoggingIn(false);
+      setError('ለምርጥ ክፍል የተሳሳተ የይለፍ ቃል።');
+      setIsLoggingIn(false);
     }
   };
 

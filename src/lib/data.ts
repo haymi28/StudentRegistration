@@ -69,17 +69,25 @@ export const verifyAdminPassword = async (role: UserRole, password: string): Pro
             where: { role },
         });
 
-        // If a credential is not found, or if the password doesn't match, return false.
-        if (!credential) {
-            return false;
+        // If credential exists, validate against it.
+        if (credential) {
+            return credential.password === password;
         }
-        
-        return credential.password === password;
-        
     } catch (error) {
-        console.error("DB Error during password verification. Assuming failure.", error);
-        return false;
+        // Log the error but proceed to check default passwords, as DB might be down/unseeded.
+        console.error("DB Error during password verification. Checking default passwords.", error);
     }
+    
+    // If credential not found or DB error, check against hardcoded default passwords.
+    const defaultPasswords: Record<UserRole, string> = {
+        superadmin: 'superpassword',
+        children: 'childrenpassword',
+        children2: 'children2password',
+        juniors: 'juniorspassword',
+        seniors: 'seniorspassword',
+    };
+
+    return defaultPasswords[role] === password;
 }
 
 export const updateAdminPassword = async (role: UserRole, currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
