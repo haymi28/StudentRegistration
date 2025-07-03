@@ -4,7 +4,7 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker, CaptionProps } from "react-day-picker"
-import * as EthiopianDateConverter from "ethiopian-calendar-date-converter"
+import { EtDatetime } from 'abushakir'
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -12,11 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
-const ETHIOPIAN_MONTHS = ['መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት', 'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜ'];
-
-// Helper to safely access the conversion functions from the imported module.
-// This handles inconsistencies in how CommonJS modules are bundled and imported in an ESM environment.
-const converter = (EthiopianDateConverter as any).default || EthiopianDateConverter;
+const ETHIOPIAN_MONTHS = [
+  'መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት',
+  'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜ'
+];
 
 
 function Calendar({
@@ -31,8 +30,8 @@ function Calendar({
   // A formatter to show Ethiopian day numbers instead of Gregorian.
   const etDayFormatter = (date: Date): React.ReactNode => {
     try {
-      const [,, etDay] = converter.toEthiopian(date.getFullYear(), date.getMonth() + 1, date.getDate());
-      return etDay;
+      const etDate = new EtDatetime(date);
+      return etDate.date;
     } catch {
       return date.getDate(); // Fallback to Gregorian day number
     }
@@ -40,46 +39,45 @@ function Calendar({
 
   // Custom Caption component with Ethiopian month/year dropdowns and navigation.
   function CustomCaption(captionProps: CaptionProps) {
-    // Get the Ethiopian representation of the currently displayed Gregorian month
-    const [etYear, etMonth] = converter.toEthiopian(captionProps.displayMonth.getFullYear(), captionProps.displayMonth.getMonth() + 1, captionProps.displayMonth.getDate());
-    const [etTodayYear] = converter.toEthiopian(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+    const etDate = new EtDatetime(captionProps.displayMonth);
+    const etYear = etDate.year;
+    const etMonth = etDate.month;
+    const etTodayYear = new EtDatetime().year;
 
     const handleYearChange = (newYearStr: string) => {
       const newYear = parseInt(newYearStr, 10);
-      // Go to the first day of the new Ethiopian month/year.
-      const greg = converter.toGregorian(newYear, etMonth, 1);
-      setMonth(new Date(greg.year, greg.month - 1, greg.day));
+      const newEtDate = new EtDatetime({ year: newYear, month: etMonth, day: 1 });
+      setMonth(newEtDate.toGregorian());
     };
 
     const handleMonthSelectChange = (newMonthStr: string) => {
       const newMonth = parseInt(newMonthStr, 10);
-      // Go to the first day of the new Ethiopian month/year.
-      const greg = converter.toGregorian(etYear, newMonth, 1);
-      setMonth(new Date(greg.year, greg.month - 1, greg.day));
+      const newEtDate = new EtDatetime({ year: etYear, month: newMonth, day: 1 });
+      setMonth(newEtDate.toGregorian());
     };
     
     const handlePreviousMonth = () => {
-        const [currentEtYear, currentEtMonth] = converter.toEthiopian(month.getFullYear(), month.getMonth() + 1, month.getDate());
-        let newEtMonth = currentEtMonth - 1;
-        let newEtYear = currentEtYear;
+        const currentEt = new EtDatetime(month);
+        let newEtMonth = currentEt.month - 1;
+        let newEtYear = currentEt.year;
         if (newEtMonth < 1) {
             newEtMonth = 13;
             newEtYear -= 1;
         }
-        const greg = converter.toGregorian(newEtYear, newEtMonth, 1);
-        setMonth(new Date(greg.year, greg.month - 1, greg.day));
+        const newGregDate = new EtDatetime({ year: newEtYear, month: newEtMonth, day: 1 }).toGregorian();
+        setMonth(newGregDate);
     };
 
     const handleNextMonth = () => {
-        const [currentEtYear, currentEtMonth] = converter.toEthiopian(month.getFullYear(), month.getMonth() + 1, month.getDate());
-        let newEtMonth = currentEtMonth + 1;
-        let newEtYear = currentEtYear;
+        const currentEt = new EtDatetime(month);
+        let newEtMonth = currentEt.month + 1;
+        let newEtYear = currentEt.year;
         if (newEtMonth > 13) {
             newEtMonth = 1;
             newEtYear += 1;
         }
-        const greg = converter.toGregorian(newEtYear, newEtMonth, 1);
-        setMonth(new Date(greg.year, greg.month - 1, greg.day));
+        const newGregDate = new EtDatetime({ year: newEtYear, month: newEtMonth, day: 1 }).toGregorian();
+        setMonth(newGregDate);
     };
 
     const fromYear = props.fromYear || etTodayYear - 100;
