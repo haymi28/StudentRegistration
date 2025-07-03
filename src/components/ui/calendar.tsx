@@ -133,7 +133,7 @@ function Calendar({
                 
                 const displayedEthYear = new ETC(displayMonth).year;
                 const ethMonthName = new ETC(displayMonth).monthName;
-                const captionText = `${ethMonthName} ${displayedEthYear}`;
+                const captionText = `${ethMonthName}, ${displayedEthYear}`;
 
                 return (
                     <>
