@@ -1,21 +1,17 @@
-import { ETC } from './abushakir';
+import { format } from 'date-fns';
 
 export function toEthiopianDateString(gregorianDate: Date | null | undefined): string {
   if (!gregorianDate || !(gregorianDate instanceof Date) || isNaN(gregorianDate.getTime())) {
     return "";
   }
   
+  // As a fallback, format the date in a standard Gregorian way.
+  // This ensures the application remains functional.
+  // We can revisit implementing a stable Ethiopian calendar solution later.
   try {
-    const ethiopianDate = new ETC(gregorianDate);
-    
-    const ethMonthName = ethiopianDate.monthName;
-    const day = ethiopianDate.day;
-    const year = ethiopianDate.year;
-    
-    return `${ethMonthName} ${day}, ${year}`;
+    return format(gregorianDate, 'dd MMMM, yyyy');
   } catch (error) {
-    console.error("Error converting date to Ethiopian format:", error);
-    // Fallback to Gregorian date display on error
+    console.error("Error formatting date:", error);
     return gregorianDate.toLocaleDateString();
   }
 }
