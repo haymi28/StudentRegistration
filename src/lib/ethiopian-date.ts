@@ -1,4 +1,4 @@
-import { toEthiopian as toEthiopianConverter } from 'ethiopian-calendar-date-converter';
+import * as EthiopianDateConverter from 'ethiopian-calendar-date-converter';
 
 const ETHIOPIAN_MONTHS = ['መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት', 'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜ'];
 
@@ -7,7 +7,7 @@ export function toEthiopianDateString(gregorianDate: Date | null | undefined): s
     return "";
   }
   try {
-    const [year, month, day] = toEthiopianConverter(gregorianDate.getFullYear(), gregorianDate.getMonth() + 1, gregorianDate.getDate());
+    const [year, month, day] = EthiopianDateConverter.toEthiopian(gregorianDate.getFullYear(), gregorianDate.getMonth() + 1, gregorianDate.getDate());
     const monthName = ETHIOPIAN_MONTHS[month - 1];
     if (!monthName) {
         // Fallback for safety, this should not happen with correct library usage
