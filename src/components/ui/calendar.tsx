@@ -78,7 +78,8 @@ function Calendar({
         ...classNames,
       }}
       formatters={{
-          formatWeekdayName: (day) => amharicWeekdays[day.getDay()]
+          formatWeekdayName: (day) => amharicWeekdays[day.getDay()],
+          formatDay: (day) => new ETC(day).day.toString()
       }}
       components={{
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
