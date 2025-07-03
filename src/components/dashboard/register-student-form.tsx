@@ -207,7 +207,7 @@ export function RegisterStudentForm() {
                             <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} name="educationLevel" autoComplete="off" /></FormControl><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="dob" render={({ field }) => (
-                            <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")} name="dob" autoComplete="bday">{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} captionLayout="dropdown-buttons" fromYear={1940} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem>
+                            <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")} name="dob" autoComplete="bday">{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} fromYear={1940} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem>
                         )} />
                         <FormField control={form.control} name="studentId" render={({ field }) => (
                             <FormItem><FormLabel>የተማሪ መለያ</FormLabel><FormControl><Input placeholder="ተማሪ005" {...field} onInput={(e) => (e.currentTarget.value = e.currentTarget.value.toUpperCase())} name="studentId" autoComplete="off" /></FormControl><FormDescription>ልዩ መለያ መሆን አለበት።</FormDescription><FormMessage /></FormItem>
@@ -232,7 +232,7 @@ export function RegisterStudentForm() {
                         )}
 
                         <FormField control={form.control} name="joiningDate" render={({ field }) => (
-                            <FormItem className="flex flex-col"><FormLabel>የተመዘገበበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")} name="joiningDate" autoComplete="off">{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} captionLayout="dropdown-buttons" fromYear={2000} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem>
+                            <FormItem className="flex flex-col"><FormLabel>የተመዘገበበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")} name="joiningDate" autoComplete="off">{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} fromYear={2000} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem>
                         )} />
                         
                         <FormField
@@ -319,7 +319,6 @@ export function RegisterStudentForm() {
                                                 mode="single"
                                                 selected={field.value}
                                                 onSelect={field.onChange}
-                                                captionLayout="dropdown-buttons" 
                                                 fromYear={2000} 
                                                 toYear={new Date().getFullYear()}
                                             />

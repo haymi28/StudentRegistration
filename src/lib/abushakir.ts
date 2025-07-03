@@ -2,7 +2,7 @@
 // Copied from https://github.com/hymnbook/abushakir/blob/master/src/ETC.js
 // to bypass npm installation issues.
 
-const constants = {
+export const constants = {
   ET: {
     weekdays: [
       "እሑድ",

@@ -9,23 +9,8 @@ import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 import { ScrollArea } from "./scroll-area"
-import { ETC } from "@/lib/abushakir"
+import { ETC, constants } from "@/lib/abushakir"
 
-
-const gregorianAmharicMonths = [
-    'ጥር',
-    'የካቲት',
-    'መጋቢት',
-    'ሚያዝያ',
-    'ግንቦት',
-    'ሰኔ',
-    'ሐምሌ',
-    'ነሐሴ',
-    'መስከረም',
-    'ጥቅምት',
-    'ኅዳር',
-    'ታኅሣሥ',
-];
 
 const amharicWeekdays = ["እሑድ", "ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "ዓርብ", "ቅዳሜ"];
 
@@ -45,7 +30,7 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center mb-4 mt-4",
+        caption: "flex justify-center pt-1 relative items-center",
         caption_label: "hidden",
         caption_dropdowns: "flex justify-center gap-1",
         nav: "space-x-1 flex items-center",
@@ -84,81 +69,78 @@ function Calendar({
       components={{
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-        Dropdown: ({ name, value, onChange, fromYear, toYear, fromMonth, toMonth }: DropdownProps) => {
+        Dropdown: ({ name, fromYear, toYear }: DropdownProps) => {
             const { goToMonth, displayMonth } = useDayPicker();
 
             if (!displayMonth) {
               return null;
             }
 
-            const handleValueChange = (newValue: string) => {
-                const newDate = new Date(displayMonth);
-                if (name === "months") {
-                    newDate.setMonth(parseInt(newValue, 10));
-                } else if (name === "years") {
-                    newDate.setFullYear(parseInt(newValue, 10));
-                }
-                goToMonth(newDate);
-            };
+            const ethDate = new ETC(displayMonth);
+            const ethYear = ethDate.year;
 
-            if (name === "months") {
+            if (name === 'months') {
                 return (
-                    <Select onValueChange={handleValueChange} value={value?.toString()}>
-                        <SelectTrigger>{gregorianAmharicMonths[value as number]}</SelectTrigger>
+                    <Select
+                        onValueChange={(newEthMonthValue) => {
+                            const newEthMonth = parseInt(newEthMonthValue, 10);
+                            const newGregDate = new ETC(ethYear, newEthMonth, 1)._gregorian_date;
+                            goToMonth(newGregDate);
+                        }}
+                        value={ethDate.month.toString()}
+                    >
+                        <SelectTrigger className="w-auto border-0 shadow-none focus:ring-0">
+                           {ethDate.monthName}
+                        </SelectTrigger>
                         <SelectContent>
-                           <ScrollArea className="h-80">
-                            {Array.from({ length: 12 }).map((_, i) => {
-                                const month = fromMonth ? new Date(fromMonth.getFullYear(), fromMonth.getMonth() + i) : new Date(new Date().getFullYear(), i);
-                                if (toMonth && month > toMonth) return null;
-                                return (
-                                    <SelectItem key={i} value={i.toString()}>
-                                        {gregorianAmharicMonths[i]}
+                            <ScrollArea className="h-80">
+                                {constants.ET.months.map((monthName, index) => (
+                                    <SelectItem key={monthName} value={(index + 1).toString()}>
+                                        {monthName}
                                     </SelectItem>
-                                );
-                            })}
-                           </ScrollArea>
+                                ))}
+                            </ScrollArea>
                         </SelectContent>
                     </Select>
                 );
             }
 
-            if (name === "years") {
+            if (name === 'years') {
                 const earliestYear = fromYear || new Date().getFullYear() - 100;
                 const latestYear = toYear || new Date().getFullYear();
-
+                
                 const gregYears: number[] = [];
                 for (let i = latestYear; i >= earliestYear; i--) {
                     gregYears.push(i);
                 }
-                
-                const displayedEthYear = new ETC(displayMonth).year;
-                const ethMonthName = new ETC(displayMonth).monthName;
-                const captionText = `${ethMonthName}, ${displayedEthYear}`;
 
                 return (
-                    <>
-                        <div className="absolute inset-x-0 -top-4 text-center text-sm font-medium">
-                           {captionText}
-                        </div>
-                        <Select onValueChange={handleValueChange} value={displayMonth.getFullYear().toString()}>
-                            <SelectTrigger>{displayedEthYear}</SelectTrigger>
-                            <SelectContent>
-                                <ScrollArea className="h-80">
-                                    {gregYears.map((gregYear) => {
-                                        const ethYear = new ETC(new Date(gregYear, 6, 1)).year;
-                                        return (
-                                            <SelectItem key={gregYear} value={gregYear.toString()}>
-                                                {ethYear}
-                                            </SelectItem>
-                                        );
-                                    })}
-                                </ScrollArea>
-                            </SelectContent>
-                        </Select>
-                    </>
+                    <Select
+                        onValueChange={(newGregYearValue) => {
+                            const newGregYear = parseInt(newGregYearValue, 10);
+                            const newDate = new Date(displayMonth);
+                            newDate.setFullYear(newGregYear);
+                            goToMonth(newDate);
+                        }}
+                        value={displayMonth.getFullYear().toString()}
+                    >
+                        <SelectTrigger className="w-auto border-0 shadow-none focus:ring-0">{ethYear}</SelectTrigger>
+                        <SelectContent>
+                            <ScrollArea className="h-80">
+                                {gregYears.map((gregYear) => {
+                                    // Use a date after Eth new year to get a reliable representative year
+                                    const representativeEthYear = new ETC(new Date(gregYear, 11, 1)).year;
+                                    return (
+                                        <SelectItem key={gregYear} value={gregYear.toString()}>
+                                            {representativeEthYear}
+                                        </SelectItem>
+                                    );
+                                })}
+                            </ScrollArea>
+                        </SelectContent>
+                    </Select>
                 );
             }
-
             return null;
         }
       }}
