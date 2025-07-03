@@ -1,17 +1,22 @@
-import { format } from 'date-fns';
+import { toEthiopian } from 'ethiopian-calendar-date-converter';
+
+const ETHIOPIAN_MONTHS = ['መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት', 'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜ'];
 
 export function toEthiopianDateString(gregorianDate: Date | null | undefined): string {
   if (!gregorianDate || !(gregorianDate instanceof Date) || isNaN(gregorianDate.getTime())) {
     return "";
   }
-  
-  // As a fallback, format the date in a standard Gregorian way.
-  // This ensures the application remains functional.
-  // We can revisit implementing a stable Ethiopian calendar solution later.
   try {
-    return format(gregorianDate, 'dd MMMM, yyyy');
+    const [year, month, day] = toEthiopian(gregorianDate.getFullYear(), gregorianDate.getMonth() + 1, gregorianDate.getDate());
+    const monthName = ETHIOPIAN_MONTHS[month - 1];
+    if (!monthName) {
+        // Fallback for safety, this should not happen with correct library usage
+        return gregorianDate.toLocaleDateString();
+    }
+    return `${day} ${monthName}, ${year}`;
   } catch (error) {
-    console.error("Error formatting date:", error);
+    console.error("Error converting date to Ethiopian:", error);
+    // Fallback to Gregorian if conversion fails for any reason
     return gregorianDate.toLocaleDateString();
   }
 }
