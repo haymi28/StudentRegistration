@@ -46,7 +46,7 @@ function Calendar({
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center mb-4 mt-4",
-        caption_label: "text-sm font-medium",
+        caption_label: "hidden",
         caption_dropdowns: "flex justify-center gap-1",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
@@ -137,7 +137,7 @@ function Calendar({
 
                 return (
                     <>
-                        <div className="absolute inset-x-0 -top-4 text-center text-sm font-medium pointer-events-none">
+                        <div className="absolute inset-x-0 -top-4 text-center text-sm font-medium">
                            {captionText}
                         </div>
                         <Select onValueChange={handleValueChange} value={displayMonth.getFullYear().toString()}>
