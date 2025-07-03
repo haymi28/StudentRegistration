@@ -4,7 +4,7 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker, CaptionProps } from "react-day-picker"
-import * as EthiopianCalendarConverter from "ethiopian-calendar-date-converter"
+import { toEthiopian, toGregorian } from "ethiopian-calendar-date-converter"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -26,7 +26,7 @@ function Calendar({
   // A formatter to show Ethiopian day numbers instead of Gregorian.
   const etDayFormatter = (date: Date): React.ReactNode => {
     try {
-      const [,, etDay] = EthiopianCalendarConverter.toEthiopian(date.getFullYear(), date.getMonth() + 1, date.getDate());
+      const [,, etDay] = toEthiopian(date.getFullYear(), date.getMonth() + 1, date.getDate());
       return etDay;
     } catch {
       return date.getDate(); // Fallback to Gregorian day number
@@ -36,44 +36,44 @@ function Calendar({
   // Custom Caption component with Ethiopian month/year dropdowns and navigation.
   function CustomCaption(captionProps: CaptionProps) {
     // Get the Ethiopian representation of the currently displayed Gregorian month
-    const [etYear, etMonth] = EthiopianCalendarConverter.toEthiopian(captionProps.displayMonth.getFullYear(), captionProps.displayMonth.getMonth() + 1, captionProps.displayMonth.getDate());
-    const [etTodayYear] = EthiopianCalendarConverter.toEthiopian(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+    const [etYear, etMonth] = toEthiopian(captionProps.displayMonth.getFullYear(), captionProps.displayMonth.getMonth() + 1, captionProps.displayMonth.getDate());
+    const [etTodayYear] = toEthiopian(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
 
     const handleYearChange = (newYearStr: string) => {
       const newYear = parseInt(newYearStr, 10);
       // Go to the first day of the new Ethiopian month/year.
-      const greg = EthiopianCalendarConverter.toGregorian(newYear, etMonth, 1);
+      const greg = toGregorian(newYear, etMonth, 1);
       setMonth(new Date(greg.year, greg.month - 1, greg.day));
     };
 
     const handleMonthSelectChange = (newMonthStr: string) => {
       const newMonth = parseInt(newMonthStr, 10);
       // Go to the first day of the new Ethiopian month/year.
-      const greg = EthiopianCalendarConverter.toGregorian(etYear, newMonth, 1);
+      const greg = toGregorian(etYear, newMonth, 1);
       setMonth(new Date(greg.year, greg.month - 1, greg.day));
     };
     
     const handlePreviousMonth = () => {
-        const [currentEtYear, currentEtMonth] = EthiopianCalendarConverter.toEthiopian(month.getFullYear(), month.getMonth() + 1, month.getDate());
+        const [currentEtYear, currentEtMonth] = toEthiopian(month.getFullYear(), month.getMonth() + 1, month.getDate());
         let newEtMonth = currentEtMonth - 1;
         let newEtYear = currentEtYear;
         if (newEtMonth < 1) {
             newEtMonth = 13;
             newEtYear -= 1;
         }
-        const greg = EthiopianCalendarConverter.toGregorian(newEtYear, newEtMonth, 1);
+        const greg = toGregorian(newEtYear, newEtMonth, 1);
         setMonth(new Date(greg.year, greg.month - 1, greg.day));
     };
 
     const handleNextMonth = () => {
-        const [currentEtYear, currentEtMonth] = EthiopianCalendarConverter.toEthiopian(month.getFullYear(), month.getMonth() + 1, month.getDate());
+        const [currentEtYear, currentEtMonth] = toEthiopian(month.getFullYear(), month.getMonth() + 1, month.getDate());
         let newEtMonth = currentEtMonth + 1;
         let newEtYear = currentEtYear;
         if (newEtMonth > 13) {
             newEtMonth = 1;
             newEtYear += 1;
         }
-        const greg = EthiopianCalendarConverter.toGregorian(newEtYear, newEtMonth, 1);
+        const greg = toGregorian(newEtYear, newEtMonth, 1);
         setMonth(new Date(greg.year, greg.month - 1, greg.day));
     };
 
