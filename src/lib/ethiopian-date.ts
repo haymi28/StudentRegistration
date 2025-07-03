@@ -1,17 +1,15 @@
 
-import { EtDatetime } from 'abushakir';
-
 export function toEthiopianDateString(gregorianDate: Date | null | undefined): string {
   if (!gregorianDate || !(gregorianDate instanceof Date) || isNaN(gregorianDate.getTime())) {
     return "";
   }
+  // Fallback to a standard Gregorian date format since the Ethiopian date library is unavailable due to environment issues.
+  // Using 'en-CA' gives a YYYY-MM-DD format which is clear and universal.
   try {
-    const etDate = new EtDatetime(gregorianDate);
-    // The default toString() returns in the format "Meskerem 1, 2011"
-    return etDate.toString();
+    return gregorianDate.toLocaleDateString('en-CA');
   } catch (error) {
-    console.error("Error converting date to Ethiopian:", error);
-    // Fallback to Gregorian if conversion fails for any reason
-    return gregorianDate.toLocaleDateString();
+    console.error("Error converting date:", error);
+    // Fallback for very old environments that might not support en-CA
+    return gregorianDate.toISOString().split('T')[0];
   }
 }

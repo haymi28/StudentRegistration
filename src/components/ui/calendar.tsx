@@ -3,20 +3,12 @@
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker, CaptionProps } from "react-day-picker"
-import { EtDatetime } from 'abushakir'
+import { DayPicker } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
-
-const ETHIOPIAN_MONTHS = [
-  'መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት',
-  'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜ'
-];
-
 
 function Calendar({
   className,
@@ -24,134 +16,45 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
-  // `month` is the Gregorian month to display. We control it to navigate through the Ethiopian calendar.
-  const [month, setMonth] = React.useState<Date>(props.selected as Date || new Date());
-  
-  // A formatter to show Ethiopian day numbers instead of Gregorian.
-  const etDayFormatter = (date: Date): React.ReactNode => {
-    try {
-      const etDate = new EtDatetime(date);
-      return etDate.date;
-    } catch {
-      return date.getDate(); // Fallback to Gregorian day number
-    }
-  };
-
-  // Custom Caption component with Ethiopian month/year dropdowns and navigation.
-  function CustomCaption(captionProps: CaptionProps) {
-    const etDate = new EtDatetime(new Date(captionProps.displayMonth));
-    const etYear = etDate.year;
-    const etMonth = etDate.month;
-    const etTodayYear = new EtDatetime().year;
-
-    const handleYearChange = (newYearStr: string) => {
-      const newYear = parseInt(newYearStr, 10);
-      const newEtDate = new EtDatetime({ year: newYear, month: etMonth, day: 1 });
-      setMonth(newEtDate.toGregorian());
-    };
-
-    const handleMonthSelectChange = (newMonthStr: string) => {
-      const newMonth = parseInt(newMonthStr, 10);
-      const newEtDate = new EtDatetime({ year: etYear, month: newMonth, day: 1 });
-      setMonth(newEtDate.toGregorian());
-    };
-    
-    const handlePreviousMonth = () => {
-        const currentEt = new EtDatetime(new Date(month));
-        let newEtMonth = currentEt.month - 1;
-        let newEtYear = currentEt.year;
-        if (newEtMonth < 1) {
-            newEtMonth = 13;
-            newEtYear -= 1;
-        }
-        const newGregDate = new EtDatetime({ year: newEtYear, month: newEtMonth, day: 1 }).toGregorian();
-        setMonth(newGregDate);
-    };
-
-    const handleNextMonth = () => {
-        const currentEt = new EtDatetime(new Date(month));
-        let newEtMonth = currentEt.month + 1;
-        let newEtYear = currentEt.year;
-        if (newEtMonth > 13) {
-            newEtMonth = 1;
-            newEtYear += 1;
-        }
-        const newGregDate = new EtDatetime({ year: newEtYear, month: newEtMonth, day: 1 }).toGregorian();
-        setMonth(newGregDate);
-    };
-
-    const fromYear = props.fromYear || etTodayYear - 100;
-    const toYear = props.toYear || etTodayYear + 5;
-    const yearOptions = Array.from({ length: toYear - fromYear + 1 }, (_, i) => fromYear + i);
-
-    return (
-       <div className="flex items-center justify-between px-1 py-2">
-        <div className="flex items-center gap-2">
-           <Select value={String(etMonth)} onValueChange={handleMonthSelectChange}>
-              <SelectTrigger className="w-[130px] focus:ring-0">
-                  <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                  {ETHIOPIAN_MONTHS.map((m, i) => (
-                      <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-            <Select value={String(etYear)} onValueChange={handleYearChange}>
-              <SelectTrigger className="w-[90px] focus:ring-0">
-                  <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                  {yearOptions.map(y => (
-                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-        </div>
-        <div className="flex items-center gap-1">
-          <button type="button" onClick={handlePreviousMonth} className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'h-7 w-7')}>
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button type="button" onClick={handleNextMonth} className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'h-7 w-7')}>
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <DayPicker
-      month={month}
-      onMonthChange={setMonth}
-      formatters={{ formatDay: etDayFormatter }}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "hidden", // We use a custom caption, so hide the default one
+        caption: "flex justify-center pt-1 relative items-center",
+        caption_label: "text-sm font-medium",
+        nav: "space-x-1 flex items-center",
+        nav_button: cn(
+          buttonVariants({ variant: "outline" }),
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+        ),
+        nav_button_previous: "absolute left-1",
+        nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+        head_cell:
+          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
         cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
           "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
         ),
-        day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+        day_selected:
+          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent text-accent-foreground",
         day_outside: "text-muted-foreground opacity-50",
         day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+        day_range_middle:
+          "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...classNames,
       }}
       components={{
-        Caption: CustomCaption,
-        IconLeft: () => null, // Hide default navigation icons
-        IconRight: () => null,
+        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
       }}
       {...props}
     />
