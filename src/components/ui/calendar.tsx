@@ -39,7 +39,7 @@ function Calendar({
 
   // Custom Caption component with Ethiopian month/year dropdowns and navigation.
   function CustomCaption(captionProps: CaptionProps) {
-    const etDate = new EtDatetime(captionProps.displayMonth);
+    const etDate = new EtDatetime(new Date(captionProps.displayMonth));
     const etYear = etDate.year;
     const etMonth = etDate.month;
     const etTodayYear = new EtDatetime().year;
@@ -57,7 +57,7 @@ function Calendar({
     };
     
     const handlePreviousMonth = () => {
-        const currentEt = new EtDatetime(month);
+        const currentEt = new EtDatetime(new Date(month));
         let newEtMonth = currentEt.month - 1;
         let newEtYear = currentEt.year;
         if (newEtMonth < 1) {
@@ -69,7 +69,7 @@ function Calendar({
     };
 
     const handleNextMonth = () => {
-        const currentEt = new EtDatetime(month);
+        const currentEt = new EtDatetime(new Date(month));
         let newEtMonth = currentEt.month + 1;
         let newEtYear = currentEt.year;
         if (newEtMonth > 13) {
