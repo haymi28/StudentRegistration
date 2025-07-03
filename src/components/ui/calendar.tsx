@@ -45,8 +45,8 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium hidden",
+        caption: "flex justify-center pt-1 relative items-center mb-4 mt-4",
+        caption_label: "text-sm font-medium",
         caption_dropdowns: "flex justify-center gap-1",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
@@ -132,23 +132,30 @@ function Calendar({
                 }
                 
                 const displayedEthYear = new ETC(displayMonth).year;
+                const ethMonthName = new ETC(displayMonth).monthName;
+                const captionText = `${ethMonthName} ${displayedEthYear}`;
 
                 return (
-                    <Select onValueChange={handleValueChange} value={displayMonth.getFullYear().toString()}>
-                        <SelectTrigger>{displayedEthYear}</SelectTrigger>
-                        <SelectContent>
-                            <ScrollArea className="h-80">
-                                {gregYears.map((gregYear) => {
-                                    const ethYear = new ETC(new Date(gregYear, 6, 1)).year;
-                                    return (
-                                        <SelectItem key={gregYear} value={gregYear.toString()}>
-                                            {ethYear}
-                                        </SelectItem>
-                                    );
-                                })}
-                            </ScrollArea>
-                        </SelectContent>
-                    </Select>
+                    <>
+                        <div className="absolute inset-x-0 -top-4 text-center text-sm font-medium pointer-events-none">
+                           {captionText}
+                        </div>
+                        <Select onValueChange={handleValueChange} value={displayMonth.getFullYear().toString()}>
+                            <SelectTrigger>{displayedEthYear}</SelectTrigger>
+                            <SelectContent>
+                                <ScrollArea className="h-80">
+                                    {gregYears.map((gregYear) => {
+                                        const ethYear = new ETC(new Date(gregYear, 6, 1)).year;
+                                        return (
+                                            <SelectItem key={gregYear} value={gregYear.toString()}>
+                                                {ethYear}
+                                            </SelectItem>
+                                        );
+                                    })}
+                                </ScrollArea>
+                            </SelectContent>
+                        </Select>
+                    </>
                 );
             }
 
@@ -162,3 +169,4 @@ function Calendar({
 Calendar.displayName = "Calendar"
 
 export { Calendar }
+    
