@@ -91,10 +91,13 @@ function Calendar({
             }
 
             const handleValueChange = (newValue: string) => {
-                if (onChange) {
-                    const event = { target: { value: newValue } } as React.ChangeEvent<HTMLSelectElement>;
-                    onChange(event);
+                const newDate = new Date(displayMonth);
+                if (name === "months") {
+                    newDate.setMonth(parseInt(newValue, 10));
+                } else if (name === "years") {
+                    newDate.setFullYear(parseInt(newValue, 10));
                 }
+                goToMonth(newDate);
             };
 
             if (name === "months") {
@@ -119,45 +122,29 @@ function Calendar({
             }
 
             if (name === "years") {
-                const gregYears: number[] = [];
-                if (fromYear && toYear) {
-                    for (let i = fromYear; i <= toYear; i++) {
-                        gregYears.push(i);
-                    }
-                }
+                const earliestYear = fromYear || new Date().getFullYear() - 100;
+                const latestYear = toYear || new Date().getFullYear();
 
-                const currentGregYear = displayMonth.getFullYear();
+                const gregYears: number[] = [];
+                for (let i = latestYear; i >= earliestYear; i--) {
+                    gregYears.push(i);
+                }
+                
                 const displayedEthYear = new ETC(displayMonth).year;
 
-                const ethYearMap = new Map<number, number>();
-                gregYears.reverse().forEach(gregYear => {
-                    const ethYear = new ETC(new Date(gregYear, 6, 1)).year;
-                    if (!ethYearMap.has(ethYear)) {
-                        ethYearMap.set(ethYear, gregYear);
-                    }
-                });
-
-                const uniqueEthYears = Array.from(ethYearMap.keys());
-                
-                const handleEthYearChange = (ethYearString: string) => {
-                    const ethYear = parseInt(ethYearString, 10);
-                    const correspondingGregYear = ethYearMap.get(ethYear) ?? currentGregYear;
-                    
-                    const newDate = new Date(displayMonth);
-                    newDate.setFullYear(correspondingGregYear);
-                    goToMonth(newDate);
-                }
-
                 return (
-                    <Select onValueChange={handleEthYearChange} value={displayedEthYear.toString()}>
+                    <Select onValueChange={handleValueChange} value={displayMonth.getFullYear().toString()}>
                         <SelectTrigger>{displayedEthYear}</SelectTrigger>
                         <SelectContent>
                             <ScrollArea className="h-80">
-                                {uniqueEthYears.map((ethYear) => (
-                                    <SelectItem key={ethYear} value={ethYear.toString()}>
-                                        {ethYear}
-                                    </SelectItem>
-                                ))}
+                                {gregYears.map((gregYear) => {
+                                    const ethYear = new ETC(new Date(gregYear, 6, 1)).year;
+                                    return (
+                                        <SelectItem key={gregYear} value={gregYear.toString()}>
+                                            {ethYear}
+                                        </SelectItem>
+                                    );
+                                })}
                             </ScrollArea>
                         </SelectContent>
                     </Select>
