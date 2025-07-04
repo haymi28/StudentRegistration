@@ -1,36 +1,40 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 model Student {
-  id                 String    @id
-  fullName           String
-  christianName      String
-  gender             String
-  educationLevel     String
-  dob                DateTime
-  subcity            String
-  kebele             String
-  houseNumber        String
-  houseAddressDetail String
-  phone              String
-  additionalPhone    String?
-  fatherPhone        String?
-  motherName         String?
-  motherPhone        String?
-  joiningDate        DateTime
-  formFilledDate     DateTime
-  role               String
-  photoUrl           String?
+  id                  String    @id
+  fullName            String
+  christianName       String
+  gender              String
+  educationLevel      String
+  dob                 DateTime
+  subcity             String
+  kebele              String
+  houseNumber         String
+  houseAddressDetail  String
+  phone               String
+  additionalPhone     String?
+  fatherPhone         String?
+  motherName          String?
+  motherPhone         String?
+  joiningDate         DateTime
+  formFilledDate      DateTime
+  role                String
+  photoUrl            String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }
 
 model AdminCredential {
-  id        Int      @id @default(autoincrement())
-  role      String   @unique
-  password  String
+  role     String @id
+  password String
 }
