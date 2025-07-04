@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -7,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
+import { format } from "date-fns"
 
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -21,7 +21,6 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth"
 import { addStudent } from "@/lib/data"
 import type { Role, StudentCreateInput, UserRole } from "@/lib/types"
-import { toEthiopianDateString } from "@/lib/ethiopian-date"
 import { Textarea } from "@/components/ui/textarea"
 
 const ROLE_NAMES: Record<string, string> = {
@@ -44,10 +43,10 @@ const formSchema = z.object({
   houseNumber: z.string().min(1, "የቤት ቁጥር ያስፈልጋል።"),
   houseAddressDetail: z.string().min(1, "የቤት ልዩ አድራሻ ያስፈልጋል።"),
   phone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
-  additionalPhone: z.string().min(10, "ትክክለኛ ተጨማሪ ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
-  fatherPhone: z.string().min(10, "ትክክለኛ የአባት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
+  additionalPhone: z.string().optional().or(z.literal('')),
+  fatherPhone: z.string().optional().or(z.literal('')),
   motherName: z.string().min(2, "የእናት ስም ቢያንስ 2 ፊደላት መሆን አለበት።").optional().or(z.literal('')),
-  motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
+  motherPhone: z.string().optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
   formFilledDate: z.date({ required_error: "ቅጹ የተሞላበት ቀን ያስፈልጋል።" }),
   role: z.enum(["children", "children2", "juniors", "seniors", "youth"], { required_error: "ክፍል ያስፈልጋል።" }),
@@ -169,7 +168,7 @@ export function RegisterStudentForm() {
     return (
         <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
-                <CardTitle className="font-headline text-xl md:text-2xl">አዲስ ተማሪ ይመዝግቡ</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-headline">አዲስ ተማሪ ይመዝግቡ</CardTitle>
                 <CardDescription>አዲስ ተማሪ ወደ ስርዓቱ ለመጨመር ከታች ያለውን ቅጽ ይሙሉ።</CardDescription>
             </CardHeader>
             <Form {...form}>
@@ -206,9 +205,50 @@ export function RegisterStudentForm() {
                          <FormField control={form.control} name="educationLevel" render={({ field }) => (
                             <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} name="educationLevel" autoComplete="off" /></FormControl><FormMessage /></FormItem>
                         )} />
-                        <FormField control={form.control} name="dob" render={({ field }) => (
-                            <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")} name="dob" autoComplete="bday">{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} fromYear={1940} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem>
-                        )} />
+                         <FormField
+                            control={form.control}
+                            name="dob"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                <FormLabel>የትውልድ ቀን</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full pl-3 text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        {field.value ? (
+                                            format(field.value, "PPP")
+                                        ) : (
+                                            <span>ቀን ይምረጡ</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) =>
+                                        date > new Date() || date < new Date("1900-01-01")
+                                        }
+                                        captionLayout="dropdown-buttons"
+                                        fromYear={1920}
+                                        toYear={new Date().getFullYear()}
+                                        initialFocus
+                                    />
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <FormField control={form.control} name="studentId" render={({ field }) => (
                             <FormItem><FormLabel>የተማሪ መለያ</FormLabel><FormControl><Input placeholder="ተማሪ005" {...field} onInput={(e) => (e.currentTarget.value = e.currentTarget.value.toUpperCase())} name="studentId" autoComplete="off" /></FormControl><FormDescription>ልዩ መለያ መሆን አለበት።</FormDescription><FormMessage /></FormItem>
                         )} />
@@ -231,9 +271,47 @@ export function RegisterStudentForm() {
                              <FormItem><FormLabel>ክፍል</FormLabel><FormControl><Input id="role" name="role" value={adminRole ? ROLE_NAMES[adminRole as UserRole] : ''} readOnly disabled /></FormControl></FormItem>
                         )}
 
-                        <FormField control={form.control} name="joiningDate" render={({ field }) => (
-                            <FormItem className="flex flex-col"><FormLabel>የተመዘገበበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")} name="joiningDate" autoComplete="off">{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} fromYear={2000} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem>
-                        )} />
+                        <FormField
+                            control={form.control}
+                            name="joiningDate"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                <FormLabel>የተመዘገበበት ቀን</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full pl-3 text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        {field.value ? (
+                                            format(field.value, "PPP")
+                                        ) : (
+                                            <span>ቀን ይምረጡ</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        captionLayout="dropdown-buttons"
+                                        fromYear={2000}
+                                        toYear={new Date().getFullYear()}
+                                        initialFocus
+                                    />
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         
                         <FormField
                             control={form.control}
@@ -255,87 +333,4 @@ export function RegisterStudentForm() {
                                                         setPhotoPreview(reader.result as string);
                                                     };
                                                     reader.readAsDataURL(file);
-                                                } else {
-                                                    setPhotoPreview(null);
-                                                }
-                                            }}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>አማራጭ። የተማሪውን ፎቶ ይስቀሉ።</FormDescription>
-                                    {photoPreview && (
-                                        <div className="mt-4">
-                                            <Image src={photoPreview} alt="Student preview" width={100} height={100} className="rounded-full aspect-square object-cover" data-ai-hint="person student" />
-                                        </div>
-                                    )}
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="md:col-span-2 space-y-4 rounded-lg border p-4">
-                            <h3 className="text-lg font-medium">አድራሻ</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <FormField control={form.control} name="subcity" render={({ field }) => ( <FormItem><FormLabel>ክፍለ ከተማ</FormLabel><FormControl><Input placeholder="ለምሳሌ ቂርቆስ" {...field} name="subcity" autoComplete="address-level1" /></FormControl><FormMessage /></FormItem> )} />
-                                <FormField control={form.control} name="kebele" render={({ field }) => ( <FormItem><FormLabel>ቀበሌ</FormLabel><FormControl><Input placeholder="ለምሳሌ 08" {...field} name="kebele" autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
-                                <FormField control={form.control} name="houseNumber" render={({ field }) => ( <FormItem><FormLabel>የቤት ቁጥር</FormLabel><FormControl><Input placeholder="ለምሳሌ 123" {...field} name="houseNumber" autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
-                            </div>
-                            <FormField control={form.control} name="houseAddressDetail" render={({ field }) => ( <FormItem><FormLabel>የቤት ልዩ አድራሻ</FormLabel><FormControl><Textarea placeholder="የቤቱን አድራሻ በዝርዝር ያስገቡ (ለምሳሌ: ከትምህርት ቤቱ ጀርባ)" {...field} name="houseAddressDetail" autoComplete="street-address" /></FormControl><FormMessage /></FormItem> )} />
-                        </div>
-
-                        <FormField control={form.control} name="phone" render={({ field }) => ( <FormItem><FormLabel>ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="phone" autoComplete="tel" /></FormControl><FormMessage /></FormItem> )} />
-                        <FormField control={form.control} name="additionalPhone" render={({ field }) => ( <FormItem><FormLabel>ተጨማሪ ስልክ</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="additionalPhone" autoComplete="tel-additional" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
-                        <FormField control={form.control} name="fatherPhone" render={({ field }) => ( <FormItem><FormLabel>የአባት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="fatherPhone" autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
-                        <FormField control={form.control} name="motherPhone" render={({ field }) => ( <FormItem><FormLabel>የእናት ስልክ ቁጥር</FormLabel><FormControl><Input type="tel" placeholder="0911223344" {...field} name="motherPhone" autoComplete="tel" /></FormControl><FormDescription>አማራጭ</FormDescription><FormMessage /></FormItem> )} />
-                        
-                        <FormField
-                            control={form.control}
-                            name="formFilledDate"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col md:col-span-2">
-                                    <FormLabel>ቅጹ የተሞላበት ቀን</FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button
-                                                    variant={"outline"}
-                                                    className={cn(
-                                                        "w-full pl-3 text-left font-normal",
-                                                        !field.value && "text-muted-foreground"
-                                                    )}
-                                                     name="formFilledDate"
-                                                     autoComplete="off"
-                                                >
-                                                    {field.value ? (
-                                                        toEthiopianDateString(field.value)
-                                                    ) : (
-                                                        <span>ቀን ይምረጡ</span>
-                                                    )}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                fromYear={2000} 
-                                                toYear={new Date().getFullYear()}
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                    </CardContent>
-                    <CardFooter className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => router.back()}>ሰርዝ</Button>
-                        <Button type="submit">ተማሪ ይመዝግቡ</Button>
-                    </CardFooter>
-                </form>
-            </Form>
-        </Card>
-    )
-}
+İ am not seeing a response. Are you still working on it?

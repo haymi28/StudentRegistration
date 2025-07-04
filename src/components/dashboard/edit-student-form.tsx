@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -21,7 +20,7 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { getStudentById, updateStudent } from "@/lib/data"
 import type { Student, Role } from "@/lib/types"
-import { toEthiopianDateString } from "@/lib/ethiopian-date"
+import { format } from "date-fns"
 import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
@@ -35,10 +34,10 @@ const formSchema = z.object({
   houseNumber: z.string().min(1, "የቤት ቁጥር ያስፈልጋል።"),
   houseAddressDetail: z.string().min(1, "የቤት ልዩ አድራሻ ያስፈልጋል።"),
   phone: z.string().min(10, "ትክክለኛ ስልክ ቁጥር ያስፈልጋል።"),
-  additionalPhone: z.string().min(10, "ትክክለኛ ተጨማሪ ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
-  fatherPhone: z.string().min(10, "ትክክለኛ የአባት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
+  additionalPhone: z.string().optional().or(z.literal('')),
+  fatherPhone: z.string().optional().or(z.literal('')),
   motherName: z.string().min(2, "የእናት ስም ቢያንስ 2 ፊደላት መሆን አለበት።").optional().or(z.literal('')),
-  motherPhone: z.string().min(10, "ትክክለኛ የእናት ስልክ ቁጥር ያስፈልጋል።").optional().or(z.literal('')),
+  motherPhone: z.string().optional().or(z.literal('')),
   joiningDate: z.date({ required_error: "የተመዘገበበት ቀን ያስፈልጋል።" }),
   formFilledDate: z.date({ required_error: "ቅጹ የተሞላበት ቀን ያስፈልጋል።" }),
   role: z.enum(["children", "children2", "juniors", "seniors", "youth"]),
@@ -130,7 +129,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         return (
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
-                    <CardTitle className="font-headline text-xl md:text-2xl">ተማሪ አልተገኘም</CardTitle>
+                    <CardTitle className="text-lg md:text-2xl font-headline">ተማሪ አልተገኘም</CardTitle>
                     <CardDescription>ለማርትዕ የሞከሩት ተማሪ የለም።</CardDescription>
                 </CardHeader>
                 <CardFooter>
@@ -143,7 +142,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     return (
         <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
-                <CardTitle className="font-headline text-xl md:text-2xl">የተማሪ መረጃ ያርትዑ</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-headline">የተማሪ መረጃ ያርትዑ</CardTitle>
                 <CardDescription>የ{student.fullName} ዝርዝሮችን ያዘምኑ።</CardDescription>
             </CardHeader>
             <Form {...form}>
@@ -180,25 +179,116 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                 )}
                             />
                             <FormField control={form.control} name="educationLevel" render={({ field }) => ( <FormItem><FormLabel>የትምህርት ደረጃ</FormLabel><FormControl><Input placeholder="ለምሳሌ 5ኛ ክፍል" {...field} autoComplete="off" /></FormControl><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="dob" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የትውልድ ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal",!field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} fromYear={1940} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="joiningDate" render={({ field }) => ( <FormItem className="flex flex-col"><FormLabel>የተመዘገበበት ቀን</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>{field.value ? toEthiopianDateString(field.value) : <span>ቀን ይምረጡ</span>}<CalendarIcon className="ml-auto h-4 w-4 opacity-50" /></Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} fromYear={2000} toYear={new Date().getFullYear()} /></PopoverContent></Popover><FormMessage /></FormItem> )} />
-                            <FormField control={form.control} name="role" render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>ክፍል</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value} name="role" autoComplete="off">
-                                        <FormControl><SelectTrigger><SelectValue placeholder="ክፍል ይምረጡ" /></SelectTrigger></FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="children">ቀዳማይ -1 ክፍል</SelectItem>
-                                            <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
-                                            <SelectItem value="juniors">ካእላይ ክፍል</SelectItem>
-                                            <SelectItem value="seniors">ማእከላይ ክፍል</SelectItem>
-                                            <SelectItem value="youth">የወጣት ክፍል</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormDescription>ተማሪውን ወደ ሌላ ቡድን ያስተላልፉ።</FormDescription>
-                                    <FormMessage />
+                            <FormField
+                              control={form.control}
+                              name="dob"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                  <FormLabel>የትውልድ ቀን</FormLabel>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant={"outline"}
+                                          className={cn(
+                                            "w-full pl-3 text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                          )}
+                                        >
+                                          {field.value ? (
+                                            format(field.value, "PPP")
+                                          ) : (
+                                            <span>ቀን ይምረጡ</span>
+                                          )}
+                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                      <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) =>
+                                          date > new Date() || date < new Date("1900-01-01")
+                                        }
+                                        captionLayout="dropdown-buttons"
+                                        fromYear={1920}
+                                        toYear={new Date().getFullYear()}
+                                        initialFocus
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                  <FormMessage />
                                 </FormItem>
-                            )} />
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="joiningDate"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                  <FormLabel>የተመዘገበበት ቀን</FormLabel>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant={"outline"}
+                                          className={cn(
+                                            "w-full pl-3 text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                          )}
+                                        >
+                                          {field.value ? (
+                                            format(field.value, "PPP")
+                                          ) : (
+                                            <span>ቀን ይምረጡ</span>
+                                          )}
+                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                      <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        captionLayout="dropdown-buttons"
+                                        fromYear={2000}
+                                        toYear={new Date().getFullYear()}
+                                        initialFocus
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="role"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>ክፍል</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} name="role" autoComplete="off">
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="ክፍል ይምረጡ" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="children">ቀዳማይ -1 ክፍል</SelectItem>
+                                                <SelectItem value="children2">ቀዳማይ -2 ክፍል</SelectItem>
+                                                <SelectItem value="juniors">ካእላይ ክፍል</SelectItem>
+                                                <SelectItem value="seniors">ማእከላይ ክፍል</SelectItem>
+                                                <SelectItem value="youth">የወጣት ክፍል</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>ተማሪውን ወደ ሌላ ቡድን ያስተላልፉ።</FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                              <FormField
                                 control={form.control}
                                 name="photo"
@@ -274,7 +364,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                                         )}
                                                     >
                                                         {field.value ? (
-                                                            toEthiopianDateString(field.value)
+                                                            format(field.value, "PPP")
                                                         ) : (
                                                             <span>ቀን ይምረጡ</span>
                                                         )}
@@ -287,8 +377,10 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                                                     mode="single"
                                                     selected={field.value}
                                                     onSelect={field.onChange}
+                                                    captionLayout="dropdown-buttons"
                                                     fromYear={2000} 
                                                     toYear={new Date().getFullYear()}
+                                                    initialFocus
                                                 />
                                             </PopoverContent>
                                         </Popover>
@@ -300,10 +392,10 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
                     </CardContent>
                     <CardFooter className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={() => router.back()}>ሰርዝ</Button>
-                        <Button type="submit">ለውጦችን ያስቀምጡ</Button>
+                        <Button type="submit" disabled={form.formState.isSubmitting}>
+                            {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            ለውጦችን ያስቀምጡ
+                        </Button>
                     </CardFooter>
                 </form>
-            </Form>
-        </Card>
-    );
-}
+            
