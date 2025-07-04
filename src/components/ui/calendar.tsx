@@ -84,7 +84,7 @@ function CustomCaption(props: CaptionProps) {
 function Calendar({
   className,
   classNames,
-  showOutsideDays = true,
+  showOutsideDays = false,
   ...props
 }: CalendarProps) {
   return (
