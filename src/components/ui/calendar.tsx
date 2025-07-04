@@ -25,16 +25,17 @@ function gregorianToJDN(year: number, month: number, day: number): number {
 }
 
 function jdnToEthiopian(jdn: number): [number, number, number] {
-    const r = (jdn - ETHIOPIAN_EPOCH) % 1461;
+    const jdnOffset = Math.floor(jdn - ETHIOPIAN_EPOCH);
+    const r = jdnOffset % 1461;
     const n = (r % 365) + 365 * Math.floor(r / 1460);
-    const year = 4 * Math.floor((jdn - ETHIOPIAN_EPOCH) / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
+    const year = 4 * Math.floor(jdnOffset / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
     const month = Math.floor(n / 30) + 1;
     const day = (n % 30) + 1;
     return [year, month, day];
 }
 
 function ethiopianToJDN(year: number, month: number, day: number): number {
-    return (ETHIOPIAN_EPOCH + 365 * (year - 1) + Math.floor(year / 4) + 30 * (month - 1) + day);
+    return Math.round(ETHIOPIAN_EPOCH + 365 * (year - 1) + Math.floor(year / 4) + 30 * (month - 1) + day);
 }
 
 function jdnToGregorian(jdn: number): [number, number, number] {
@@ -74,7 +75,7 @@ function CustomCaption(props: CaptionProps) {
   const [etYear, etMonth] = toEthiopian(displayMonth);
 
   const fromEtYear = fromYear ? toEthiopian(new Date(fromYear, 0, 1))[0] : etYear - 100;
-  const toEtYear = toYear ? toEthiopian(new Date(toYear, 11, 31))[0] : etYear;
+  const toEtYear = toYear ? toEthiopian(new Date(toYear, 11, 31))[0] : 2017;
   
   const yearOptions = [];
   for (let i = toEtYear; i >= fromEtYear; i--) {
