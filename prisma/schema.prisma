@@ -1,3 +1,5 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
   provider = "postgresql"
@@ -9,7 +11,7 @@ generator client {
 }
 
 model Student {
-  id                 String   @id
+  id                 String   @id @unique
   fullName           String
   christianName      String
   gender             String
@@ -26,16 +28,27 @@ model Student {
   motherPhone        String?
   joiningDate        DateTime
   formFilledDate     DateTime
+  role               Role
   photoUrl           String?
-  role               String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
 }
 
 model AdminCredential {
-  id        String   @id @default(cuid())
-  role      String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role     UserRole @id @unique
+  password String
+}
+
+enum Role {
+  children
+  children2
+  juniors
+  seniors
+  youth
+}
+
+enum UserRole {
+  children
+  children2
+  juniors
+  seniors
+  superadmin
 }
