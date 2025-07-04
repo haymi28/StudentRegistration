@@ -3,150 +3,167 @@
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker, useNavigation, type CaptionProps } from "react-day-picker"
+import type { DayPickerProps } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { toEthiopian, toGregorian } from "@/lib/ethiopian-date"
+import { toEthiopian, toGregorian, ETHIOPIAN_MONTH_NAMES } from "@/lib/ethiopian-date"
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
-
-const ETHIOPIAN_MONTH_NAMES = [
-  'መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት', 'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜን'
-];
-
-const AMHARIC_WEEKDAY_NAMES = ['እ', 'ሰ', 'ማ', 'ረ', 'ሐ', 'ዐ', 'ቅ'];
-
-function CustomCaption(props: CaptionProps) {
-  const { goToMonth, nextMonth, previousMonth } = useNavigation();
-  const { fromYear, toYear, displayMonth } = props;
-
-  const [etYear, etMonth] = toEthiopian(displayMonth);
-
-  const fromEtYear = fromYear ? toEthiopian(new Date(fromYear, 0, 1))[0] : etYear - 100;
-  const toEtYear = toYear ? toEthiopian(new Date(toYear, 11, 31))[0] : 2017;
-  
-  const yearOptions = [];
-  for (let i = toEtYear; i >= fromEtYear; i--) {
-      yearOptions.push(i);
-  }
-
-  const handleYearChange = (year: string) => {
-    const newDate = toGregorian(Number(year), etMonth, 1);
-    goToMonth(newDate);
-  };
-  
-  const handleMonthChange = (month: string) => {
-    const newDate = toGregorian(etYear, Number(month), 1);
-    goToMonth(newDate);
-  };
-
-  return (
-    <div className="flex justify-between items-center p-1">
-      <Button variant="outline" className="h-7 w-7 p-0" disabled={!previousMonth} onClick={() => previousMonth && goToMonth(previousMonth)}>
-        <span className="sr-only">Go to previous month</span>
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-
-      <div className="flex gap-2">
-         <Select value={String(etMonth)} onValueChange={handleMonthChange}>
-            <SelectTrigger className="w-[120px] focus:ring-0">
-                <SelectValue placeholder="ወር" />
-            </SelectTrigger>
-            <SelectContent>
-                {ETHIOPIAN_MONTH_NAMES.map((month, i) => (
-                    <SelectItem key={month} value={String(i + 1)}>{month}</SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-        <Select value={String(etYear)} onValueChange={handleYearChange}>
-            <SelectTrigger className="w-[100px] focus:ring-0">
-                <SelectValue placeholder="ዓመት" />
-            </SelectTrigger>
-            <SelectContent>
-                {yearOptions.map((year) => (
-                    <SelectItem key={year} value={String(year)}>{year}</SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-      </div>
-
-      <Button variant="outline" className="h-7 w-7 p-0" disabled={!nextMonth} onClick={() => nextMonth && goToMonth(nextMonth)}>
-        <span className="sr-only">Go to next month</span>
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </div>
-  )
-}
+// We use DayPickerProps for type compatibility with existing call sites,
+// but the implementation is custom to render a simple 1-30 grid.
+export type CalendarProps = DayPickerProps
 
 function Calendar({
   className,
-  classNames,
-  showOutsideDays = false,
+  selected,
+  onSelect,
+  month: monthProp,
+  defaultMonth,
+  fromYear,
+  toYear,
+  disabled,
   ...props
 }: CalendarProps) {
-  // Use a state to control the displayed month, allowing us to accurately
-  // determine which days are "outside" the current Ethiopian month.
-  const [month, setMonth] = React.useState<Date>(props.month || props.defaultMonth || (props.selected as Date) || new Date());
+  
+  // State for the currently displayed month.
+  const [displayDate, setDisplayDate] = React.useState<Date>(monthProp || defaultMonth || (selected as Date) || new Date())
 
+  // Update displayDate if the controlled `month` prop changes.
   React.useEffect(() => {
-    if (props.month && props.month.getTime() !== month.getTime()) {
-      setMonth(props.month);
+    if (monthProp && monthProp.getTime() !== displayDate.getTime()) {
+      setDisplayDate(monthProp)
     }
-  }, [props.month, month]);
+  }, [monthProp, displayDate])
 
-  const [etYear, etMonth] = toEthiopian(month);
+  const [etYear, etMonth] = toEthiopian(displayDate)
 
-  const isOutsideEthiopianMonth = (date: Date) => {
-      const [dEtYear, dEtMonth] = toEthiopian(date);
-      return dEtYear !== etYear || dEtMonth !== etMonth;
+  // --- Date Calculation & Navigation ---
+  const daysInMonth = etMonth === 13 ? (etYear % 4 === 3 ? 6 : 5) : 30
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1)
+
+  const handleDayClick = (day: number) => {
+    if (!onSelect) return
+    const newGregorianDate = toGregorian(etYear, etMonth, day)
+    
+    // Check if the date is disabled
+    if (disabled) {
+        if (typeof disabled === 'function' && disabled(newGregorianDate)) {
+            return;
+        }
+    }
+    
+    // The type signature for the onSelect handler from react-day-picker is complex,
+    // but in "single" mode it effectively passes the selected date to the callback.
+    // Our forms rely on this behavior for react-hook-form's `onChange`.
+    // Casting to `any` bypasses the strict `DayPicker` prop types which we are not fully implementing.
+    (onSelect as any)(newGregorianDate)
+  }
+  
+  const handlePreviousMonth = () => {
+    const newMonth = etMonth === 1 ? 13 : etMonth - 1;
+    const newYear = etMonth === 1 ? etYear - 1 : etYear;
+    setDisplayDate(toGregorian(newYear, newMonth, 1));
+  }
+
+  const handleNextMonth = () => {
+    const newMonth = etMonth === 13 ? 1 : etMonth + 1;
+    const newYear = etMonth === 13 ? etYear + 1 : etYear;
+    setDisplayDate(toGregorian(newYear, newMonth, 1));
+  }
+  
+  // --- Month/Year Dropdown Logic ---
+  const defaultFromEtYear = toEthiopian(new Date())[0] - 100;
+  const defaultToEtYear = toEthiopian(new Date())[0];
+
+  const fromEtYear = fromYear ? toEthiopian(new Date(fromYear, 0, 1))[0] : defaultFromEtYear;
+  const toEtYear = toYear ? toEthiopian(new Date(toYear, 11, 31))[0] : defaultToEtYear;
+
+  const yearOptions = []
+  for (let i = toEtYear; i >= fromEtYear; i--) {
+    yearOptions.push(i)
+  }
+
+  const handleYearChange = (year: string) => {
+    const newDate = toGregorian(Number(year), etMonth, 1)
+    setDisplayDate(newDate)
+  }
+
+  const handleMonthChange = (month: string) => {
+    const newDate = toGregorian(etYear, Number(month), 1)
+    setDisplayDate(newDate)
+  }
+  
+  // --- Determine Selected Day ---
+  let selectedDay: number | undefined = undefined
+  if (selected && selected instanceof Date && !isNaN(selected.getTime())) {
+      const [selectedEtYear, selectedEtMonth, sDay] = toEthiopian(selected)
+      if (selectedEtYear === etYear && selectedEtMonth === etMonth) {
+          selectedDay = sDay
+      }
   }
 
   return (
-    <DayPicker
-      month={month}
-      onMonthChange={setMonth}
-      showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
-      classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "hidden", // We use our own custom caption
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
-        ),
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
-        ...classNames,
-      }}
-      components={{
-        Caption: CustomCaption,
-      }}
-      formatters={{
-        formatDay: (day) => String(toEthiopian(day)[2]),
-        formatWeekdayName: (day) => AMHARIC_WEEKDAY_NAMES[day.getDay()],
-      }}
-      modifiers={{
-        outside: isOutsideEthiopianMonth,
-      }}
-      modifiersClassNames={{
-        outside: "invisible",
-      }}
-      {...props}
-    />
+    <div className={cn("p-3 w-full", className)} {...props}>
+      <div className="flex justify-between items-center p-1">
+        <Button variant="outline" className="h-7 w-7 p-0" onClick={handlePreviousMonth}>
+          <span className="sr-only">Go to previous month</span>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <div className="flex gap-2">
+          <Select value={String(etMonth)} onValueChange={handleMonthChange}>
+            <SelectTrigger className="w-[120px] focus:ring-0">
+              <SelectValue placeholder="ወር" />
+            </SelectTrigger>
+            <SelectContent>
+              {ETHIOPIAN_MONTH_NAMES.map((month, i) => (
+                <SelectItem key={month} value={String(i + 1)}>{month}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={String(etYear)} onValueChange={handleYearChange}>
+            <SelectTrigger className="w-[100px] focus:ring-0">
+              <SelectValue placeholder="ዓመት" />
+            </SelectTrigger>
+            <SelectContent>
+              {yearOptions.map((year) => (
+                <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button variant="outline" className="h-7 w-7 p-0" onClick={handleNextMonth}>
+          <span className="sr-only">Go to next month</span>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1 mt-4">
+        {days.map(day => {
+          const dayIsSelected = day === selectedDay;
+          let isDisabled = false;
+          if (disabled) {
+              const dateToCheck = toGregorian(etYear, etMonth, day);
+              if (typeof disabled === 'function') {
+                  isDisabled = disabled(dateToCheck);
+              }
+          }
+          
+          return (
+            <Button
+              key={day}
+              variant={dayIsSelected ? "default" : "ghost"}
+              className="h-9 w-9 p-0 font-normal"
+              onClick={() => handleDayClick(day)}
+              disabled={isDisabled}
+              aria-selected={dayIsSelected}
+            >
+              {day}
+            </Button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 Calendar.displayName = "Calendar"
