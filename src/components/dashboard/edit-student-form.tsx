@@ -130,7 +130,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
         return (
             <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
-                    <CardTitle className="font-headline text-2xl">ተማሪ አልተገኘም</CardTitle>
+                    <CardTitle className="font-headline text-xl md:text-2xl">ተማሪ አልተገኘም</CardTitle>
                     <CardDescription>ለማርትዕ የሞከሩት ተማሪ የለም።</CardDescription>
                 </CardHeader>
                 <CardFooter>
@@ -143,7 +143,7 @@ export function EditStudentForm({ studentId }: { studentId: string }) {
     return (
         <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">የተማሪ መረጃ ያርትዑ</CardTitle>
+                <CardTitle className="font-headline text-xl md:text-2xl">የተማሪ መረጃ ያርትዑ</CardTitle>
                 <CardDescription>የ{student.fullName} ዝርዝሮችን ያዘምኑ።</CardDescription>
             </CardHeader>
             <Form {...form}>

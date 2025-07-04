@@ -169,7 +169,7 @@ export function RegisterStudentForm() {
     return (
         <Card className="w-full max-w-2xl mx-auto">
             <CardHeader>
-                <CardTitle className="font-headline text-2xl">አዲስ ተማሪ ይመዝግቡ</CardTitle>
+                <CardTitle className="font-headline text-xl md:text-2xl">አዲስ ተማሪ ይመዝግቡ</CardTitle>
                 <CardDescription>አዲስ ተማሪ ወደ ስርዓቱ ለመጨመር ከታች ያለውን ቅጽ ይሙሉ።</CardDescription>
             </CardHeader>
             <Form {...form}>

@@ -53,7 +53,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-background">
+    <main className="flex items-center justify-center min-h-screen bg-background p-4">
       <div className="flex flex-col items-center text-center">
         <div className="mb-8 flex flex-col items-center">
             <Image
@@ -65,14 +65,14 @@ export default function LoginPage() {
               data-ai-hint="church logo"
               priority
             />
-            <h2 className="text-2xl font-headline font-bold text-primary mb-2 text-center">የደብረ ገሊላ ቅዱስ ዐማኑኤል ካቴድራል እግዚአብሔር ምስሌነ ሰ/ት/ቤት</h2>
+            <h2 className="text-xl md:text-2xl font-headline font-bold text-primary mb-2 text-center">የደብረ ገሊላ ቅዱስ ዐማኑኤል ካቴድራል እግዚአብሔር ምስሌነ ሰ/ት/ቤት</h2>
             <div className="flex items-center justify-center gap-4">
-                <h1 className="text-2xl font-headline font-bold text-primary">የተማሪዎች መመዝገቢያ ቅጽ</h1>
+                <h1 className="text-xl md:text-2xl font-headline font-bold text-primary">የተማሪዎች መመዝገቢያ ቅጽ</h1>
             </div>
         </div>
         <Card className="w-full max-w-sm shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl font-headline flex items-center gap-2 justify-center"><Users /> የአስተዳዳሪ መግቢያ</CardTitle>
+            <CardTitle className="text-xl md:text-2xl font-headline flex items-center gap-2 justify-center"><Users /> የአስተዳዳሪ መግቢያ</CardTitle>
             <CardDescription>የአስተዳዳሪነት ክፍልዎን ይምረጡ እና የይለፍ ቃልዎን ያስገቡ።</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>

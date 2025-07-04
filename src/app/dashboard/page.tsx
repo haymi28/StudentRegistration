@@ -32,7 +32,7 @@ export default function DashboardPage() {
         </div>
         <Card className="max-w-4xl">
             <CardHeader>
-                <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                <CardTitle className="font-headline text-xl md:text-2xl flex items-center gap-2">
                     <Shield /> እንኳን ደህና መጡ, {role ? ROLE_FRIENDLY_NAMES[role] : "አስተዳዳሪ"}!
                 </CardTitle>
                 <CardDescription>{welcomeMessage}</CardDescription>

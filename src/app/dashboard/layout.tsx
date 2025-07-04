@@ -68,7 +68,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-2 p-2">
             <SidebarMenuButton tooltip="የተማሪዎች መመዝገቢያ ቅጽ" onClick={() => router.push('/dashboard')}>
                 <BookMarked className="text-sidebar-primary" />
-                <span className="font-headline font-semibold text-lg text-sidebar-primary">የተማሪዎች መመዝገቢያ ቅጽ</span>
+                <span className="font-headline font-semibold text-base md:text-lg text-sidebar-primary">የተማሪዎች መመዝገቢያ ቅጽ</span>
             </SidebarMenuButton>
           </div>
         </SidebarHeader>

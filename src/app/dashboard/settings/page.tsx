@@ -1,3 +1,4 @@
+
 import { PasswordSettingsForm } from '@/components/dashboard/password-settings-form';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { KeyRound } from 'lucide-react';
@@ -13,7 +14,7 @@ export default function SettingsPage() {
             </div>
             <Card className="max-w-2xl">
                 <CardHeader>
-                    <CardTitle className="font-headline">የይለፍ ቃልዎን ይቀይሩ</CardTitle>
+                    <CardTitle className="font-headline text-xl md:text-2xl">የይለፍ ቃልዎን ይቀይሩ</CardTitle>
                     <CardDescription>የመግቢያ የይለፍ ቃልዎን እዚህ ማዘመን ይችላሉ።</CardDescription>
                 </CardHeader>
                 <PasswordSettingsForm />

@@ -575,7 +575,7 @@ export function StudentsPageClient() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>ተማሪዎችን ከኤክሴል አስመጣ</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
             የተማሪዎችን ዝርዝር ከ.xlsx ወይም ከ.xls ፋይል ያስመጡ። ፋይሉ "id", "fullName", "christianName", "gender", "educationLevel", "dob", "subcity", "kebele", "houseNumber", "houseAddressDetail", "phone", "additionalPhone", "fatherPhone", "motherName", "motherPhone", "joiningDate", "formFilledDate", እና "role" አምዶችን መያዝ አለበት። ለ "gender" አምድ፣ እሴቶቹ “ወንድ” ወይም “ሴት” መሆን አለባቸው። ለ "role" አምድ、 እሴቶቹ “ቀዳማይ -1 ክፍል”、 “ቀዳማይ -2 ክፍል”、 “ካእላይ ክፍል”、 “ማእከላይ ክፍል” ወይም “የወጣት ክፍል” መሆን አለባቸው። ለ "dob", "joiningDate", እና "formFilledDate" አምዶች ቀኖች በጎርጎርያን ካላንደር (ለምሳሌ 2024-07-26) መቀመጥ አለባቸው።
             </DialogDescription>
           </DialogHeader>
