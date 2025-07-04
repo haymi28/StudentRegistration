@@ -1,31 +1,31 @@
 
-const ETHIOPIAN_EPOCH = 1723855.5;
 
 const ETHIOPIAN_MONTH_NAMES = [
   'መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት', 'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜን'
 ];
 
 // --- Internal Conversion Functions ---
+// Using a known-correct JDN (Julian Day Number) conversion ensures accuracy.
+const ETHIOPIC_EPOCH = 1724220.5;
+
+function jdnToEthiopic(jdn: number): [number, number, number] {
+  const r = (jdn - ETHIOPIC_EPOCH) % 1461;
+  const n = (r % 365) + 365 * Math.floor(r / 1460);
+  const year = 4 * Math.floor((jdn - ETHIOPIC_EPOCH) / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
+  const month = Math.floor(n / 30) + 1;
+  const day = (n % 30) + 1;
+  return [year, month, day];
+}
+
+function ethiopicToJDN(year: number, month: number, day: number): number {
+  return (ETHIOPIC_EPOCH - 1) + 365 * (year - 1) + Math.floor(year / 4) + 30 * (month - 1) + day;
+}
 
 function gregorianToJDN(year: number, month: number, day: number): number {
     const a = Math.floor((14 - month) / 12);
     const y = year + 4800 - a;
     const m = month + 12 * a - 3;
     return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
-}
-
-function jdnToEthiopian(jdn: number): [number, number, number] {
-    const jdnOffset = Math.floor(jdn - ETHIOPIAN_EPOCH);
-    const r = (jdnOffset % 1461) | 0;
-    const n = (r % 365) + 365 * Math.floor(r / 1460);
-    const year = 4 * Math.floor(jdnOffset / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
-    const month = Math.floor(n / 30) + 1;
-    const day = (n % 30) + 1;
-    return [year, month, day];
-}
-
-function ethiopianToJDN(year: number, month: number, day: number): number {
-    return Math.round(ETHIOPIAN_EPOCH + 365 * (year - 1) + Math.floor(year / 4) + 30 * (month - 1) + day);
 }
 
 function jdnToGregorian(jdn: number): [number, number, number] {
@@ -43,27 +43,27 @@ function jdnToGregorian(jdn: number): [number, number, number] {
 
 /**
  * Converts a Gregorian JS Date object to an Ethiopian date array.
+ * Uses UTC date parts to avoid timezone-related errors.
  * @param gregDate The Gregorian Date object.
  * @returns An array [year, month, day].
  */
 export function toEthiopian(gregDate: Date): [number, number, number] {
     if (!gregDate) return [0, 0, 0];
-    // Use local date parts to reflect the user's calendar, avoiding timezone shifts.
-    const jdn = gregorianToJDN(gregDate.getFullYear(), gregDate.getMonth() + 1, gregDate.getDate());
-    return jdnToEthiopian(jdn);
+    const jdn = gregorianToJDN(gregDate.getUTCFullYear(), gregDate.getUTCMonth() + 1, gregDate.getUTCDate());
+    return jdnToEthiopic(jdn);
 }
 
 /**
  * Converts an Ethiopian date to a Gregorian JS Date object.
+ * Creates a UTC date to ensure consistency across timezones.
  * @param ethYear The Ethiopian year.
  * @param ethMonth The Ethiopian month.
  * @param ethDay The Ethiopian day.
  * @returns A Gregorian Date object set to midnight UTC.
  */
 export function toGregorian(ethYear: number, ethMonth: number, ethDay: number): Date {
-    const jdn = ethiopianToJDN(ethYear, ethMonth, ethDay);
+    const jdn = ethiopicToJDN(ethYear, ethMonth, ethDay);
     const [year, month, day] = jdnToGregorian(jdn);
-    // Return as a UTC date to prevent the local timezone from shifting it.
     return new Date(Date.UTC(year, month - 1, day));
 }
 

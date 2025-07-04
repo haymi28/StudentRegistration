@@ -87,8 +87,27 @@ function Calendar({
   showOutsideDays = false,
   ...props
 }: CalendarProps) {
+  // Use a state to control the displayed month, allowing us to accurately
+  // determine which days are "outside" the current Ethiopian month.
+  const [month, setMonth] = React.useState<Date>(props.month || props.defaultMonth || (props.selected as Date) || new Date());
+
+  React.useEffect(() => {
+    if (props.month && props.month.getTime() !== month.getTime()) {
+      setMonth(props.month);
+    }
+  }, [props.month, month]);
+
+  const [etYear, etMonth] = toEthiopian(month);
+
+  const isOutsideEthiopianMonth = (date: Date) => {
+      const [dEtYear, dEtMonth] = toEthiopian(date);
+      return dEtYear !== etYear || dEtMonth !== etMonth;
+  }
+
   return (
     <DayPicker
+      month={month}
+      onMonthChange={setMonth}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
@@ -107,7 +126,6 @@ function Calendar({
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent text-accent-foreground",
-        day_outside: "text-muted-foreground opacity-50",
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
@@ -120,6 +138,12 @@ function Calendar({
       formatters={{
         formatDay: (day) => String(toEthiopian(day)[2]),
         formatWeekdayName: (day) => AMHARIC_WEEKDAY_NAMES[day.getDay()],
+      }}
+      modifiers={{
+        outside: isOutsideEthiopianMonth,
+      }}
+      modifiersClassNames={{
+        outside: "invisible",
       }}
       {...props}
     />
