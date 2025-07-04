@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -11,7 +8,7 @@ generator client {
 }
 
 model Student {
-  id                 String   @id @unique
+  id                 String    @id
   fullName           String
   christianName      String
   gender             String
@@ -28,27 +25,12 @@ model Student {
   motherPhone        String?
   joiningDate        DateTime
   formFilledDate     DateTime
-  role               Role
+  role               String
   photoUrl           String?
 }
 
 model AdminCredential {
-  role     UserRole @id @unique
-  password String
-}
-
-enum Role {
-  children
-  children2
-  juniors
-  seniors
-  youth
-}
-
-enum UserRole {
-  children
-  children2
-  juniors
-  seniors
-  superadmin
+  id        Int      @id @default(autoincrement())
+  role      String   @unique
+  password  String
 }
