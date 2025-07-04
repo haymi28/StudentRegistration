@@ -1,6 +1,7 @@
 
 
-const ETHIOPIAN_MONTH_NAMES = [
+
+export const ETHIOPIAN_MONTH_NAMES = [
   'መስከረም', 'ጥቅምት', 'ኅዳር', 'ታኅሣሥ', 'ጥር', 'የካቲት', 'መጋቢት', 'ሚያዝያ', 'ግንቦት', 'ሰኔ', 'ሐምሌ', 'ነሐሴ', 'ጳጉሜን'
 ];
 
