@@ -1,5 +1,6 @@
 
 
+
 const ETHIOPIAN_EPOCH = 1723855.5;
 
 const ETHIOPIAN_MONTH_NAMES = [
@@ -15,7 +16,7 @@ function gregorianToJDN(year: number, month: number, day: number): number {
 
 function jdnToEthiopian(jdn: number): [number, number, number] {
     const jdnOffset = Math.floor(jdn - ETHIOPIAN_EPOCH);
-    const r = jdnOffset % 1461;
+    const r = (jdnOffset % 1461) | 0;
     const n = (r % 365) + 365 * Math.floor(r / 1460);
     const year = 4 * Math.floor(jdnOffset / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
     const month = Math.floor(n / 30) + 1;
@@ -30,7 +31,7 @@ export function toEthiopianDateString(gregorianDate: Date | null | undefined): s
   }
   
   try {
-    const jdn = gregorianToJDN(gregorianDate.getFullYear(), gregorianDate.getMonth() + 1, gregorianDate.getDate());
+    const jdn = gregorianToJDN(gregorianDate.getUTCFullYear(), gregorianDate.getUTCMonth() + 1, gregorianDate.getUTCDate());
     const [year, month, day] = jdnToEthiopian(jdn);
     return `${ETHIOPIAN_MONTH_NAMES[month - 1]} ${day}, ${year}`;
   } catch (error) {

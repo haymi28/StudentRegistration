@@ -13,8 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
 // --- Corrected Embedded Ethiopian Date Converter ---
-// This logic is self-contained to avoid dependency issues.
-
 const ETHIOPIAN_EPOCH = 1723855.5;
 
 function gregorianToJDN(year: number, month: number, day: number): number {
@@ -26,7 +24,7 @@ function gregorianToJDN(year: number, month: number, day: number): number {
 
 function jdnToEthiopian(jdn: number): [number, number, number] {
     const jdnOffset = Math.floor(jdn - ETHIOPIAN_EPOCH);
-    const r = jdnOffset % 1461;
+    const r = (jdnOffset % 1461) | 0;
     const n = (r % 365) + 365 * Math.floor(r / 1460);
     const year = 4 * Math.floor(jdnOffset / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
     const month = Math.floor(n / 30) + 1;
@@ -51,14 +49,14 @@ function jdnToGregorian(jdn: number): [number, number, number] {
 
 function toEthiopian(gregDate: Date): [number, number, number] {
     if (!gregDate) return [0, 0, 0];
-    const jdn = gregorianToJDN(gregDate.getFullYear(), gregDate.getMonth() + 1, gregDate.getDate());
+    const jdn = gregorianToJDN(gregDate.getUTCFullYear(), gregDate.getUTCMonth() + 1, gregDate.getUTCDate());
     return jdnToEthiopian(jdn);
 }
 
 function toGregorian(ethYear: number, ethMonth: number, ethDay: number): Date {
     const jdn = ethiopianToJDN(ethYear, ethMonth, ethDay);
     const [year, month, day] = jdnToGregorian(jdn);
-    return new Date(year, month - 1, day);
+    return new Date(Date.UTC(year, month - 1, day));
 }
 // --- End of Embedded Converter ---
 
@@ -167,7 +165,8 @@ function Calendar({
         Caption: CustomCaption,
       }}
       formatters={{
-        formatWeekdayName: (day) => AMHARIC_WEEKDAY_NAMES[day.getDay()],
+        formatDay: (day) => String(toEthiopian(day)[2]),
+        formatWeekdayName: (day) => AMHARIC_WEEKDAY_NAMES[day.getUTCDay()],
       }}
       {...props}
     />
