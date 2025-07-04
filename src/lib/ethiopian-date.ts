@@ -1,6 +1,4 @@
 
-
-
 const ETHIOPIAN_EPOCH = 1723855.5;
 
 const ETHIOPIAN_MONTH_NAMES = [
@@ -31,7 +29,10 @@ export function toEthiopianDateString(gregorianDate: Date | null | undefined): s
   }
   
   try {
-    const jdn = gregorianToJDN(gregorianDate.getUTCFullYear(), gregorianDate.getUTCMonth() + 1, gregorianDate.getUTCDate());
+    // Use local date parts (getFullYear, getMonth, getDate) because react-day-picker
+    // provides a Date object set to midnight in the user's local timezone.
+    // Using UTC parts would cause an off-by-one error for users in timezones ahead of UTC.
+    const jdn = gregorianToJDN(gregorianDate.getFullYear(), gregorianDate.getMonth() + 1, gregorianDate.getDate());
     const [year, month, day] = jdnToEthiopian(jdn);
     return `${ETHIOPIAN_MONTH_NAMES[month - 1]} ${day}, ${year}`;
   } catch (error) {
